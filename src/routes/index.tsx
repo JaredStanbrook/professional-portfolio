@@ -313,15 +313,14 @@ function Homepage() {
           </p>
 
           <p className="mt-2 text-lg md:text-xl text-muted-foreground text-justify">
-            Focused on security tooling, thoughtful UX, and reliable delivery.
+            Making complex systems feel calmer.
           </p>
         </div>
 
         <div className="flex flex-col justify-center w-full md:w-1/2 self-end">
           <p className="text-lg md:text-xl text-muted-foreground max-w-xl text-justify">
-            I build tools that make systems more observable, workflows more
-            intuitive, and teams more confident. Below is a snapshot of my
-            latest projects and writing.
+            I care about collaboration, shared ownership, and doing the work
+            that makes good discussions possible.
           </p>
         </div>
       </section>

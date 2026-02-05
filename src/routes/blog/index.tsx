@@ -63,11 +63,12 @@ function BlogIndex() {
           Blog
         </p>
         <h1 className="text-4xl font-semibold md:text-5xl">
-          Writing on security and systems.
+          Stored as Markdown files. Presented as stories. From Jared.
         </h1>
         <p className="text-lg text-muted-foreground max-w-2xl">
           Research notes, build logs, and reflections from real-world security
-          and infrastructure work.
+          and infrastructure work. Thoughts, guides, and reflections gathered
+          along the way — lessons learned, notes kept, ideas tested.
         </p>
       </header>
 

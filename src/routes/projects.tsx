@@ -95,11 +95,11 @@ function ProjectsArchive() {
             Project Archive
           </p>
           <h1 className="text-4xl font-semibold md:text-5xl">
-            Work that ships.
+            Made from 100% key strokes.
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl">
-            A curated archive of security, full-stack, and operations tooling.
-            Filter by tags, status, or search for the stack you care about.
+            A curated archive of code forged from a passion for learning and
+            crafting. Filter by tags, status, or seach for one you have in mind.
           </p>
         </div>
       </header>

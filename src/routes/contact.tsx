@@ -11,12 +11,10 @@ function Contact() {
         <p className="text-sm uppercase tracking-[0.3em] text-muted-foreground">
           Contact
         </p>
-        <h1 className="text-4xl font-semibold md:text-5xl">
-          Let’s build something resilient.
-        </h1>
+        <h1 className="text-4xl font-semibold md:text-5xl">Loves a chat.</h1>
         <p className="text-lg text-muted-foreground max-w-2xl">
-          I’m open to security, IT, and full-stack roles focused on dependable
-          systems. Reach out and I’ll respond within 48 hours.
+          Open to learning, new challenges, and everything in between. Always
+          happy to connect — I’ll reply within 48 hours.
         </p>
       </header>
 
