@@ -12,6 +12,18 @@ export const blogMetadata = sqliteTable("blog_metadata", {
 });
 
 export const selectBlogMetadataSchema = createSelectSchema(blogMetadata);
+export const blogFrontmatterSchema = z.object({
+  title: z.string().min(1),
+  slug: z.string().optional(),
+  summary: z.string().optional(),
+  tags: z.array(z.string()).default([]),
+  draft: z.boolean().default(false),
+  featured: z.boolean().default(false),
+  publishedAt: z.iso.datetime().optional(),
+  updatedAt: z.iso.datetime().optional(),
+  readTime: z.number().optional(),
+  subject: z.string().optional(),
+});
 
 export const insertBlogMetadataSchema = createInsertSchema(blogMetadata, {
   filename: (s) => s.min(1, "Filename is required").regex(/\.mdx$/, "Must be an .mdx file"),
@@ -36,6 +48,12 @@ export const updateBlogMetadataSchema = createUpdateSchema(blogMetadata, {
 
 export const apiSelectBlogMetadataSchema = createSelectSchema(blogMetadata).extend({
   authorName: z.string(),
+  slug: z.string(),
+  summary: z.string().optional(),
+  tags: z.array(z.string()).default([]),
+  draft: z.boolean().default(false),
+  featured: z.boolean().default(false),
+  publishedAt: z.iso.datetime().optional(),
 });
 export const apiBlogPayloadSchema = insertBlogMetadataSchema
   .pick({
@@ -60,6 +78,12 @@ export const apiBlogResponseSchema = z.object({
     .extend({
       authorId: z.string(),
       authorName: z.string(),
+      slug: z.string(),
+      summary: z.string().optional(),
+      tags: z.array(z.string()).default([]),
+      draft: z.boolean().default(false),
+      featured: z.boolean().default(false),
+      publishedAt: z.iso.datetime().optional(),
     }),
 });
 

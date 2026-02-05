@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getUserQueryOptions } from "@/api/authApi";
 import { getBlogContentQueryOptions } from "@/api/blogApi";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 export const Route = createFileRoute("/blog/$slug")({
   component: BlogView,
@@ -17,9 +18,7 @@ function BlogView() {
   const filename = `${slug}.mdx`;
   const navigate = useNavigate();
 
-  // Auth query
   const { data: userData } = useQuery(getUserQueryOptions);
-
   const { data: blog, isPending, error } = useQuery(getBlogContentQueryOptions(filename));
 
   const formatDate = (dateString: string) => {
@@ -31,7 +30,6 @@ function BlogView() {
     });
   };
 
-  // Loading skeleton
   if (isPending) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-12">
@@ -48,7 +46,6 @@ function BlogView() {
     );
   }
 
-  // Error or no blog found
   if (error || !blog) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-12">
@@ -56,7 +53,7 @@ function BlogView() {
           <h1 className="text-3xl font-bold text-foreground mb-4">
             {error?.message || "Blog not found"}
           </h1>
-          <Button variant="outline" onClick={() => navigate({ to: "/" })}>
+          <Button variant="outline" onClick={() => navigate({ to: "/blog" })}>
             <span className="text-base">Back</span>
             <span className="text-xs ml-1 text-foreground/75">Back</span>
             <span className="text-tiny ml-1 text-foreground/50">Back</span>
@@ -69,7 +66,7 @@ function BlogView() {
   return (
     <>
       <div className="flex justify-center py-8 gap-3">
-        <Button variant="outline" onClick={() => navigate({ to: "/" })}>
+        <Button variant="outline" onClick={() => navigate({ to: "/blog" })}>
           <span className="text-base">Back</span>
           <span className="text-xs ml-1 text-foreground/75">Back</span>
           <span className="text-tiny ml-1 text-foreground/50">Back</span>
@@ -118,6 +115,24 @@ function BlogView() {
               {blog.metadata.title}
             </h1>
 
+            {blog.metadata.summary && (
+              <p className="text-lg text-muted-foreground mb-8 max-w-2xl">
+                {blog.metadata.summary}
+              </p>
+            )}
+
+            {blog.metadata.tags?.length ? (
+              <div className="flex flex-wrap gap-2 mb-8">
+                {blog.metadata.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            ) : null}
+
             <article
               className="prose prose-lg dark:prose-invert max-w-none
                 prose-headings:text-foreground 
@@ -129,7 +144,23 @@ function BlogView() {
                 prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground
                 prose-img:rounded-lg prose-img:shadow-lg
                 prose-hr:border-border">
-              <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                rehypePlugins={[rehypeRaw]}
+                components={{
+                  code({ className, children, ...props }) {
+                    const isBlock = className?.includes("language-");
+                    if (!isBlock) {
+                      return (
+                        <code className={className} {...props}>
+                          {children}
+                        </code>
+                      );
+                    }
+                    const rawCode = String(children).replace(/\n$/, "");
+                    return <CodeBlock code={rawCode} className={className} />;
+                  },
+                }}>
                 {blog.content}
               </ReactMarkdown>
             </article>
@@ -137,5 +168,33 @@ function BlogView() {
         </section>
       </div>
     </>
+  );
+}
+
+function CodeBlock({ code, className }: { code: string; className?: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+    }
+  };
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={handleCopy}
+        className="absolute right-3 top-3 rounded-md border border-border bg-background/80 px-2 py-1 text-xs text-muted-foreground hover:text-foreground">
+        {copied ? "Copied" : "Copy"}
+      </button>
+      <pre className={className}>
+        <code>{code}</code>
+      </pre>
+    </div>
   );
 }

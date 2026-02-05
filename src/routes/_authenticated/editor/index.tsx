@@ -21,6 +21,12 @@ function NewBlogEditor() {
   const [title, setTitle] = useState("");
   const [readTime, setReadTime] = useState(5);
   const [subject, setSubject] = useState("");
+  const [summary, setSummary] = useState("");
+  const [tags, setTags] = useState("");
+  const [publishedAt, setPublishedAt] = useState("");
+  const [updatedAt, setUpdatedAt] = useState("");
+  const [draft, setDraft] = useState(false);
+  const [featured, setFeatured] = useState(false);
   const [content, setContent] = useState("");
   const [filename, setFilename] = useState("");
 
@@ -31,11 +37,25 @@ function NewBlogEditor() {
     return content.replace(/^---\n[\s\S]+?\n---\n/, "").trim();
   }, [content]);
 
+  const toIsoString = (value: string) =>
+    value ? new Date(value).toISOString() : new Date().toISOString();
+
   const generateMDX = () => {
     return `---
 title: "${title.trim()}"
 readTime: ${readTime}
 subject: "${subject.trim()}"
+summary: "${summary.trim()}"
+tags: [${tags
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter(Boolean)
+      .map((tag) => `"${tag}"`)
+      .join(", ")}]
+draft: ${draft}
+featured: ${featured}
+publishedAt: "${toIsoString(publishedAt)}"
+updatedAt: "${toIsoString(updatedAt)}"
 ---
 
 ${content.trim()}`;
@@ -147,6 +167,68 @@ ${content.trim()}`;
                 placeholder="Technology, Design, etc."
               />
             </div>
+
+            <div>
+              <Label htmlFor="summary">Summary</Label>
+              <Input
+                id="summary"
+                type="text"
+                value={summary}
+                onChange={(e) => setSummary(e.target.value)}
+                placeholder="Short summary for previews"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="tags">Tags</Label>
+              <Input
+                id="tags"
+                type="text"
+                value={tags}
+                onChange={(e) => setTags(e.target.value)}
+                placeholder="security, cloud, tooling"
+              />
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <Label htmlFor="publishedAt">Published At</Label>
+                <Input
+                  id="publishedAt"
+                  type="datetime-local"
+                  value={publishedAt}
+                  onChange={(e) => setPublishedAt(e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="updatedAt">Updated At</Label>
+                <Input
+                  id="updatedAt"
+                  type="datetime-local"
+                  value={updatedAt}
+                  onChange={(e) => setUpdatedAt(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-6">
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={draft}
+                  onChange={(e) => setDraft(e.target.checked)}
+                />
+                Draft
+              </label>
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={featured}
+                  onChange={(e) => setFeatured(e.target.checked)}
+                />
+                Featured
+              </label>
+            </div>
           </div>
 
           {/* Content Editor */}
@@ -183,6 +265,7 @@ ${content.trim()}`;
             <div className="text-sm text-muted-foreground mt-1">
               {readTime} min read • {subject || "No subject"}
             </div>
+            {summary && <p className="mt-2 text-sm text-muted-foreground">{summary}</p>}
           </div>
 
           <div className="prose prose-lg dark:prose-invert max-w-none">

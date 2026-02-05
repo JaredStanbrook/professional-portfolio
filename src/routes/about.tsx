@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 
 import {
   Card,
@@ -10,6 +10,7 @@ import {
   CardItem,
   CardImage,
 } from "@/components/ui/customcard";
+import { featuredProjects } from "@/data/projects";
 
 export const Route = createFileRoute("/about")({
   component: Homepage,
@@ -334,172 +335,30 @@ function Homepage() {
             </div>
             <div>
               <ul className="group/list">
-                <li className="mb-12">
-                  <Card>
-                    <CardContent>
-                      <CardTitle href="https://github.com/TeamFixIT/portscan-delta-reporter">
-                        Port Scanner Delta Reporter
-                      </CardTitle>
-                      <CardDescription>
-                        A network security monitoring system that performs automated port scans and
-                        generates delta reports. Features scheduled scanning, change detection,
-                        comprehensive reporting with CSV exports, and a responsive dashboard for
-                        tracking network vulnerabilities across multiple hosts.
-                      </CardDescription>
-                      <CardFooter>
-                        <CardItem>Python</CardItem>
-                        <CardItem>Flask</CardItem>
-                        <CardItem>SQLAlchemy</CardItem>
-                        <CardItem>Nmap</CardItem>
-                      </CardFooter>
-                    </CardContent>
-                    <CardImage src="https://stanbrook.me/portscan-delta-reporter-preview.png" />
-                  </Card>
-                </li>
-                <li className="mb-12">
-                  <Card>
-                    <CardContent>
-                      <CardTitle href="https://github.com/JaredStanbrook/SmartAlertSystem">
-                        Motion Sensor Monitor
-                      </CardTitle>
-                      <CardDescription>
-                        A real-time smart home dashboard for monitoring motion and door sensors.
-                        Features live status, frequency-based activity analysis, and a downloadable
-                        activity log. Built with a modern UI, real-time updates via Socket.IO, and
-                        interactive charts for data visualization.
-                      </CardDescription>
-                      <CardFooter>
-                        <CardItem>HTML5</CardItem>
-                        <CardItem>CSS3</CardItem>
-                        <CardItem>JavaScript</CardItem>
-                        <CardItem>Socket.IO</CardItem>
-                        <CardItem>Chart.js</CardItem>
-                        <CardItem>Express.js</CardItem>
-                        <CardItem>Raspberry Pi</CardItem>
-                      </CardFooter>
-                    </CardContent>
-                    <CardImage src="https://stanbrook.me/sensor-monitor-preview.png" />
-                  </Card>
-                </li>
-                <li className="mb-12">
-                  <Card>
-                    <CardContent>
-                      <CardTitle href="https://github.com/JaredStanbrook/TenantSystem">
-                        Tenant System
-                      </CardTitle>
-                      <CardDescription>
-                        A full-stack property management platform for tenants and landlords.
-                        Features include expense and bill tracking, property and tenant management,
-                        authentication, and a modern, responsive UI. Built to streamline rental
-                        workflows and enhance communication between all parties.
-                      </CardDescription>
-                      <CardFooter>
-                        <CardItem>TypeScript</CardItem>
-                        <CardItem>React</CardItem>
-                        <CardItem>TanStack Router</CardItem>
-                        <CardItem>Tailwind CSS</CardItem>
-                        <CardItem>Hono</CardItem>
-                        <CardItem>Bun</CardItem>
-                        <CardItem>Drizzle ORM</CardItem>
-                      </CardFooter>
-                    </CardContent>
-                    <CardImage src="https://stanbrook.me/tenant-system-preview.png" />
-                  </Card>
-                </li>
-                <li className="mb-12">
-                  <Card>
-                    <CardContent>
-                      <CardTitle href="/">Greenova – Envenge Group</CardTitle>
-                      <CardDescription>
-                        Developed <strong>Greenova</strong>, a Django-based web application for
-                        streamlining environmental management and compliance tracking. The platform
-                        featured a modular, accessible interface and supported efficient workflows
-                        for managing obligations, documentation, and team responsibilities. Used
-                        Docker and a VS Code dev container to ensure a consistent and reproducible
-                        development environment.
-                      </CardDescription>
-
-                      <CardFooter>
-                        <CardItem>Django</CardItem>
-                        <CardItem>Docker</CardItem>
-                        <CardItem>VS Code Dev Containers</CardItem>
-                        <CardItem>PicoCSS</CardItem>
-                        <CardItem>Python</CardItem>
-                        <CardItem>Github</CardItem>
-                      </CardFooter>
-                    </CardContent>
-                    <CardImage src="https://stanbrook.me/greenova-preview.png"></CardImage>
-                  </Card>
-                </li>
-                <li className="mb-12">
-                  <Card>
-                    <CardContent>
-                      <CardTitle href="/">IT Service Desk Portal | Website</CardTitle>
-                      <CardDescription>
-                        This website was developed to address the unique needs of our student-run
-                        support desk, enhancing efficiency by digitising client records and feedback
-                        forms to streamline service and improve customer support.
-                      </CardDescription>
-
-                      <CardFooter>
-                        <CardItem>Typescript</CardItem>
-                        <CardItem>Tailwind CSS</CardItem>
-                        <CardItem>React</CardItem>
-                        <CardItem>Hono</CardItem>
-                        <CardItem>Bun</CardItem>
-                        <CardItem>SQLite</CardItem>
-                      </CardFooter>
-                    </CardContent>
-                    <CardImage src="https://stanbrook.me/it-service-desk-preview.png"></CardImage>
-                  </Card>
-                </li>
-                <li className="mb-12">
-                  <Card>
-                    <CardContent>
-                      <CardTitle href="https://github.com/JaredStanbrook/MyOwnBusinessSystem">
-                        MOBS | Invoice System
-                      </CardTitle>
-                      <CardDescription>
-                        I developed My Own Business System to cater specifically to my needs as an
-                        independent disability support worker, streamlining the process of creating
-                        invoices.
-                      </CardDescription>
-                      <CardFooter>
-                        <CardItem>Mongo DB</CardItem>
-                        <CardItem>Express.js</CardItem>
-                        <CardItem>Pug</CardItem>
-                        <CardItem>Node.js</CardItem>
-                      </CardFooter>
-                    </CardContent>
-                    <CardImage src="https://stanbrook.me/mobs-preview.png"></CardImage>
-                  </Card>
-                </li>
-                <li className="mb-12">
-                  <Card>
-                    <CardContent>
-                      <CardTitle href="/about">Professional Portfolio | Website</CardTitle>
-                      <CardDescription>
-                        This website was developed for the purpose of displaying my achievements and
-                        digitally represent my passion for technology.
-                      </CardDescription>
-                      <CardFooter>
-                        <CardItem>Typescript</CardItem>
-                        <CardItem>Tailwind CSS</CardItem>
-                        <CardItem>React</CardItem>
-                        <CardItem>Hono</CardItem>
-                        <CardItem>Bun</CardItem>
-                      </CardFooter>
-                    </CardContent>
-                    <CardImage src="https://stanbrook.me/portfolio-preview.png"></CardImage>
-                  </Card>
-                </li>
+                {featuredProjects.map((project) => (
+                  <li className="mb-12" key={project.slug}>
+                    <Card>
+                      <CardContent>
+                        <CardTitle href={`/projects/${project.slug}`}>{project.title}</CardTitle>
+                        <CardDescription>{project.summary}</CardDescription>
+                        <CardFooter>
+                          {project.techStack.map((item) => (
+                            <CardItem key={`${project.slug}-${item}`}>{item}</CardItem>
+                          ))}
+                        </CardFooter>
+                      </CardContent>
+                      {project.screenshots?.[0] && (
+                        <CardImage src={project.screenshots[0]} alt={project.title} />
+                      )}
+                    </Card>
+                  </li>
+                ))}
               </ul>
               <div className="mt-12">
-                <a
+                <Link
                   className="inline-flex items-center font-medium leading-tight text-foreground group"
                   aria-label="View Full Project Archive"
-                  href="#projects">
-                  {/* TODO: Link to full project archive */}
+                  to="/projects">
                   <span>
                     <span className="border-b border-transparent pb-px transition group-hover:border-primary motion-reduce:transition-none">
                       View Full Project&nbsp;
@@ -521,7 +380,7 @@ function Homepage() {
                       </svg>
                     </span>
                   </span>
-                </a>
+                </Link>
               </div>
             </div>
           </section>

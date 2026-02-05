@@ -15,6 +15,7 @@
     "create-admin:remote": "bun run scripts/create-admin.ts --remote",
     "deploy": "bunx wrangler types && bun run build && bunx wrangler deploy",
     "lint": "eslint .",
+    "blog:check": "bun run scripts/validate-blog.ts",
     "preview": "bun run build && vite preview",
     "prepare": "husky",
     "test": "vitest"

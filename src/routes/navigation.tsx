@@ -13,6 +13,14 @@ type NavigationItem = {
 const defaultMenu: NavigationItem[] = [
   {
     to: "/",
+    name: "Home",
+  },
+  {
+    to: "/projects",
+    name: "Projects",
+  },
+  {
+    to: "/blog",
     name: "Blog",
   },
   {
@@ -20,8 +28,8 @@ const defaultMenu: NavigationItem[] = [
     name: "About",
   },
   {
-    to: "/unimark",
-    name: "Unimark",
+    to: "/contact",
+    name: "Contact",
   },
 ];
 

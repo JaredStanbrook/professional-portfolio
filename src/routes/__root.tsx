@@ -20,9 +20,11 @@ type NavigationItem = {
 };
 
 const publicMenu: NavigationItem[] = [
-  { to: "/", name: "Blog" },
+  { to: "/", name: "Home" },
+  { to: "/projects", name: "Projects" },
+  { to: "/blog", name: "Blog" },
   { to: "/about", name: "About" },
-  { to: "/grade-calculator", name: "Grade Calculator" },
+  { to: "/contact", name: "Contact" },
 ];
 
 const authenticatedMenu: NavigationItem[] = [

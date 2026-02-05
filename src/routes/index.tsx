@@ -1,9 +1,10 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { CardContent } from "@/components/ui/card";
 import { HighlightCard, type HighlightCardSize } from "@/components/ui/highlight-card";
 import Typewriter from "@/components/typewriter";
 import type { SelectBlogMetadata } from "@server/schema/blogs.schema";
+import { featuredProjects } from "@/data/projects";
 
 export const Route = createFileRoute("/")({
   component: Homepage,
@@ -53,7 +54,9 @@ function Homepage() {
         const response = await fetch("/api/blog");
         if (response.ok) {
           const data = await response.json();
-          const sortedBlogs = [...data.blogs].sort(
+          const sortedBlogs = [...data.blogs]
+            .filter((blog) => !blog.draft)
+            .sort(
             (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
           );
           setBlogs(sortedBlogs || []);
@@ -206,9 +209,7 @@ function Homepage() {
     });
   };
 
-  const handleBlogClick = (filename: string) => {
-    // Remove .mdx extension for URL
-    const slug = filename.replace(".mdx", "");
+  const handleBlogClick = (slug: string) => {
     navigate({ to: "/blog/$slug", params: { slug } });
   };
   const cursorSize = 20 * cursorState.scale; // Base size 20px
@@ -257,19 +258,62 @@ function Homepage() {
         <div className="flex flex-col justify-center w-full md:w-1/2 self-start">
           <h1 className="text-3xl md:text-5xl font-bold text-foreground mb-4">Welcome</h1>
 
-          <p className="uppercase text-lg md:text-xl font-semibold mb-2 text-foreground">My Blog</p>
+          <p className="uppercase text-lg md:text-xl font-semibold mb-2 text-foreground">
+            Featured work
+          </p>
 
           <p className="mt-2 text-lg md:text-xl text-muted-foreground text-justify">
-            Sharing my progress, projects, and insights.
+            Focused on security tooling, thoughtful UX, and reliable delivery.
           </p>
         </div>
 
         <div className="flex flex-col justify-center w-full md:w-1/2 self-end">
           <p className="text-lg md:text-xl text-muted-foreground max-w-xl text-justify">
-            Dive into my journey as I explore, experiment, and grow. Here you'll find hands-on labs,
-            project breakdowns, and reflections on what I'm learning as a student and aspiring
-            professional.
+            I build tools that make systems more observable, workflows more intuitive, and teams
+            more confident. Below is a snapshot of my latest projects and writing.
           </p>
+        </div>
+      </section>
+      <section className="py-12 w-full">
+        <div className="w-full flex items-center justify-center my-4">
+          <span className="text-xl font-semibold tracking-widest text-foreground mr-4">
+            Projects
+          </span>
+          <hr className="w-full border-t-2 border-foreground opacity-30 self-center" />
+        </div>
+        <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
+          {featuredProjects.slice(0, 4).map((project) => (
+            <Link
+              key={project.slug}
+              to="/projects/$slug"
+              params={{ slug: project.slug }}
+              className="group rounded-2xl border border-border bg-card p-5 transition hover:-translate-y-1 hover:border-primary/40">
+              <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
+                <span className="rounded-full bg-muted px-3 py-1">{project.status}</span>
+                {project.featured && (
+                  <span className="rounded-full bg-primary/10 px-3 py-1 text-primary">
+                    Featured
+                  </span>
+                )}
+              </div>
+              <h2 className="mt-4 text-xl font-semibold text-foreground">{project.title}</h2>
+              <p className="mt-2 text-sm text-muted-foreground">{project.summary}</p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {project.tags.slice(0, 3).map((tag) => (
+                  <span
+                    key={`${project.slug}-${tag}`}
+                    className="rounded-full bg-muted/60 px-3 py-1 text-xs text-muted-foreground">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </Link>
+          ))}
+        </div>
+        <div className="mt-6 flex justify-end">
+          <Link to="/projects" className="text-sm text-primary hover:text-primary/80">
+            View all projects →
+          </Link>
         </div>
       </section>
       <main className="py-8 w-full">
@@ -298,7 +342,7 @@ function Homepage() {
                 <HighlightCard
                   key={blog.filename}
                   size={size}
-                  onClick={() => handleBlogClick(blog.filename)}
+                  onClick={() => handleBlogClick(blog.slug ?? blog.filename.replace(".mdx", ""))}
                   tabIndex={0}
                   role="button">
                   <CardContent className="p-4 flex flex-col justify-between h-full">
@@ -323,6 +367,11 @@ function Homepage() {
             })}
           </div>
         )}
+        <div className="mt-6 flex justify-end">
+          <Link to="/blog" className="text-sm text-primary hover:text-primary/80">
+            Visit the blog →
+          </Link>
+        </div>
       </main>
     </div>
   );

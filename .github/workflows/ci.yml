@@ -26,6 +26,9 @@ jobs:
             - name: Run linter
               run: bun run lint
 
+            - name: Validate blog metadata
+              run: bun run blog:check
+
             - name: Run type check
               run: bun run tsc -b --noEmit
 

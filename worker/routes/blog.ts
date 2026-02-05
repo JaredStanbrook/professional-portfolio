@@ -7,6 +7,7 @@ import { blogMetadata } from "../schema/blogs.schema";
 import type { AppEnv } from "../types";
 import { authMiddleware } from "../middleware/auth.middleware";
 import { users } from "../schema/auth.schema";
+import { getReadingTime, parseFrontMatter, stripFrontMatter } from "../utils/blog";
 
 const access = new AccessControl();
 
@@ -27,12 +28,35 @@ export const blogRoute = new Hono<AppEnv>()
         .orderBy(desc(blogMetadata.createdAt))
         .all();
 
-      const blogs = results.map((row) => ({
-        ...row,
-        authorName: row.authorName || "Anonymous",
-      }));
+      const blogs = await Promise.all(
+        results.map(async (row) => {
+          const object = await c.env.BLOG.get(row.filename);
+          const frontmatter = object ? parseFrontMatter(await object.text()) : null;
 
-      return c.json({ blogs });
+          if (frontmatter?.draft) {
+            return null;
+          }
+
+          const slug = frontmatter?.slug || row.filename.replace(/\\.mdx$/, "");
+          const tags = frontmatter?.tags ?? [];
+          const summary = frontmatter?.summary;
+          const featured = frontmatter?.featured ?? false;
+          const publishedAt = frontmatter?.publishedAt;
+
+          return {
+            ...row,
+            authorName: row.authorName || "Anonymous",
+            slug,
+            tags,
+            summary,
+            featured,
+            draft: false,
+            publishedAt,
+          };
+        })
+      );
+
+      return c.json({ blogs: blogs.filter(Boolean) });
     } catch (error) {
       console.error("Error fetching blog metadata:", error);
       return c.json({ error: "Failed to fetch blog metadata" }, 500);
@@ -61,9 +85,19 @@ export const blogRoute = new Hono<AppEnv>()
         .where(eq(blogMetadata.filename, filename))
         .get();
 
-      const content = fileContent.replace(/^---\n[\s\S]+?\n---\n/, "");
-
+      const content = stripFrontMatter(fileContent);
       const parsedFrontmatter = parseFrontMatter(fileContent);
+      const readTime = parsedFrontmatter.readTime ?? metadata?.readTime ?? getReadingTime(content);
+      const user = c.var.auth.user;
+
+      if (parsedFrontmatter.draft) {
+        const isOwner = user?.id && metadata?.userId === user.id;
+        const isPrivileged =
+          user?.roles?.includes("admin") || user?.roles?.includes("editor") || isOwner;
+        if (!isPrivileged) {
+          return c.json({ error: "Blog not found" }, 404);
+        }
+      }
 
       const authorName = metadata?.userId
         ? (await db.select().from(users).where(eq(users.id, metadata.userId)).get())?.displayName ||
@@ -74,12 +108,18 @@ export const blogRoute = new Hono<AppEnv>()
         content,
         metadata: {
           title: metadata?.title || parsedFrontmatter.title,
-          readTime: metadata?.readTime || parsedFrontmatter.readTime,
-          subject: metadata?.subject || parsedFrontmatter.subject,
+          readTime,
+          subject: metadata?.subject || parsedFrontmatter.subject || "General",
           createdAt: metadata?.createdAt || new Date().toISOString(),
           updatedAt: metadata?.updatedAt || new Date().toISOString(),
           authorId: metadata?.userId,
           authorName,
+          slug: parsedFrontmatter.slug || filename.replace(/\\.mdx$/, ""),
+          summary: parsedFrontmatter.summary,
+          tags: parsedFrontmatter.tags ?? [],
+          draft: parsedFrontmatter.draft ?? false,
+          featured: parsedFrontmatter.featured ?? false,
+          publishedAt: parsedFrontmatter.publishedAt,
         },
       });
     } catch (err) {
@@ -115,6 +155,8 @@ export const blogRoute = new Hono<AppEnv>()
 
       // 2. Parse Metadata from the MDX body
       const meta = parseFrontMatter(body);
+      const content = stripFrontMatter(body);
+      const readTime = meta.readTime ?? getReadingTime(content);
 
       // 3. Save file to R2
       await c.env.BLOG.put(filename, body);
@@ -124,16 +166,16 @@ export const blogRoute = new Hono<AppEnv>()
         .values({
           filename,
           title: meta.title,
-          readTime: meta.readTime,
-          subject: meta.subject,
+          readTime,
+          subject: meta.subject ?? "General",
           userId: existing ? existing.userId : user.id,
         })
         .onConflictDoUpdate({
           target: blogMetadata.filename,
           set: {
             title: meta.title,
-            readTime: meta.readTime,
-            subject: meta.subject,
+            readTime,
+            subject: meta.subject ?? "General",
             updatedAt: new Date().toISOString(), // Force update timestamp
           },
         });
@@ -141,7 +183,11 @@ export const blogRoute = new Hono<AppEnv>()
       return c.json({
         ok: true,
         filename,
-        metadata: meta,
+        metadata: {
+          ...meta,
+          readTime,
+          subject: meta.subject ?? "General",
+        },
       });
     } catch (error: any) {
       // Handle Access Control Errors (403) specifically
@@ -192,23 +238,3 @@ export const blogRoute = new Hono<AppEnv>()
   });
 
 // --- Helper ---
-
-function parseFrontMatter(content: string) {
-  const match = content.match(/^---\n([\s\S]+?)\n---/);
-  let title = "Untitled";
-  let readTime = 0;
-  let subject = "General";
-
-  if (match) {
-    const frontmatter = match[1];
-    const titleMatch = frontmatter.match(/title:\s*["']?(.+?)["']?$/m);
-    const readTimeMatch = frontmatter.match(/readTime:\s*(\d+)/m);
-    const subjectMatch = frontmatter.match(/subject:\s*["']?(.+?)["']?$/m);
-
-    if (titleMatch) title = titleMatch[1].trim();
-    if (readTimeMatch) readTime = parseInt(readTimeMatch[1], 10);
-    if (subjectMatch) subject = subjectMatch[1].trim();
-  }
-
-  return { title, readTime, subject };
-}

@@ -8,7 +8,7 @@ import {
   type SelectBlogMetadata,
   type BlogPayload,
   apiBlogResponseSchema,
-  selectBlogMetadataSchema,
+  apiSelectBlogMetadataSchema,
 } from "@server/schema/blogs.schema";
 
 export const blogKeys = {
@@ -27,7 +27,7 @@ export async function getAllBlogs() {
   const data = await res.json();
 
   // Runtime Validation: Ensure backend sends what we expect
-  const result = z.array(selectBlogMetadataSchema).safeParse(data.blogs);
+  const result = z.array(apiSelectBlogMetadataSchema).safeParse(data.blogs);
   if (!result.success) {
     console.error("API Contract Violation:", result.error);
     throw new Error("Invalid data received from server");
