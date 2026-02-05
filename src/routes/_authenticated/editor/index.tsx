@@ -41,24 +41,42 @@ function NewBlogEditor() {
     value ? new Date(value).toISOString() : new Date().toISOString();
 
   const generateMDX = () => {
-    return `---
-title: "${title.trim()}"
-readTime: ${readTime}
-subject: "${subject.trim()}"
-summary: "${summary.trim()}"
-tags: [${tags
+    const lines = [
+      `title: "${title.trim()}"`,
+      `readTime: ${readTime}`,
+      `subject: "${subject.trim()}"`,
+    ];
+
+    if (summary.trim()) {
+      lines.push(`summary: "${summary.trim()}"`);
+    }
+
+    const tagList = tags
       .split(",")
       .map((tag) => tag.trim())
       .filter(Boolean)
-      .map((tag) => `"${tag}"`)
-      .join(", ")}]
-draft: ${draft}
-featured: ${featured}
-publishedAt: "${toIsoString(publishedAt)}"
-updatedAt: "${toIsoString(updatedAt)}"
----
+      .map((tag) => `"${tag}"`);
+    if (tagList.length) {
+      lines.push(`tags: [${tagList.join(", ")}]`);
+    }
 
-${content.trim()}`;
+    if (draft) {
+      lines.push("draft: true");
+    }
+
+    if (featured) {
+      lines.push("featured: true");
+    }
+
+    if (publishedAt) {
+      lines.push(`publishedAt: "${toIsoString(publishedAt)}"`);
+    }
+
+    if (updatedAt) {
+      lines.push(`updatedAt: "${toIsoString(updatedAt)}"`);
+    }
+
+    return `---\n${lines.join("\n")}\n---\n\n${content.trim()}`;
   };
 
   const handleSave = async () => {
