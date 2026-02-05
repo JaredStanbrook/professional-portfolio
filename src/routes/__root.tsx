@@ -28,6 +28,7 @@ const publicMenu: NavigationItem[] = [
 ];
 
 const authenticatedMenu: NavigationItem[] = [
+  { to: "/editor", name: "New Blog", authRequired: true },
   { to: "/dashboard", name: "Dashboard", authRequired: true },
   { to: "/profile", name: "Profile", authRequired: true },
 ];
