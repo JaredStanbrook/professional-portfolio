@@ -23,13 +23,15 @@ export const githubRoute = new Hono<AppEnv>().get("/*", async (c) => {
   }
   console.log(fullUrl);
   try {
-    const res = await fetch(fullUrl, {
-      headers: {
-        Authorization: `Bearer ${c.env.GITHUB_API_TOKEN}`,
-        Accept: "application/vnd.github.v3+json",
-        "User-Agent": "Hono-App",
-      },
-    });
+    const headers: Record<string, string> = {
+      Accept: "application/vnd.github.v3+json",
+      "User-Agent": "Hono-App",
+    };
+    if (c.env.GITHUB_API_TOKEN) {
+      headers.Authorization = `Bearer ${c.env.GITHUB_API_TOKEN}`;
+    }
+
+    const res = await fetch(fullUrl, { headers });
 
     const data = await res.json();
 

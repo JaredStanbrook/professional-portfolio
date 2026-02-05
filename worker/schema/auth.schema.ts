@@ -2,7 +2,7 @@
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { relations, sql } from "drizzle-orm";
-import { email, z } from "zod";
+import { z } from "zod";
 
 // Helper for generating UUIDs
 const genId = () => crypto.randomUUID();
@@ -216,7 +216,7 @@ export const registerPasskeyVerifySchema = z.object({
       transports: z.array(z.string()).optional(),
       // extensions and other optional fields can be added if needed
     }),
-    clientExtensionResults: z.object({}).optional(),
+    clientExtensionResults: z.record(z.string(), z.unknown()).optional(),
     authenticatorAttachment: z.enum(["platform", "cross-platform"]).optional(),
   }),
 });
@@ -239,7 +239,7 @@ export const loginPasskeyVerifySchema = z.object({
       signature: base64UrlString,
       userHandle: base64UrlString.optional(),
     }),
-    clientExtensionResults: z.object({}).optional(),
+    clientExtensionResults: z.record(z.string(), z.unknown()).optional(),
     authenticatorAttachment: z.enum(["platform", "cross-platform"]).optional(),
   }),
 });

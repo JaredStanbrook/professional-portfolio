@@ -1,9 +1,9 @@
 import { createMiddleware } from "hono/factory";
-import type { Variables } from "../types";
+import type { Bindings, Variables } from "../types";
 import { parseAuthConfig, type AuthMethod } from "../config/auth.config";
 
 export const configMiddleware = createMiddleware<{
-  Bindings: Env;
+  Bindings: Bindings;
   Variables: Variables;
 }>(async (c, next) => {
   const authConfig = parseAuthConfig(c.env);

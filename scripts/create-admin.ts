@@ -35,7 +35,7 @@ async function main() {
       type: "text",
       name: "email",
       message: "Admin Email:",
-      validate: (value) => (value.includes("@") ? true : "Invalid email"),
+      validate: (value: string) => (value.includes("@") ? true : "Invalid email"),
     },
     {
       type: "text",
@@ -53,7 +53,8 @@ async function main() {
       type: "password",
       name: "password",
       message: "Password:",
-      validate: (value) => (value.length < (isRemote ? 8 : 0) ? "Must be 8+ chars" : true),
+      validate: (value: string) =>
+        value.length < (isRemote ? 8 : 0) ? "Must be 8+ chars" : true,
     },
   ])) as PromptResponse;
 

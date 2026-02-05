@@ -1,10 +1,11 @@
 import { useState } from "react";
-import QRCode from "qrcode.react"; // npm install qrcode.react
+import { QRCodeCanvas } from "qrcode.react";
 import {
   useSetupTotpMutation,
   useEnableTotpMutation,
   useDisableTotpMutation,
   getUserQueryOptions,
+  type TotpSetupResponse,
 } from "@/api/authApi";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -21,7 +22,7 @@ export function TotpSettings() {
   const { data: user } = useQuery(getUserQueryOptions);
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState<"IDLE" | "SCAN" | "SUCCESS">("IDLE");
-  const [secretData, setSecretData] = useState<{ secret: string; otpauthUrl: string } | null>(null);
+  const [secretData, setSecretData] = useState<TotpSetupResponse | null>(null);
   const [code, setCode] = useState("");
 
   const setupMutation = useSetupTotpMutation();
@@ -82,7 +83,7 @@ export function TotpSettings() {
           {step === "SCAN" && secretData && (
             <div className="flex flex-col items-center space-y-6">
               <div className="bg-white p-4 rounded-lg">
-                <QRCode value={secretData.otpauthUrl} size={180} />
+                <QRCodeCanvas value={secretData.otpauthUrl} size={180} />
               </div>
 
               <div className="text-center text-sm text-muted-foreground">

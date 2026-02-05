@@ -3,7 +3,12 @@ import { useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { toast } from "sonner";
 import { Copy, Check, Loader2, ShieldCheck, Smartphone } from "lucide-react";
-import { useSetupTotpMutation, useEnableTotpMutation, useDisableTotpMutation } from "@/api/authApi";
+import {
+  useSetupTotpMutation,
+  useEnableTotpMutation,
+  useDisableTotpMutation,
+  type TotpSetupResponse,
+} from "@/api/authApi";
 
 // UI Components
 import { Button } from "@/components/ui/button";
@@ -28,7 +33,7 @@ export function TotpSettingsCard({ isEnabled }: TotpSettingsProps) {
   const [step, setStep] = useState<"LOADING" | "SCAN" | "SUCCESS">("LOADING");
 
   // State for Data
-  const [secretData, setSecretData] = useState<{ secret: string; otpauthUrl: string } | null>(null);
+  const [secretData, setSecretData] = useState<TotpSetupResponse | null>(null);
   const [code, setCode] = useState("");
   const [copied, setCopied] = useState(false);
 

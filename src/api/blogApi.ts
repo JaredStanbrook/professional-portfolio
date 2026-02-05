@@ -143,7 +143,7 @@ export function useDeleteBlogMutation() {
 
   return useMutation({
     mutationFn: deleteBlogContent,
-    onSuccess: (data, filename) => {
+    onSuccess: (_data, filename) => {
       toast.info("Blog deleted");
 
       // 1. Optimistic List Update: Remove item from list immediately

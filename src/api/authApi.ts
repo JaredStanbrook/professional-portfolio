@@ -36,6 +36,10 @@ type AuthResult = {
   user?: SafeUser;
   requireTotp?: boolean;
 };
+export type TotpSetupResponse = {
+  secret: string;
+  otpauthUrl: string;
+};
 type RegistrationOptionsJSON = Parameters<typeof startRegistration>[0]["optionsJSON"];
 type AuthenticationOptionsJSON = Parameters<typeof startAuthentication>[0]["optionsJSON"];
 
@@ -154,7 +158,11 @@ export async function registerUserPasskey({ email }: Pick<RegisterPasskeyVerify,
 
   // 3. Verify
   const verRes = await auth.passkey.register.verify.$post({
-    json: { email, response: attResp, challengeId: options.challengeId },
+    json: {
+      email,
+      response: attResp as RegisterPasskeyVerify["response"],
+      challengeId: options.challengeId,
+    },
   });
 
   if (!verRes.ok) throw new Error(await getErrorMessage(verRes));
@@ -188,7 +196,11 @@ export async function loginUserPasskey({ email }: Pick<LoginPasskeyVerify, "emai
 
   // 3. Verify
   const verRes = await auth.passkey.login.verify.$post({
-    json: { email, response: authResp, challengeId: options.challengeId },
+    json: {
+      email,
+      response: authResp as LoginPasskeyVerify["response"],
+      challengeId: options.challengeId,
+    },
   });
 
   if (!verRes.ok) throw new Error(await getErrorMessage(verRes));
@@ -212,7 +224,7 @@ export function useSetupTotpMutation() {
     mutationFn: async () => {
       const res = await auth.totp.setup.$get();
       if (!res.ok) throw new Error(await getErrorMessage(res));
-      return await readJson<unknown>(res);
+      return await readJson<TotpSetupResponse>(res);
     },
     onError: (err: unknown) => toast.error(getToastMessage(err)),
   });
@@ -262,7 +274,7 @@ export function useLogoutMutation() {
     mutationFn: logoutUser,
     onSuccess: () => {
       toast.info("Logged out");
-      queryClient.setQueryData(getUserQueryOptions.queryKey, null);
+      queryClient.setQueryData(getUserQueryOptions.queryKey, undefined);
       window.location.href = "/"; // Hard reload to clear client state often safer
     },
   });

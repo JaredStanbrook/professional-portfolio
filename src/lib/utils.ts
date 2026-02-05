@@ -14,12 +14,17 @@ export function blogFilenameFromSlug(value: string) {
 }
 export async function getErrorMessage(res: Response): Promise<string> {
   try {
-    const data = (await res.json()) as { error?: string; message?: string };
-    if (typeof data.error === "string" && data.error.length > 0) {
-      return data.error;
-    }
-    if (typeof data.message === "string" && data.message.length > 0) {
-      return data.message;
+    const data: unknown = await res.json();
+    if (typeof data === "object" && data !== null) {
+      const error = "error" in data ? data.error : undefined;
+      const message = "message" in data ? data.message : undefined;
+
+      if (typeof error === "string" && error.length > 0) {
+        return error;
+      }
+      if (typeof message === "string" && message.length > 0) {
+        return message;
+      }
     }
     return "An unexpected error occurred";
   } catch {

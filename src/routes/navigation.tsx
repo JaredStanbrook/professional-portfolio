@@ -83,7 +83,7 @@ function Navigation() {
 
             {userError && (
               <>
-                <Link to={"/signup"} activeProps={{ className: `font-normal underline` }}>
+                <Link to={"/register"} activeProps={{ className: `font-normal underline` }}>
                   {"Create Account"}
                 </Link>
                 <Link to={"/login"} activeProps={{ className: `font-normal underline` }}>
@@ -98,7 +98,7 @@ function Navigation() {
                   Log out
                 </button>
                 <p> | </p>
-                <div>Welcome back, {userData?.firstName}</div>
+                <div>Welcome back, {userData?.displayName ?? userData?.username ?? "friend"}</div>
               </div>
             )}
           </nav>

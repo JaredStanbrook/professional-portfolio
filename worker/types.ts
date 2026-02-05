@@ -1,3 +1,4 @@
+/// <reference types="@cloudflare/workers-types" />
 import { drizzle } from "drizzle-orm/d1";
 import type { AuthConfig } from "./config/auth.config";
 import type { Auth } from "./services/auth.service";
@@ -8,6 +9,7 @@ export type Bindings = {
   ASSETS: Fetcher;
   BLOG: R2Bucket;
   RATE_LIMITER: RateLimit;
+  GITHUB_API_TOKEN?: string;
 };
 export type Variables = {
   db: ReturnType<typeof drizzle>;

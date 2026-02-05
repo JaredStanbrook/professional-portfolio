@@ -50,7 +50,13 @@ worker.get("/rss.xml", async (c) => {
 
   const results = await db
     .select({
-      ...blogMetadata,
+      filename: blogMetadata.filename,
+      title: blogMetadata.title,
+      readTime: blogMetadata.readTime,
+      subject: blogMetadata.subject,
+      userId: blogMetadata.userId,
+      createdAt: blogMetadata.createdAt,
+      updatedAt: blogMetadata.updatedAt,
       authorName: users.displayName,
     })
     .from(blogMetadata)
@@ -59,7 +65,7 @@ worker.get("/rss.xml", async (c) => {
     .all();
 
   const items = await Promise.all(
-    results.map(async (row) => {
+    results.map(async (row: { filename: string; title: string; createdAt: string }) => {
       const object = await c.env.BLOG.get(row.filename);
       if (!object) return null;
       const raw = await object.text();
@@ -91,7 +97,7 @@ worker.get("/sitemap.xml", async (c) => {
 
   const results = await db.select().from(blogMetadata).all();
   const blogUrls = await Promise.all(
-    results.map(async (row) => {
+    results.map(async (row: { filename: string; title: string; createdAt: string }) => {
       const object = await c.env.BLOG.get(row.filename);
       if (!object) return null;
       const raw = await object.text();

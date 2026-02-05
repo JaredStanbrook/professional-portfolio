@@ -247,7 +247,7 @@ function SupportDashboard() {
                         animationEasing="ease-in-out"
                         radius={[10, 10, 0, 0]} // Rounded corners for the bars
                       >
-                        {dailyInteractions.map((entry, index) => (
+                        {dailyInteractions.map((_entry, index) => (
                           <Cell
                             key={`cell-${index}`}
                             fill={COLORS[index % COLORS.length]}
@@ -356,7 +356,7 @@ function SupportDashboard() {
                           activeShape={renderActiveShape}
                           onMouseEnter={onPieEnterCollaboration}
                         >
-                          {collaborationData.map((entry, index) => (
+                          {collaborationData.map((_entry, index) => (
                             <Cell
                               key={`cell-${index}`}
                               fill={COLORS[index % COLORS.length]}
