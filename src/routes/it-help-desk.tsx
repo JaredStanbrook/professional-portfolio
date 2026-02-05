@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import badge01 from "@/assets/badge01.svg";
@@ -76,11 +76,19 @@ function SupportDashboard() {
     { name: "Collaborative Support", value: 13 },
   ];
 
-  const COLORS = ["#1E3A8A", "#2563EB", "#3B82F6", "#60A5FA", "#93C5FD", "#BFDBFE"];
+  const COLORS = [
+    "#1E3A8A",
+    "#2563EB",
+    "#3B82F6",
+    "#60A5FA",
+    "#93C5FD",
+    "#BFDBFE",
+  ];
 
   // State for active indices of the pie charts
 
-  const [activeIndexCollaboration, setActiveIndexCollaboration] = useState<number>(0);
+  const [activeIndexCollaboration, setActiveIndexCollaboration] =
+    useState<number>(0);
 
   const onPieEnterCollaboration = (_: any, index: number) => {
     setActiveIndexCollaboration(index);
@@ -88,10 +96,22 @@ function SupportDashboard() {
   const total = collaborationData.reduce((acc, cur) => acc + cur.value, 0);
   const activePercentage =
     activeIndexCollaboration !== null
-      ? ((collaborationData[activeIndexCollaboration].value / total) * 100).toFixed(1)
+      ? (
+          (collaborationData[activeIndexCollaboration].value / total) *
+          100
+        ).toFixed(1)
       : null;
   const renderActiveShape = (props: any) => {
-    const { cx, cy, innerRadius, outerRadius, cornerRadius, startAngle, endAngle, fill } = props;
+    const {
+      cx,
+      cy,
+      innerRadius,
+      outerRadius,
+      cornerRadius,
+      startAngle,
+      endAngle,
+      fill,
+    } = props;
     return (
       <g>
         <Sector
@@ -122,7 +142,8 @@ function SupportDashboard() {
       src: "https://images.credly.com/images/fc1352af-87fa-4947-ba54-398a0e63322e/security-compliance-and-identity-fundamentals-600x600.png",
       alt: "SC-900 Badge",
       url: "https://www.credly.com/users/jared-stanbrook",
-      tooltip: "Microsoft Certified: Security, Compliance, and Identity Fundamentals",
+      tooltip:
+        "Microsoft Certified: Security, Compliance, and Identity Fundamentals",
     },
     {
       src: badge02,
@@ -134,13 +155,14 @@ function SupportDashboard() {
       src: badge01,
       alt: "MS-900 Badge",
       url: "https://learn.microsoft.com/api/achievements/share/en-us/JaredStanbrook-5821/B6LGLXND?sharingId=B519DFD4EAAE8B7D",
-      tooltip: "MS-900 Microsoft 365 Fundamentals: Describe Microsoft 365 apps and services",
+      tooltip:
+        "MS-900 Microsoft 365 Fundamentals: Describe Microsoft 365 apps and services",
     },
   ];
   //<GitHubRepoStats owner="JaredStanbrook" repo="it-service-desk" />
   return (
     <>
-      <div className="space-y-4">
+      <div className="space-y-4 lg:py-20">
         <div className="lg:sticky lg:top-0 lg:flex lg:flex-col lg:py-24 gap-4">
           <Card className="mb-1">
             <CardHeader>
@@ -149,8 +171,15 @@ function SupportDashboard() {
             <CardContent>
               <div className="flex flex-wrap justify-left gap-4">
                 {badgeImages.map((badge, index) => (
-                  <div key={index} className="flex flex-col items-center w-24 relative group">
-                    <a href={badge.url} target="_blank" rel="noopener noreferrer">
+                  <div
+                    key={index}
+                    className="flex flex-col items-center w-24 relative group"
+                  >
+                    <a
+                      href={badge.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       <img
                         src={badge.src}
                         alt={badge.alt}
@@ -161,7 +190,9 @@ function SupportDashboard() {
                     <span className="absolute bottom-20 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded-md py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
                       {badge.tooltip}
                     </span>
-                    <p className="mt-2 text-sm text-center break-words">{badge.alt}</p>
+                    <p className="mt-2 text-sm text-center break-words">
+                      {badge.alt}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -178,7 +209,8 @@ function SupportDashboard() {
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                       data={dailyInteractions}
-                      margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                      margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                    >
                       <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
                       <XAxis dataKey="date" stroke="#4a4a4a" />
                       <YAxis stroke="#4a4a4a" />
@@ -194,7 +226,13 @@ function SupportDashboard() {
                       />
                       <Legend verticalAlign="top" height={36} />
                       <defs>
-                        <linearGradient id="interactionGradient" x1="0" y1="0" x2="1" y2="0">
+                        <linearGradient
+                          id="interactionGradient"
+                          x1="0"
+                          y1="0"
+                          x2="1"
+                          y2="0"
+                        >
                           <stop offset="0%" stopColor={COLORS[0]} />
                           <stop offset="50%" stopColor={COLORS[2]} />
                           <stop offset="100%" stopColor={COLORS[4]} />
@@ -210,7 +248,10 @@ function SupportDashboard() {
                         radius={[10, 10, 0, 0]} // Rounded corners for the bars
                       >
                         {dailyInteractions.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={COLORS[index % COLORS.length]}
+                          />
                         ))}
                       </Bar>
                     </BarChart>
@@ -221,7 +262,10 @@ function SupportDashboard() {
                 <div className="flex flex-col justify-center mr-6 text-gray-700">
                   <p className="text-lg font-semibold">Total Tickets</p>
                   <p className="text-2xl font-bold">
-                    {dailyInteractions.reduce((acc, entry) => acc + entry.count, 0)}
+                    {dailyInteractions.reduce(
+                      (acc, entry) => acc + entry.count,
+                      0,
+                    )}
                   </p>
                 </div>
               </div>
@@ -236,7 +280,12 @@ function SupportDashboard() {
               <CardContent className="h-80">
                 <div className="flex flex-col items-center justify-between h-full">
                   <ResponsiveContainer width="100%" height="100%">
-                    <RadarChart cx="50%" cy="50%" outerRadius="70%" data={issueTypes}>
+                    <RadarChart
+                      cx="50%"
+                      cy="50%"
+                      outerRadius="70%"
+                      data={issueTypes}
+                    >
                       <PolarGrid
                         stroke="#d1d5db"
                         strokeDasharray="3 3" // Softer dashed lines
@@ -305,9 +354,13 @@ function SupportDashboard() {
                           dataKey="value"
                           activeIndex={activeIndexCollaboration}
                           activeShape={renderActiveShape}
-                          onMouseEnter={onPieEnterCollaboration}>
+                          onMouseEnter={onPieEnterCollaboration}
+                        >
                           {collaborationData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={COLORS[index % COLORS.length]}
+                            />
                           ))}
                         </Pie>
                         <Legend
@@ -327,10 +380,13 @@ function SupportDashboard() {
                     {/* Allow it to take full width on mobile and 30% on larger screens */}
                     <div className="text-center">
                       <p className="text-lg font-semibold">
-                        {collaborationData[activeIndexCollaboration]?.name || "Select a section"}
+                        {collaborationData[activeIndexCollaboration]?.name ||
+                          "Select a section"}
                       </p>
                       <p className="text-2xl font-bold">
-                        {activeIndexCollaboration !== null ? `${activePercentage}%` : ""}
+                        {activeIndexCollaboration !== null
+                          ? `${activePercentage}%`
+                          : ""}
                       </p>
                     </div>
                   </div>

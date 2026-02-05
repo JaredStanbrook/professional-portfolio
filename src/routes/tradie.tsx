@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -54,16 +54,20 @@ function TradiePage() {
   };
 
   const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + galleryImages.length) % galleryImages.length);
+    setCurrentImageIndex(
+      (prev) => (prev - 1 + galleryImages.length) % galleryImages.length,
+    );
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-background text-foreground">
+    <div className="flex flex-col min-h-screen bg-background text-foreground lg:py-20">
       {/* Header Section */}
       <section className="w-full flex flex-col items-left pt-8 gap-4 px-6">
         <div className="overflow-hidden">
           <span className="text-2xl md:text-4xl font-extrabold tracking-tight text-foreground transition-all duration-300 select-none block">
-            <span className="inline">Jared Stanbrook - Your trusted local tradie</span>
+            <span className="inline">
+              Jared Stanbrook - Your trusted local tradie
+            </span>
           </span>
         </div>
         <hr className="w-full border-t-2 border-border" />
@@ -76,14 +80,17 @@ function TradiePage() {
             Quality Work, Every Time
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-8">
-            With over 5 years of experience in residential projects, I deliver reliable,
-            high-quality workmanship that stands the test of time. From small repairs to major
-            renovations, I've got you covered.
+            With over 5 years of experience in residential projects, I deliver
+            reliable, high-quality workmanship that stands the test of time.
+            From small repairs to major renovations, I've got you covered.
           </p>
 
           {/* Quick Contact Buttons */}
           <div className="flex flex-col sm:flex-row gap-4">
-            <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
+            <Button
+              size="lg"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
+            >
               <Phone className="w-4 h-4 mr-2" />
               Call Now: [REDACTED_PHONE]
             </Button>
@@ -96,7 +103,9 @@ function TradiePage() {
 
         {/* Services Overview */}
         <div className="flex flex-col justify-center w-full md:w-1/2">
-          <h2 className="text-2xl font-bold text-foreground mb-6">Services Offered</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-6">
+            Services Offered
+          </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
               "Lawn mowing & edging",
@@ -110,7 +119,11 @@ function TradiePage() {
               "Door handle & hinge adjustments",
               "Reticulation repairs",
             ].map((service) => (
-              <Badge key={service} variant="secondary" className="p-3 justify-start text-sm">
+              <Badge
+                key={service}
+                variant="secondary"
+                className="p-3 justify-start text-sm"
+              >
                 <CheckCircle className="w-3 h-3 mr-2 flex-shrink-0" />
                 <span className="text-left">{service}</span>
               </Badge>
@@ -134,7 +147,9 @@ function TradiePage() {
               <Phone className="w-8 h-8 mx-auto mb-3 text-primary" />
               <h3 className="font-semibold mb-2 text-foreground">Phone</h3>
               <p className="text-foreground font-medium">[REDACTED_PHONE]</p>
-              <p className="text-sm text-muted-foreground mt-1">Available 7am - 6pm</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                Available 7am - 6pm
+              </p>
             </CardContent>
           </Card>
 
@@ -142,17 +157,27 @@ function TradiePage() {
             <CardContent className="p-6 text-center">
               <Mail className="w-8 h-8 mx-auto mb-3 text-primary" />
               <h3 className="font-semibold mb-2 text-foreground">Email</h3>
-              <p className="text-foreground font-medium">jared.stanbrook@outlook.com</p>
-              <p className="text-sm text-muted-foreground mt-1">Response within the day</p>
+              <p className="text-foreground font-medium">
+                jared.stanbrook@outlook.com
+              </p>
+              <p className="text-sm text-muted-foreground mt-1">
+                Response within the day
+              </p>
             </CardContent>
           </Card>
 
           <Card className="hover:shadow-lg transition-all duration-300">
             <CardContent className="p-6 text-center">
               <MapPin className="w-8 h-8 mx-auto mb-3 text-primary" />
-              <h3 className="font-semibold mb-2 text-foreground">Service Area</h3>
-              <p className="text-foreground font-medium">Perth Eastern Suburbs</p>
-              <p className="text-sm text-muted-foreground mt-1">Free quotes within 20km</p>
+              <h3 className="font-semibold mb-2 text-foreground">
+                Service Area
+              </h3>
+              <p className="text-foreground font-medium">
+                Perth Eastern Suburbs
+              </p>
+              <p className="text-sm text-muted-foreground mt-1">
+                Free quotes within 20km
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -180,13 +205,15 @@ function TradiePage() {
             {/* Gallery Navigation */}
             <button
               onClick={prevImage}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-background/80 hover:bg-background text-foreground p-2 rounded-full transition-all border">
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-background/80 hover:bg-background text-foreground p-2 rounded-full transition-all border"
+            >
               <ChevronLeft className="w-5 h-5" />
             </button>
 
             <button
               onClick={nextImage}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-background/80 hover:bg-background text-foreground p-2 rounded-full transition-all border">
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-background/80 hover:bg-background text-foreground p-2 rounded-full transition-all border"
+            >
               <ChevronRight className="w-5 h-5" />
             </button>
 
@@ -206,8 +233,13 @@ function TradiePage() {
                   index === currentImageIndex
                     ? "border-primary"
                     : "border-border opacity-60 hover:opacity-80"
-                }`}>
-                <img src={image.src} alt={image.alt} className="w-full h-full object-cover" />
+                }`}
+              >
+                <img
+                  src={image.src}
+                  alt={image.alt}
+                  className="w-full h-full object-cover"
+                />
               </button>
             ))}
           </div>
@@ -232,19 +264,25 @@ function TradiePage() {
             <div className="text-center">
               <Clock className="w-8 h-8 mx-auto mb-3 text-primary" />
               <h3 className="font-semibold mb-2">On-Time Delivery</h3>
-              <p className="text-sm text-muted-foreground">Projects completed when promised</p>
+              <p className="text-sm text-muted-foreground">
+                Projects completed when promised
+              </p>
             </div>
 
             <div className="text-center">
               <CheckCircle className="w-8 h-8 mx-auto mb-3 text-primary" />
               <h3 className="font-semibold mb-2">Quality Guaranteed</h3>
-              <p className="text-sm text-muted-foreground">Workmanship you can trust, every time</p>
+              <p className="text-sm text-muted-foreground">
+                Workmanship you can trust, every time
+              </p>
             </div>
 
             <div className="text-center">
               <MapPin className="w-8 h-8 mx-auto mb-3 text-primary" />
               <h3 className="font-semibold mb-2">Locally Owned</h3>
-              <p className="text-sm text-muted-foreground">Proudly serving your community</p>
+              <p className="text-sm text-muted-foreground">
+                Proudly serving your community
+              </p>
             </div>
           </div>
         </div>
@@ -256,8 +294,8 @@ function TradiePage() {
           Ready to Get Started?
         </h2>
         <p className="text-lg text-muted-foreground mb-6 max-w-2xl mx-auto">
-          Don't wait for small problems to become big ones. Contact me today for a free quote and
-          let's discuss your project.
+          Don't wait for small problems to become big ones. Contact me today for
+          a free quote and let's discuss your project.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button size="lg" className="bg-primary hover:bg-primary/90">
@@ -275,7 +313,9 @@ function TradiePage() {
       <footer className="w-full py-6 px-4 border-t mt-auto">
         <div className="text-center text-sm text-muted-foreground">
           <p>&copy; 2025 Jared Stanbrook | ABN: 62 385 109 727</p>
-          <p className="mt-1">Serving Perth Eastern Suburbs & Surrounding Areas</p>
+          <p className="mt-1">
+            Serving Perth Eastern Suburbs & Surrounding Areas
+          </p>
         </div>
       </footer>
     </div>

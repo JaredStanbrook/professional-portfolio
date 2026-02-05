@@ -66,7 +66,7 @@ export function getExcerpt(content: string, limit = 160) {
 
 function parseTags(value?: string) {
   if (!value) return [];
-  const cleaned = value.replace(/^[\[\]]/g, "").replace(/\]$/g, "");
+  const cleaned = value.replace(/^\[/, "").replace(/]$/, "");
   return cleaned
     .split(/[,\n]/)
     .map((tag) => tag.trim().replace(/^["']|["']$/g, ""))

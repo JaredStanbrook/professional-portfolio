@@ -125,7 +125,7 @@ const CardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDiv
     <div
       ref={ref}
       className={cn("mt-2 flex flex-wrap", className)}
-      aria-label={cn("Technologies used", className)}
+      aria-label={ariaLabel ?? "Technologies used"}
       {...props}
     />
   )

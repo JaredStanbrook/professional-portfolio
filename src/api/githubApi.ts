@@ -1,6 +1,10 @@
 import { queryOptions } from "@tanstack/react-query";
 
-export async function getGitHubData(owner: string, repo: string, ext: string): Promise<any[]> {
+export async function getGitHubData(
+  owner: string,
+  repo: string,
+  ext: string
+): Promise<unknown[]> {
   const res = await fetch(`/api/github/${owner}/${repo}/${ext}`);
 
   if (!res.ok) {
@@ -9,7 +13,7 @@ export async function getGitHubData(owner: string, repo: string, ext: string): P
 
   const json = (await res.json()) as { data?: unknown };
   // Ensure the returned data is always an array
-  return Array.isArray(json.data) ? json.data : [];
+  return Array.isArray(json.data) ? (json.data as unknown[]) : [];
 }
 
 export const getGitHubCommitDataQueryOptions = (owner: string, repo: string) =>

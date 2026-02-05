@@ -1,14 +1,7 @@
 // worker/services/roles.service.ts
-import { eq, and, or, isNull, gt, inArray } from "drizzle-orm";
-import {
-  userRoles,
-  rolePermissions,
-  userPermissions,
-  type ROLES,
-  type PERMISSIONS,
-} from "../schema/roles.schema";
+import { eq, and, or, isNull, gt } from "drizzle-orm";
+import { userRoles, userPermissions } from "../schema/roles.schema";
 import type { AuthConfig } from "../config/auth.config";
-import type { Context } from "hono";
 
 export class RoleService {
   private db: any;

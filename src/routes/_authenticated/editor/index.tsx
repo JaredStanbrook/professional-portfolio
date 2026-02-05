@@ -128,7 +128,7 @@ function NewBlogEditor() {
   };
 
   return (
-    <div className="container py-12 flex flex-col mx-auto max-w-7xl">
+    <div className="container lg:py-20 flex flex-col mx-auto max-w-7xl ">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Create New Blog</h1>
         <Button variant="outline" onClick={handleCancel}>
@@ -140,7 +140,9 @@ function NewBlogEditor() {
         {/* Editor Panel */}
         <div className="space-y-6">
           <div className="rounded-lg border shadow-lg p-6 space-y-4 bg-card">
-            <h2 className="text-xl font-semibold border-b pb-3 mb-4">Metadata</h2>
+            <h2 className="text-xl font-semibold border-b pb-3 mb-4">
+              Metadata
+            </h2>
 
             <div>
               <Label htmlFor="filename">Filename *</Label>
@@ -150,6 +152,7 @@ function NewBlogEditor() {
                 value={filename}
                 onChange={(e) => setFilename(e.target.value)}
                 placeholder="my-blog-post.mdx"
+                className="mt-2"
               />
             </div>
 
@@ -161,6 +164,7 @@ function NewBlogEditor() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="My Amazing Blog Post"
+                className="mt-2"
               />
             </div>
 
@@ -172,6 +176,7 @@ function NewBlogEditor() {
                 value={readTime}
                 onChange={(e) => setReadTime(parseInt(e.target.value) || 1)}
                 min="1"
+                className="mt-2"
               />
             </div>
 
@@ -183,6 +188,7 @@ function NewBlogEditor() {
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
                 placeholder="Technology, Design, etc."
+                className="mt-2"
               />
             </div>
 
@@ -194,6 +200,7 @@ function NewBlogEditor() {
                 value={summary}
                 onChange={(e) => setSummary(e.target.value)}
                 placeholder="Short summary for previews"
+                className="mt-2"
               />
             </div>
 
@@ -205,6 +212,7 @@ function NewBlogEditor() {
                 value={tags}
                 onChange={(e) => setTags(e.target.value)}
                 placeholder="security, cloud, tooling"
+                className="mt-2"
               />
             </div>
 
@@ -216,6 +224,7 @@ function NewBlogEditor() {
                   type="datetime-local"
                   value={publishedAt}
                   onChange={(e) => setPublishedAt(e.target.value)}
+                  className="mt-2"
                 />
               </div>
               <div>
@@ -225,6 +234,7 @@ function NewBlogEditor() {
                   type="datetime-local"
                   value={updatedAt}
                   onChange={(e) => setUpdatedAt(e.target.value)}
+                  className="mt-2"
                 />
               </div>
             </div>
@@ -251,7 +261,9 @@ function NewBlogEditor() {
 
           {/* Content Editor */}
           <div className="rounded-lg border shadow-lg p-6 bg-card">
-            <h2 className="text-xl font-semibold border-b pb-3 mb-4">Content (MDX)</h2>
+            <h2 className="text-xl font-semibold border-b pb-3 mb-4">
+              Content (MDX)
+            </h2>
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
@@ -261,7 +273,11 @@ function NewBlogEditor() {
           </div>
 
           <div className="flex gap-3 pb-12">
-            <Button onClick={handleSave} disabled={putBlog.isPending} className="w-full">
+            <Button
+              onClick={handleSave}
+              disabled={putBlog.isPending}
+              className="w-full"
+            >
               {putBlog.isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -276,18 +292,25 @@ function NewBlogEditor() {
 
         {/* Preview Panel */}
         <div className="rounded-lg border shadow-lg p-6 bg-card lg:sticky lg:top-24 lg:max-h-[85vh] lg:overflow-y-auto">
-          <h2 className="text-xl font-semibold border-b pb-3 mb-4">Live Preview</h2>
+          <h2 className="text-xl font-semibold border-b pb-3 mb-4">
+            Live Preview
+          </h2>
 
           <div className="mb-4 p-4 rounded border bg-muted/50">
             <h3 className="text-xl font-bold">{title || "Untitled"}</h3>
             <div className="text-sm text-muted-foreground mt-1">
               {readTime} min read • {subject || "No subject"}
             </div>
-            {summary && <p className="mt-2 text-sm text-muted-foreground">{summary}</p>}
+            {summary && (
+              <p className="mt-2 text-sm text-muted-foreground">{summary}</p>
+            )}
           </div>
 
           <div className="prose prose-lg dark:prose-invert max-w-none">
-            <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              rehypePlugins={[rehypeRaw]}
+            >
               {contentWithoutFrontmatter || "*Start typing to see preview...*"}
             </ReactMarkdown>
           </div>

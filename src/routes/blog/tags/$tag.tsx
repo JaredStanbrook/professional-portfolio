@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { getAllBlogsQueryOptions } from "@/api/blogApi";
+import { normalizeBlogSlug } from "@/lib/utils";
 
 export const Route = createFileRoute("/blog/tags/$tag")({
   component: BlogTagView,
@@ -37,7 +38,7 @@ function BlogTagView() {
           <Link
             key={blog.filename}
             to="/blog/$slug"
-            params={{ slug: blog.slug }}
+            params={{ slug: normalizeBlogSlug(blog.slug) }}
             className="rounded-2xl border border-border bg-card p-4 transition hover:-translate-y-1 hover:border-primary/40">
             <div className="text-xs text-muted-foreground">{blog.readTime} min read</div>
             <h2 className="mt-2 text-lg font-semibold text-foreground">{blog.title}</h2>

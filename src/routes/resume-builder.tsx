@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useEffect, useRef } from "react";
 
 export const Route = createFileRoute("/resume-builder")({
   component: Resume,
@@ -283,14 +282,6 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
     </section>
   );
 };
-const Page = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <div className="page">
-      <div className="p-2 border-2 print:border-none border-red-500 h-[973px]">{children}</div>
-    </div>
-  );
-};
-
 // SkillBox component for skill categories
 const SkillBox = ({ title, skills }: { title: string; skills: string[] }) => {
   return (

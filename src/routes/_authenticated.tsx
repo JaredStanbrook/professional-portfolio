@@ -8,7 +8,7 @@ export const Route = createFileRoute("/_authenticated")({
     const queryClient = context.queryClient;
     try {
       await queryClient.ensureQueryData(getUserQueryOptions);
-    } catch (err) {
+    } catch {
       queryClient.removeQueries(getUserQueryOptions);
       await logoutUser();
       throw redirect({

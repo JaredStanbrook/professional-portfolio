@@ -1,11 +1,28 @@
-import { createRootRouteWithContext, Link, Outlet, useNavigate } from "@tanstack/react-router";
+import {
+  createRootRouteWithContext,
+  Link,
+  Outlet,
+} from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { QueryClient, useQuery } from "@tanstack/react-query";
 import { ModeToggle } from "@/components/mode-toggle";
-import { Menu, LogOut, User as UserIcon, X } from "lucide-react";
+import {
+  BookOpen,
+  FolderGit2,
+  Home,
+  Info,
+  LayoutDashboard,
+  LogOut,
+  Mail,
+  Menu,
+  PencilLine,
+  User as UserIcon,
+  X,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { useState } from "react";
-import { toast, Toaster } from "sonner";
+import { Toaster } from "sonner";
 
 import "../index.css";
 import { Button } from "@/components/ui/button";
@@ -16,21 +33,27 @@ import type { SafeUser } from "@server/schema/auth.schema";
 type NavigationItem = {
   to: string;
   name: string;
+  icon: LucideIcon;
   authRequired?: boolean;
 };
 
 const publicMenu: NavigationItem[] = [
-  { to: "/", name: "Home" },
-  { to: "/projects", name: "Projects" },
-  { to: "/blog", name: "Blog" },
-  { to: "/about", name: "About" },
-  { to: "/contact", name: "Contact" },
+  { to: "/", name: "Home", icon: Home },
+  { to: "/projects", name: "Projects", icon: FolderGit2 },
+  { to: "/blog", name: "Blog", icon: BookOpen },
+  { to: "/about", name: "About", icon: Info },
+  { to: "/contact", name: "Contact", icon: Mail },
 ];
 
 const authenticatedMenu: NavigationItem[] = [
-  { to: "/editor", name: "New Blog", authRequired: true },
-  { to: "/dashboard", name: "Dashboard", authRequired: true },
-  { to: "/profile", name: "Profile", authRequired: true },
+  { to: "/editor", name: "New Blog", icon: PencilLine, authRequired: true },
+  {
+    to: "/dashboard",
+    name: "Dashboard",
+    icon: LayoutDashboard,
+    authRequired: true,
+  },
+  { to: "/profile", name: "Profile", icon: UserIcon, authRequired: true },
 ];
 
 // 1. UPDATE CONTEXT INTERFACE
@@ -50,10 +73,16 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 /**
  * Sidebar Navigation Component
  */
-function SidebarNavigation({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  const navigate = useNavigate();
+function SidebarNavigation({
+  isOpen,
+  onClose,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+}) {
   // Fetch user data for the menu header
-  const { data: userData, isPending: isUserPending } = useQuery(getUserQueryOptions);
+  const { data: userData, isPending: isUserPending } =
+    useQuery(getUserQueryOptions);
 
   const logoutMutation = useLogoutMutation();
 
@@ -72,8 +101,9 @@ function SidebarNavigation({ isOpen, onClose }: { isOpen: boolean; onClose: () =
 
       {/* Sidebar Container */}
       <div
-        className={`fixed top-0 left-0 h-full w-64 bg-card shadow-2xl z-60 transform transition-transform duration-300 ease-in-out 
-          ${isOpen ? "translate-x-0" : "-translate-x-full"}`}>
+        className={`fixed top-0 left-0 h-full w-64 bg-card shadow-2xl z-60 transform transition-transform duration-300 ease-in-out
+          ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
+      >
         {/* Header & Close Button */}
         <div className="flex justify-between items-center p-4 border-b">
           <h2 className="text-lg font-semibold">Menu</h2>
@@ -84,7 +114,7 @@ function SidebarNavigation({ isOpen, onClose }: { isOpen: boolean; onClose: () =
 
         {/* Navigation Links */}
         <nav className="p-4 flex flex-col gap-2">
-          {menuItems.map(({ to, name, authRequired }) => {
+          {menuItems.map(({ to, name, icon: Icon, authRequired }) => {
             // Only show auth-required links if authenticated
             if (authRequired && !isAuthenticated) return null;
 
@@ -93,10 +123,13 @@ function SidebarNavigation({ isOpen, onClose }: { isOpen: boolean; onClose: () =
                 key={to}
                 to={to}
                 onClick={onClose} // Close sidebar when a link is clicked
-                className="block px-3 py-2 rounded-lg text-sm font-medium hover:bg-muted transition-colors"
+                className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium hover:bg-muted transition-colors"
                 activeProps={{
-                  className: "bg-primary text-primary-foreground hover:bg-primary/90",
-                }}>
+                  className:
+                    "bg-primary text-primary-foreground hover:bg-primary/90",
+                }}
+              >
+                <Icon className="h-4 w-4" />
                 {name}
               </Link>
             );
@@ -106,16 +139,21 @@ function SidebarNavigation({ isOpen, onClose }: { isOpen: boolean; onClose: () =
         {/* User Status & Auth Actions */}
         <div className="absolute bottom-0 w-full p-4 border-t bg-card">
           {isUserPending && (
-            <div className="text-sm text-center text-muted-foreground">Loading user...</div>
+            <div className="text-sm text-center text-muted-foreground">
+              Loading user...
+            </div>
           )}
 
           {!isUserPending && isAuthenticated && (
             <div className="flex flex-col gap-2">
-              <p className="text-sm font-medium truncate">Welcome, {userData.email}</p>
+              <p className="text-sm font-medium truncate">
+                Welcome, {userData.email}
+              </p>
               <Button
                 onClick={() => logoutMutation.mutate()}
                 disabled={logoutMutation.isPending}
-                variant="destructive">
+                variant="destructive"
+              >
                 <LogOut className="mr-2 h-4 w-4" />
                 {logoutMutation.isPending ? "Logging out..." : "Log out"}
               </Button>
@@ -153,13 +191,20 @@ function Root() {
   return (
     <div className="bg-background leading-relaxed text-foreground antialiased font-sans">
       {/* Sidebar Component */}
-      <SidebarNavigation isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
+      <SidebarNavigation
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
+      />
 
       {/* Fixed Header Bar */}
       <div className="fixed flex flex-row gap-2 top-2.5 right-4 lg:w-full lg:flex-row lg:justify-between lg:right-0 lg:px-5 lg:top-4 z-50 pointer-events-none">
         {/* Left: Menu Toggle Button (Now controls local state) */}
         <div className="lg:order-first pointer-events-auto">
-          <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(true)}>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsMenuOpen(true)}
+          >
             <Menu />
           </Button>
         </div>
@@ -191,13 +236,19 @@ function Root() {
 
 // Simple helper to show Login vs Logout (used in the header bar)
 function AuthButtons({ logout }: { logout: () => void }) {
-  const { data: userData, isLoading: isUserLoading } = useQuery(getUserQueryOptions);
+  const { data: userData, isLoading: isUserLoading } =
+    useQuery(getUserQueryOptions);
 
   if (isUserLoading) return null;
 
   if (userData) {
     return (
-      <Button variant="ghost" size="icon" onClick={() => logout()} title="Logout">
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => logout()}
+        title="Logout"
+      >
         <LogOut className="h-[1.2rem] w-[1.2rem]" />
       </Button>
     );

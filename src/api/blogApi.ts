@@ -6,7 +6,6 @@ import { api } from "@/api/apiClient";
 import { getErrorMessage } from "@/lib/utils";
 import {
   type SelectBlogMetadata,
-  type BlogPayload,
   apiBlogResponseSchema,
   apiSelectBlogMetadataSchema,
 } from "@server/schema/blogs.schema";
@@ -19,12 +18,28 @@ export const blogKeys = {
 
 export const blog = api.blog;
 
+type BlogListResponse = {
+  blogs?: unknown;
+};
+type PutBlogResponse = {
+  ok: boolean;
+  filename: string;
+  metadata: SelectBlogMetadata;
+};
+
+const getToastMessage = (err: unknown) =>
+  err instanceof Error ? err.message : "An unexpected error occurred";
+
+async function readJson<T>(res: Response): Promise<T> {
+  return (await res.json()) as T;
+}
+
 export async function getAllBlogs() {
   const res = await blog.$get();
 
   if (!res.ok) throw new Error("Failed to fetch blogs");
 
-  const data = await res.json();
+  const data = await readJson<BlogListResponse>(res);
 
   // Runtime Validation: Ensure backend sends what we expect
   const result = z.array(apiSelectBlogMetadataSchema).safeParse(data.blogs);
@@ -53,7 +68,7 @@ export async function getBlogContent(filename: string) {
     throw new Error("Failed to load blog post");
   }
 
-  const data = await res.json();
+  const data = await readJson<unknown>(res);
 
   // Runtime Validation
   const result = apiBlogResponseSchema.safeParse(data);
@@ -72,7 +87,7 @@ export const getBlogContentQueryOptions = (filename: string) =>
     enabled: !!filename,
     retry: (failureCount, error) => {
       // Don't retry if it's a 404
-      if (error.message.includes("404")) return false;
+      if (error instanceof Error && error.message.includes("404")) return false;
       return failureCount < 3;
     },
   });
@@ -83,11 +98,7 @@ export async function putBlogContent({ filename, content }: { filename: string; 
     json: { body: content },
   });
   if (!res.ok) throw new Error(await getErrorMessage(res));
-  return res.json();
-
-  // Return the parsed response to help with cache updates
-  const data = await res.json();
-  return data as { ok: boolean; filename: string; metadata: SelectBlogMetadata };
+  return await readJson<PutBlogResponse>(res);
 }
 
 export async function deleteBlogContent(filename: string) {
@@ -96,7 +107,7 @@ export async function deleteBlogContent(filename: string) {
   });
 
   if (!res.ok) throw new Error(await getErrorMessage(res));
-  return res.json();
+  return await readJson<unknown>(res);
 }
 
 export function usePutBlogMutation() {
@@ -110,7 +121,7 @@ export function usePutBlogMutation() {
       // 1. Instant Detail Update: Update the specific blog cache
       // We reconstruct the full object assuming the body content we just sent is valid
       // Note: In a real app, you might want the backend to return the full content or refetch.
-      queryClient.setQueryData(blogKeys.detail(data.filename), (old: BlogPayload | undefined) => {
+      queryClient.setQueryData(blogKeys.detail(data.filename), () => {
         // We can't fully reconstruct 'content' here without passing it from variables,
         // so we usually invalidate to be safe, OR we update just metadata if the UI supports it.
         // For now, let's invalidate to ensure we get the fresh DB timestamps and sanitized content.
@@ -118,12 +129,12 @@ export function usePutBlogMutation() {
       });
 
       // 2. Refresh the list to show new title/timestamps
-      queryClient.invalidateQueries({ queryKey: blogKeys.lists() });
+      void queryClient.invalidateQueries({ queryKey: blogKeys.lists() });
 
       // 3. Force refetch of the specific item
-      queryClient.invalidateQueries({ queryKey: blogKeys.detail(data.filename) });
+      void queryClient.invalidateQueries({ queryKey: blogKeys.detail(data.filename) });
     },
-    onError: (err: any) => toast.error(err.message),
+    onError: (err: unknown) => toast.error(getToastMessage(err)),
   });
 }
 
@@ -143,6 +154,6 @@ export function useDeleteBlogMutation() {
       // 2. Remove the specific detail cache entirely
       queryClient.removeQueries({ queryKey: blogKeys.detail(filename) });
     },
-    onError: (err: any) => toast.error(err.message),
+    onError: (err: unknown) => toast.error(getToastMessage(err)),
   });
 }

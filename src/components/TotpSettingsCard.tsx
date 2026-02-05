@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { toast } from "sonner";
-import { Copy, Check, Loader2, ShieldCheck, Smartphone, QrCode } from "lucide-react";
+import { Copy, Check, Loader2, ShieldCheck, Smartphone } from "lucide-react";
 import { useSetupTotpMutation, useEnableTotpMutation, useDisableTotpMutation } from "@/api/authApi";
 
 // UI Components
@@ -16,9 +16,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface TotpSettingsProps {
   isEnabled: boolean;
@@ -75,7 +73,7 @@ export function TotpSettingsCard({ isEnabled }: TotpSettingsProps) {
   // Helper: Copy Secret to Clipboard
   const copyToClipboard = () => {
     if (secretData?.secret) {
-      navigator.clipboard.writeText(secretData.secret);
+      void navigator.clipboard.writeText(secretData.secret);
       setCopied(true);
       toast.success("Secret copied!");
       setTimeout(() => setCopied(false), 2000);

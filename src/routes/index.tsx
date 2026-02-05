@@ -5,6 +5,7 @@ import { HighlightCard, type HighlightCardSize } from "@/components/ui/highlight
 import Typewriter from "@/components/typewriter";
 import type { SelectBlogMetadata } from "@server/schema/blogs.schema";
 import { featuredProjects } from "@/data/projects";
+import { normalizeBlogSlug } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
   component: Homepage,
@@ -210,7 +211,7 @@ function Homepage() {
   };
 
   const handleBlogClick = (slug: string) => {
-    navigate({ to: "/blog/$slug", params: { slug } });
+    navigate({ to: "/blog/$slug", params: { slug: normalizeBlogSlug(slug) } });
   };
   const cursorSize = 20 * cursorState.scale; // Base size 20px
   return (
@@ -342,7 +343,7 @@ function Homepage() {
                 <HighlightCard
                   key={blog.filename}
                   size={size}
-                  onClick={() => handleBlogClick(blog.slug ?? blog.filename.replace(".mdx", ""))}
+                  onClick={() => handleBlogClick(blog.slug ?? blog.filename)}
                   tabIndex={0}
                   role="button">
                   <CardContent className="p-4 flex flex-col justify-between h-full">

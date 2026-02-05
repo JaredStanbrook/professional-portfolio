@@ -8,6 +8,7 @@ import { getUserQueryOptions } from "@/api/authApi";
 import { getBlogContentQueryOptions } from "@/api/blogApi";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { blogFilenameFromSlug } from "@/lib/utils";
 
 export const Route = createFileRoute("/blog/$slug")({
   component: BlogView,
@@ -15,7 +16,7 @@ export const Route = createFileRoute("/blog/$slug")({
 
 function BlogView() {
   const { slug } = Route.useParams();
-  const filename = `${slug}.mdx`;
+  const filename = blogFilenameFromSlug(slug);
   const navigate = useNavigate();
 
   const { data: userData } = useQuery(getUserQueryOptions);

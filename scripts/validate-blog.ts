@@ -43,14 +43,18 @@ async function main() {
     }
 
     console.log("Blog metadata validation passed.");
-  } catch (error: any) {
-    if (error.code === "ENOENT") {
+  } catch (error: unknown) {
+    if (isErrnoException(error) && error.code === "ENOENT") {
       console.warn("content/blog directory not found. Skipping blog metadata validation.");
       return;
     }
     console.error("Blog metadata validation failed with an unexpected error:", error);
     process.exit(1);
   }
+}
+
+function isErrnoException(error: unknown): error is NodeJS.ErrnoException {
+  return error instanceof Error && "code" in error;
 }
 
 function parseFrontmatter(block: string) {
@@ -97,4 +101,4 @@ function validateLinks(content: string, filename: string, errors: string[]) {
   }
 }
 
-main();
+void main();

@@ -18,7 +18,7 @@ import {
   getGitHubCodeFrequencyQueryOptions,
   getGitHubPunchCardQueryOptions,
 } from "@/api/githubApi";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 const COLORS = ["#1E3A8A", "#2563EB", "#3B82F6", "#60A5FA", "#93C5FD", "#BFDBFE"];
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -89,7 +89,7 @@ export function GitHubRepoCodeFrequency() {
 
   const processCodeFrequency = (data: [number, number, number][]) => {
     return data
-      .filter(([_, additions, deletions]) => additions !== 0 || deletions !== 0) // Keep only entries with changes
+      .filter(([, additions, deletions]) => additions !== 0 || deletions !== 0) // Keep only entries with changes
       .map(([date, additions, deletions]) => ({
         week: new Date(date * 1000).toLocaleDateString("en-US", {
           day: "2-digit",
@@ -146,7 +146,7 @@ export function GitHubRepoPunchCard() {
   if (!data) return null;
 
   const punchData = data
-    .filter(([_, __, commits]: [number, number, number]) => commits > 0)
+    .filter(([, , commits]: [number, number, number]) => commits > 0)
     .map(([day, hour, commits]: [number, number, number]) => ({
       day: DAYS[day],
       dayIndex: day,
@@ -188,7 +188,7 @@ export function GitHubRepoPunchCard() {
             range={[60, 300]} // Bubble size range
           />
           <Tooltip
-            formatter={(value: any, name: any, props: any) => {
+            formatter={(value: number | string, name: string, props: { payload: { day: number; hour: number } }) => {
               if (name === "Commits") {
                 const { payload } = props;
                 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];

@@ -14,7 +14,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { TotpSettingsCard } from "@/components/TotpSettingsCard";
@@ -58,7 +64,10 @@ function Profile() {
   }, [user?.displayName]);
 
   const handleUpdateProfile = () => {
-    updateProfileMutation.mutate({ displayName }, { onSuccess: () => setIsEditing(false) });
+    updateProfileMutation.mutate(
+      { displayName },
+      { onSuccess: () => setIsEditing(false) },
+    );
   };
 
   // Helper for dates
@@ -76,12 +85,16 @@ function Profile() {
   if (!user) return null;
 
   return (
-    <div className="container max-w-4xl py-10 space-y-8">
+    <div className="container max-w-4xl lg:py-20 space-y-8">
       {/* HEADER */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Profile Settings</h1>
-          <p className="text-muted-foreground">Manage your account settings and preferences.</p>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Profile Settings
+          </h1>
+          <p className="text-muted-foreground">
+            Manage your account settings and preferences.
+          </p>
         </div>
       </div>
 
@@ -98,16 +111,25 @@ function Profile() {
         </CardHeader>
         <CardContent className="grid gap-6 md:grid-cols-2">
           <div className="space-y-1">
-            <Label className="text-muted-foreground text-xs uppercase">User ID</Label>
-            <div className="font-mono text-sm bg-muted p-2 rounded truncate">{user.id}</div>
+            <Label className="text-muted-foreground text-xs uppercase">
+              User ID
+            </Label>
+            <div className="font-mono text-sm bg-muted p-2 rounded truncate">
+              {user.id}
+            </div>
           </div>
 
           <div className="space-y-1">
-            <Label className="text-muted-foreground text-xs uppercase">Email Address</Label>
+            <Label className="text-muted-foreground text-xs uppercase">
+              Email Address
+            </Label>
             <div className="flex items-center gap-2">
               <span>{user.email}</span>
               {user.emailVerified ? (
-                <Badge variant="secondary" className="text-green-600 bg-green-50">
+                <Badge
+                  variant="secondary"
+                  className="text-green-600 bg-green-50"
+                >
                   <CheckCircle2 className="w-3 h-3 mr-1" /> Verified
                 </Badge>
               ) : (
@@ -119,27 +141,40 @@ function Profile() {
           </div>
 
           <div className="space-y-1">
-            <Label className="text-muted-foreground text-xs uppercase">Display Name</Label>
+            <Label className="text-muted-foreground text-xs uppercase">
+              Display Name
+            </Label>
             {isEditing ? (
               <div className="flex gap-2 max-w-xs">
-                <Input value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
+                <Input
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                />
                 <Button
                   size="sm"
                   onClick={handleUpdateProfile}
-                  disabled={updateProfileMutation.isPending}>
+                  disabled={updateProfileMutation.isPending}
+                >
                   Save
                 </Button>
-                <Button size="sm" variant="ghost" onClick={() => setIsEditing(false)}>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setIsEditing(false)}
+                >
                   Cancel
                 </Button>
               </div>
             ) : (
               <div className="flex items-center gap-2">
-                <span className="font-medium">{user.displayName || "Not set"}</span>
+                <span className="font-medium">
+                  {user.displayName || "Not set"}
+                </span>
                 <Button
                   variant="link"
                   className="h-auto p-0 text-xs"
-                  onClick={() => setIsEditing(true)}>
+                  onClick={() => setIsEditing(true)}
+                >
                   Edit
                 </Button>
               </div>
@@ -147,10 +182,15 @@ function Profile() {
           </div>
 
           <div className="space-y-1">
-            <Label className="text-muted-foreground text-xs uppercase">Account Roles</Label>
+            <Label className="text-muted-foreground text-xs uppercase">
+              Account Roles
+            </Label>
             <div className="flex flex-wrap gap-2 mt-1">
               {user.roles.map((role) => (
-                <Badge key={role} variant={role === "admin" ? "default" : "secondary"}>
+                <Badge
+                  key={role}
+                  variant={role === "admin" ? "default" : "secondary"}
+                >
                   {role}
                 </Badge>
               ))}
@@ -158,12 +198,16 @@ function Profile() {
           </div>
 
           <div className="space-y-1">
-            <Label className="text-muted-foreground text-xs uppercase">Joined</Label>
+            <Label className="text-muted-foreground text-xs uppercase">
+              Joined
+            </Label>
             <div>{formatDate(user.createdAt)}</div>
           </div>
 
           <div className="space-y-1">
-            <Label className="text-muted-foreground text-xs uppercase">Last Login</Label>
+            <Label className="text-muted-foreground text-xs uppercase">
+              Last Login
+            </Label>
             <div>{formatDate(user.lastLoginAt)}</div>
           </div>
         </CardContent>
@@ -176,11 +220,15 @@ function Profile() {
             <Shield className="h-5 w-5 text-primary" />
             <CardTitle>Security</CardTitle>
           </div>
-          <CardDescription>Manage your password and authentication methods.</CardDescription>
+          <CardDescription>
+            Manage your password and authentication methods.
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* --- TOTP SECTION --- */}
-          {config?.methods.includes("totp") && <TotpSettingsCard isEnabled={!!user.totpEnabled} />}
+          {config?.methods.includes("totp") && (
+            <TotpSettingsCard isEnabled={!!user.totpEnabled} />
+          )}
           {/* Change Password Dialog */}
           {config?.methods.includes("password") && (
             <div className="flex items-center justify-between p-4 border rounded-lg">
@@ -190,7 +238,9 @@ function Profile() {
                 </div>
                 <div>
                   <h4 className="font-medium">Password</h4>
-                  <p className="text-sm text-muted-foreground">Update your account password</p>
+                  <p className="text-sm text-muted-foreground">
+                    Update your account password
+                  </p>
                 </div>
               </div>
               <ChangePasswordDialog />
@@ -206,7 +256,9 @@ function Profile() {
                 </div>
                 <div>
                   <h4 className="font-medium">Security PIN</h4>
-                  <p className="text-sm text-muted-foreground">Update your numeric PIN</p>
+                  <p className="text-sm text-muted-foreground">
+                    Update your numeric PIN
+                  </p>
                 </div>
               </div>
               <ChangePinDialog />
@@ -223,7 +275,9 @@ function Profile() {
             <Trash2 className="h-5 w-5" />
             <CardTitle>Danger Zone</CardTitle>
           </div>
-          <CardDescription>Irreversible actions regarding your account.</CardDescription>
+          <CardDescription>
+            Irreversible actions regarding your account.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between">
@@ -259,7 +313,7 @@ function ChangePasswordDialog() {
           setCurrent("");
           setNew("");
         },
-      }
+      },
     );
   };
 
@@ -271,7 +325,9 @@ function ChangePasswordDialog() {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Change Password</DialogTitle>
-          <DialogDescription>Enter your current password to set a new one.</DialogDescription>
+          <DialogDescription>
+            Enter your current password to set a new one.
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="space-y-2">
@@ -320,7 +376,7 @@ function ChangePinDialog() {
           setCurrent("");
           setNew("");
         },
-      }
+      },
     );
   };
 
@@ -332,7 +388,9 @@ function ChangePinDialog() {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Change PIN</DialogTitle>
-          <DialogDescription>Enter your current PIN to set a new one.</DialogDescription>
+          <DialogDescription>
+            Enter your current PIN to set a new one.
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="space-y-2">
@@ -382,8 +440,8 @@ function DeleteAccountDialog() {
         <DialogHeader>
           <DialogTitle>Are you absolutely sure?</DialogTitle>
           <DialogDescription>
-            This action cannot be undone. This will permanently delete your account and remove your
-            data from our servers.
+            This action cannot be undone. This will permanently delete your
+            account and remove your data from our servers.
           </DialogDescription>
         </DialogHeader>
         <div className="py-4 space-y-2">
@@ -400,7 +458,8 @@ function DeleteAccountDialog() {
           <Button
             variant="destructive"
             disabled={confirmation !== "DELETE" || isPending}
-            onClick={() => mutate()}>
+            onClick={() => mutate()}
+          >
             {isPending ? "Deleting..." : "Confirm Deletion"}
           </Button>
         </DialogFooter>

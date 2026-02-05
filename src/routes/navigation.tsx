@@ -2,55 +2,45 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import type { FileRouteTypes } from "@/routeTree.gen";
 import { useQuery } from "@tanstack/react-query";
+import { BookOpen, FolderGit2, Home, Info, Mail } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 import { getUserQueryOptions, useLogoutMutation } from "@/api/authApi";
 
 type NavigationItem = {
   to: FileRouteTypes["to"];
   name: string;
+  icon: LucideIcon;
 };
 
 const defaultMenu: NavigationItem[] = [
   {
     to: "/",
     name: "Home",
+    icon: Home,
   },
   {
     to: "/projects",
     name: "Projects",
+    icon: FolderGit2,
   },
   {
     to: "/blog",
     name: "Blog",
+    icon: BookOpen,
   },
   {
     to: "/about",
     name: "About",
+    icon: Info,
   },
   {
     to: "/contact",
     name: "Contact",
+    icon: Mail,
   },
 ];
 
-const authMenu: NavigationItem[] = [
-  {
-    to: "/admin",
-    name: "Home",
-  },
-  {
-    to: "/admin/tenant",
-    name: "Tenants",
-  },
-  {
-    to: "/admin/bill",
-    name: "Bills",
-  },
-  {
-    to: "/admin/property",
-    name: "Properties",
-  },
-];
 export const Route = createFileRoute("/navigation")({
   component: Navigation,
 });
@@ -76,13 +66,16 @@ function Navigation() {
         <h1 className="text-5xl font-bold">My Website</h1>
         <div className="flex flex-col gap-x-6">
           <nav className="flex flex-col gap-4 text-3xl font-bold">
-            {menu.map(({ to, name }) => (
+            {menu.map(({ to, name, icon: Icon }) => (
               <Link
                 key={to}
                 to={to}
                 activeProps={{ className: "font-normal underline" }}
                 activeOptions={{ exact: to === "/" }}>
-                {name}
+                <span className="inline-flex items-center gap-3">
+                  <Icon className="h-6 w-6" />
+                  {name}
+                </span>
               </Link>
             ))}
 

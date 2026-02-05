@@ -7,7 +7,11 @@ import { blogMetadata } from "../schema/blogs.schema";
 import type { AppEnv } from "../types";
 import { authMiddleware } from "../middleware/auth.middleware";
 import { users } from "../schema/auth.schema";
-import { getReadingTime, parseFrontMatter, stripFrontMatter } from "../utils/blog";
+import {
+  getReadingTime,
+  parseFrontMatter,
+  stripFrontMatter,
+} from "../utils/blog";
 
 const access = new AccessControl();
 
@@ -31,7 +35,9 @@ export const blogRoute = new Hono<AppEnv>()
       const blogs = await Promise.all(
         results.map(async (row) => {
           const object = await c.env.BLOG.get(row.filename);
-          const frontmatter = object ? parseFrontMatter(await object.text()) : null;
+          const frontmatter = object
+            ? parseFrontMatter(await object.text())
+            : null;
 
           if (frontmatter?.draft) {
             return null;
@@ -53,7 +59,7 @@ export const blogRoute = new Hono<AppEnv>()
             draft: false,
             publishedAt,
           };
-        })
+        }),
       );
 
       return c.json({ blogs: blogs.filter(Boolean) });
@@ -87,21 +93,31 @@ export const blogRoute = new Hono<AppEnv>()
 
       const content = stripFrontMatter(fileContent);
       const parsedFrontmatter = parseFrontMatter(fileContent);
-      const readTime = parsedFrontmatter.readTime ?? metadata?.readTime ?? getReadingTime(content);
+      const readTime =
+        parsedFrontmatter.readTime ??
+        metadata?.readTime ??
+        getReadingTime(content);
       const user = c.var.auth.user;
 
       if (parsedFrontmatter.draft) {
         const isOwner = user?.id && metadata?.userId === user.id;
         const isPrivileged =
-          user?.roles?.includes("admin") || user?.roles?.includes("editor") || isOwner;
+          user?.roles?.includes("admin") ||
+          user?.roles?.includes("editor") ||
+          isOwner;
         if (!isPrivileged) {
           return c.json({ error: "Blog not found" }, 404);
         }
       }
 
       const authorName = metadata?.userId
-        ? (await db.select().from(users).where(eq(users.id, metadata.userId)).get())?.displayName ||
-          "Anonymous"
+        ? (
+            await db
+              .select()
+              .from(users)
+              .where(eq(users.id, metadata.userId))
+              .get()
+          )?.displayName || "Anonymous"
         : "Anonymous";
 
       return c.json({
@@ -131,72 +147,76 @@ export const blogRoute = new Hono<AppEnv>()
   // =================================================================
   // PUT /:filename - Create or Update Blog
   // =================================================================
-  .put("/:filename{.+\\.mdx}", zValidator("json", z.object({ body: z.string() })), async (c) => {
-    const filename = c.req.param("filename");
-    const { body } = c.req.valid("json");
-    const user = c.var.auth.user!;
-    const db = c.get("db");
+  .put(
+    "/:filename{.+\\.mdx}",
+    zValidator("json", z.object({ body: z.string() })),
+    async (c) => {
+      const filename = c.req.param("filename");
+      const { body } = c.req.valid("json");
+      const user = c.var.auth.user!;
+      const db = c.get("db");
 
-    try {
-      // 1. Check existence to determine Permission Requirement (Create vs Update)
-      const existing = await db
-        .select()
-        .from(blogMetadata)
-        .where(eq(blogMetadata.filename, filename))
-        .get();
+      try {
+        // 1. Check existence to determine Permission Requirement (Create vs Update)
+        const existing = await db
+          .select()
+          .from(blogMetadata)
+          .where(eq(blogMetadata.filename, filename))
+          .get();
 
-      if (existing) {
-        // UPDATE: Requires 'blogs.update' AND Ownership (unless 'blogs.update.any')
-        access.authorize(user, "blogs", "update", existing.userId);
-      } else {
-        // CREATE: Requires 'blogs.create'
-        access.authorize(user, "blogs", "create");
-      }
+        if (existing) {
+          // UPDATE: Requires 'blogs.update' AND Ownership (unless 'blogs.update.any')
+          access.authorize(user, "blogs", "update", existing.userId);
+        } else {
+          // CREATE: Requires 'blogs.create'
+          access.authorize(user, "blogs", "create");
+        }
 
-      // 2. Parse Metadata from the MDX body
-      const meta = parseFrontMatter(body);
-      const content = stripFrontMatter(body);
-      const readTime = meta.readTime ?? getReadingTime(content);
+        // 2. Parse Metadata from the MDX body
+        const meta = parseFrontMatter(body);
+        const content = stripFrontMatter(body);
+        const readTime = meta.readTime ?? getReadingTime(content);
 
-      // 3. Save file to R2
-      await c.env.BLOG.put(filename, body);
+        // 3. Save file to R2
+        await c.env.BLOG.put(filename, body);
 
-      await db
-        .insert(blogMetadata)
-        .values({
-          filename,
-          title: meta.title,
-          readTime,
-          subject: meta.subject ?? "General",
-          userId: existing ? existing.userId : user.id,
-        })
-        .onConflictDoUpdate({
-          target: blogMetadata.filename,
-          set: {
+        await db
+          .insert(blogMetadata)
+          .values({
+            filename,
             title: meta.title,
             readTime,
             subject: meta.subject ?? "General",
-            updatedAt: new Date().toISOString(), // Force update timestamp
+            userId: existing ? existing.userId : user.id,
+          })
+          .onConflictDoUpdate({
+            target: blogMetadata.filename,
+            set: {
+              title: meta.title,
+              readTime,
+              subject: meta.subject ?? "General",
+              updatedAt: new Date().toISOString(), // Force update timestamp
+            },
+          });
+
+        return c.json({
+          ok: true,
+          filename,
+          metadata: {
+            ...meta,
+            readTime,
+            subject: meta.subject ?? "General",
           },
         });
+      } catch (error: any) {
+        // Handle Access Control Errors (403) specifically
+        if (error.status === 403) return c.json({ error: error.message }, 403);
 
-      return c.json({
-        ok: true,
-        filename,
-        metadata: {
-          ...meta,
-          readTime,
-          subject: meta.subject ?? "General",
-        },
-      });
-    } catch (error: any) {
-      // Handle Access Control Errors (403) specifically
-      if (error.status === 403) return c.json({ error: error.message }, 403);
-
-      console.error("Error saving blog:", error);
-      return c.json({ error: "Failed to save blog" }, 500);
-    }
-  })
+        console.error("Error saving blog:", error);
+        return c.json({ error: "Failed to save blog" }, 500);
+      }
+    },
+  )
 
   // =================================================================
   // DELETE /:filename

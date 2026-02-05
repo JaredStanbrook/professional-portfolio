@@ -12,6 +12,13 @@ const DB_NAME = "DB"; // Match the database_name in your wrangler.toml
 const TABLE_USERS = "users";
 const TABLE_ROLES = "user_roles";
 
+type PromptResponse = {
+  email?: string;
+  username?: string;
+  displayName?: string;
+  password?: string;
+};
+
 // ==========================================
 // 🚀 MAIN SCRIPT
 // ==========================================
@@ -23,7 +30,7 @@ async function main() {
   console.log(`\n👑 \x1b[33mCreate Admin User [${env}]\x1b[0m\n`);
 
   // 1. Get Inputs
-  const response = await prompts([
+  const response = (await prompts([
     {
       type: "text",
       name: "email",
@@ -48,7 +55,7 @@ async function main() {
       message: "Password:",
       validate: (value) => (value.length < (isRemote ? 8 : 0) ? "Must be 8+ chars" : true),
     },
-  ]);
+  ])) as PromptResponse;
 
   if (!response.email || !response.password) {
     console.log("❌ Cancelled");
@@ -103,4 +110,4 @@ async function main() {
   });
 }
 
-main();
+void main();

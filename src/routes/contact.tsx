@@ -6,13 +6,17 @@ export const Route = createFileRoute("/contact")({
 
 function Contact() {
   return (
-    <div className="min-h-screen space-y-8">
+    <div className="min-h-screen space-y-8 lg:py-20">
       <header className="space-y-4 border-b border-border pb-6">
-        <p className="text-sm uppercase tracking-[0.3em] text-muted-foreground">Contact</p>
-        <h1 className="text-4xl font-semibold md:text-5xl">Let’s build something resilient.</h1>
+        <p className="text-sm uppercase tracking-[0.3em] text-muted-foreground">
+          Contact
+        </p>
+        <h1 className="text-4xl font-semibold md:text-5xl">
+          Let’s build something resilient.
+        </h1>
         <p className="text-lg text-muted-foreground max-w-2xl">
-          I’m open to security, IT, and full-stack roles focused on dependable systems. Reach out and
-          I’ll respond within 48 hours.
+          I’m open to security, IT, and full-stack roles focused on dependable
+          systems. Reach out and I’ll respond within 48 hours.
         </p>
       </header>
 
@@ -22,7 +26,8 @@ function Contact() {
           <p className="text-muted-foreground">jared.stanbrook@proton.me</p>
           <a
             className="text-primary hover:text-primary/80"
-            href="mailto:jared.stanbrook@proton.me">
+            href="mailto:jared.stanbrook@proton.me"
+          >
             Send a message
           </a>
         </div>
@@ -32,14 +37,16 @@ function Contact() {
             className="block text-primary hover:text-primary/80"
             href="https://www.linkedin.com/in/jaredstanbrook/"
             target="_blank"
-            rel="noreferrer noopener">
+            rel="noreferrer noopener"
+          >
             LinkedIn
           </a>
           <a
             className="block text-primary hover:text-primary/80"
             href="https://github.com/JaredStanbrook"
             target="_blank"
-            rel="noreferrer noopener">
+            rel="noreferrer noopener"
+          >
             GitHub
           </a>
         </div>

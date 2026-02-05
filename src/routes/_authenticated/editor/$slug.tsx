@@ -11,6 +11,7 @@ import { Loader2, AlertCircle } from "lucide-react";
 
 import { getBlogContentQueryOptions, usePutBlogMutation } from "@/api/blogApi";
 import { useQuery } from "@tanstack/react-query";
+import { blogFilenameFromSlug } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/editor/$slug")({
   component: EditBlogEditor,
@@ -32,7 +33,7 @@ function EditBlogEditor() {
   const [content, setContent] = useState("");
   const [hasLoadedData, setHasLoadedData] = useState(false);
 
-  const currentFilename = `${slug}.mdx`;
+  const currentFilename = blogFilenameFromSlug(slug);
   const putBlog = usePutBlogMutation();
 
   const {
@@ -53,10 +54,12 @@ function EditBlogEditor() {
       setPublishedAt(
         initialBlogData.metadata.publishedAt
           ? initialBlogData.metadata.publishedAt.slice(0, 16)
-          : ""
+          : "",
       );
       setUpdatedAt(
-        initialBlogData.metadata.updatedAt ? initialBlogData.metadata.updatedAt.slice(0, 16) : ""
+        initialBlogData.metadata.updatedAt
+          ? initialBlogData.metadata.updatedAt.slice(0, 16)
+          : "",
       );
       setDraft(initialBlogData.metadata.draft ?? false);
       setFeatured(initialBlogData.metadata.featured ?? false);
@@ -177,7 +180,9 @@ function EditBlogEditor() {
         <div className="text-center space-y-4">
           <AlertCircle className="h-12 w-12 text-destructive mx-auto" />
           <h2 className="text-2xl font-bold">Failed to Load Blog</h2>
-          <p className="text-muted-foreground">Could not load the blog post. It may not exist.</p>
+          <p className="text-muted-foreground">
+            Could not load the blog post. It may not exist.
+          </p>
           <Button onClick={() => navigate({ to: "/" })}>Return Home</Button>
         </div>
       </div>
@@ -187,7 +192,9 @@ function EditBlogEditor() {
   return (
     <div className="container py-12 flex flex-col mx-auto max-w-7xl">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Edit Blog: {title || slug}</h1>
+        <h1 className="text-3xl font-bold tracking-tight">
+          Edit Blog: {title || slug}
+        </h1>
         <Button variant="outline" onClick={handleCancel}>
           Cancel
         </Button>
@@ -198,7 +205,9 @@ function EditBlogEditor() {
         <div className="space-y-6">
           {/* Metadata Section */}
           <div className="rounded-lg border shadow-lg p-6 space-y-4 bg-card">
-            <h2 className="text-xl font-semibold border-b pb-3 mb-4">Metadata</h2>
+            <h2 className="text-xl font-semibold border-b pb-3 mb-4">
+              Metadata
+            </h2>
 
             <div>
               <Label htmlFor="filename">Filename</Label>
@@ -207,7 +216,7 @@ function EditBlogEditor() {
                 type="text"
                 value={currentFilename}
                 disabled
-                className="cursor-not-allowed bg-muted/50"
+                className="cursor-not-allowed bg-muted/50 mt-2"
               />
               <p className="text-xs text-muted-foreground mt-1">
                 Filename cannot be changed after creation
@@ -225,6 +234,7 @@ function EditBlogEditor() {
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="My Amazing Blog Post"
                 required
+                className="mt-2"
               />
             </div>
 
@@ -241,6 +251,7 @@ function EditBlogEditor() {
                 }}
                 min="1"
                 required
+                className="mt-2"
               />
             </div>
 
@@ -255,6 +266,7 @@ function EditBlogEditor() {
                 onChange={(e) => setSubject(e.target.value)}
                 placeholder="Technology, Design, etc."
                 required
+                className="mt-2"
               />
             </div>
 
@@ -266,6 +278,7 @@ function EditBlogEditor() {
                 value={summary}
                 onChange={(e) => setSummary(e.target.value)}
                 placeholder="Short summary for previews"
+                className="mt-2"
               />
             </div>
 
@@ -277,6 +290,7 @@ function EditBlogEditor() {
                 value={tags}
                 onChange={(e) => setTags(e.target.value)}
                 placeholder="security, cloud, tooling"
+                className="mt-2"
               />
             </div>
 
@@ -288,6 +302,7 @@ function EditBlogEditor() {
                   type="datetime-local"
                   value={publishedAt}
                   onChange={(e) => setPublishedAt(e.target.value)}
+                  className="mt-2"
                 />
               </div>
               <div>
@@ -297,6 +312,7 @@ function EditBlogEditor() {
                   type="datetime-local"
                   value={updatedAt}
                   onChange={(e) => setUpdatedAt(e.target.value)}
+                  className="mt-2"
                 />
               </div>
             </div>
@@ -323,7 +339,9 @@ function EditBlogEditor() {
 
           {/* Content Editor */}
           <div className="rounded-lg border shadow-lg p-6 bg-card">
-            <h2 className="text-xl font-semibold border-b pb-3 mb-4">Content (MDX)</h2>
+            <h2 className="text-xl font-semibold border-b pb-3 mb-4">
+              Content (MDX)
+            </h2>
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
@@ -346,7 +364,11 @@ console.log('Hello, world!');
           </div>
 
           <div className="flex gap-3 pb-12">
-            <Button onClick={handleSave} disabled={putBlog.isPending} className="w-full">
+            <Button
+              onClick={handleSave}
+              disabled={putBlog.isPending}
+              className="w-full"
+            >
               {putBlog.isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -361,19 +383,23 @@ console.log('Hello, world!');
 
         {/* Preview Panel */}
         <div className="rounded-lg border shadow-lg p-6 bg-card lg:sticky lg:top-24 lg:max-h-[85vh] lg:overflow-y-auto">
-          <h2 className="text-xl font-semibold border-b pb-3 mb-4">Live Preview</h2>
+          <h2 className="text-xl font-semibold border-b pb-3 mb-4">
+            Live Preview
+          </h2>
 
           <div className="mb-4 p-4 rounded border bg-muted/50">
             <h3 className="text-xl font-bold">{title || "Untitled"}</h3>
             <div className="text-sm text-muted-foreground mt-1">
               {readTime} min read • {subject || "No subject"}
             </div>
-            {summary && <p className="mt-2 text-sm text-muted-foreground">{summary}</p>}
+            {summary && (
+              <p className="mt-2 text-sm text-muted-foreground">{summary}</p>
+            )}
           </div>
 
           <div
             className="prose prose-lg dark:prose-invert max-w-none
-          prose-headings:text-foreground 
+          prose-headings:text-foreground
           prose-p:text-muted-foreground
           prose-a:text-primary hover:prose-a:text-primary/80
           prose-strong:text-foreground
@@ -382,8 +408,12 @@ console.log('Hello, world!');
           prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground
           prose-img:rounded-lg prose-img:shadow-lg
           prose-hr:border-border
-        ">
-            <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+        "
+          >
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              rehypePlugins={[rehypeRaw]}
+            >
               {contentWithoutFrontmatter || "*Start typing to see preview...*"}
             </ReactMarkdown>
           </div>

@@ -13,12 +13,15 @@ function ProjectDetail() {
 
   if (!project) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center text-center gap-4">
+      <div className="min-h-screen flex flex-col items-center justify-center text-center gap-4 lg:py-20">
         <h1 className="text-3xl font-semibold">Project not found</h1>
         <p className="text-muted-foreground max-w-md">
-          We couldn’t find that project. Try heading back to the archive to explore available work.
+          We couldn’t find that project. Try heading back to the archive to
+          explore available work.
         </p>
-        <Button onClick={() => navigate({ to: "/projects" })}>Back to projects</Button>
+        <Button onClick={() => navigate({ to: "/projects" })}>
+          Back to projects
+        </Button>
       </div>
     );
   }
@@ -26,7 +29,10 @@ function ProjectDetail() {
   return (
     <div className="min-h-screen space-y-10">
       <header className="space-y-6 border-b border-border pb-8">
-        <Link to="/projects" className="text-sm text-muted-foreground hover:text-primary">
+        <Link
+          to="/projects"
+          className="text-sm text-muted-foreground hover:text-primary"
+        >
           ← Back to projects
         </Link>
         <div className="space-y-4">
@@ -43,14 +49,19 @@ function ProjectDetail() {
               Updated {project.updatedAt ?? project.startedAt}
             </span>
           </div>
-          <h1 className="text-4xl font-semibold md:text-5xl">{project.title}</h1>
-          <p className="text-lg text-muted-foreground max-w-3xl">{project.summary}</p>
+          <h1 className="text-4xl font-semibold md:text-5xl">
+            {project.title}
+          </h1>
+          <p className="text-lg text-muted-foreground max-w-3xl">
+            {project.summary}
+          </p>
         </div>
         <div className="flex flex-wrap gap-2">
           {project.tags.map((tag) => (
             <span
               key={`${project.slug}-${tag}`}
-              className="rounded-full bg-muted/70 px-3 py-1 text-xs text-muted-foreground">
+              className="rounded-full bg-muted/70 px-3 py-1 text-xs text-muted-foreground"
+            >
               {tag}
             </span>
           ))}
@@ -96,7 +107,8 @@ function ProjectDetail() {
               {project.techStack.map((tech) => (
                 <span
                   key={`${project.slug}-${tech}`}
-                  className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">
+                  className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground"
+                >
                   {tech}
                 </span>
               ))}
@@ -124,7 +136,8 @@ function ProjectDetail() {
                   className="text-primary hover:text-primary/80"
                   href={project.links.live}
                   target="_blank"
-                  rel="noreferrer noopener">
+                  rel="noreferrer noopener"
+                >
                   Live site
                 </a>
               )}
@@ -133,7 +146,8 @@ function ProjectDetail() {
                   className="text-primary hover:text-primary/80"
                   href={project.links.github}
                   target="_blank"
-                  rel="noreferrer noopener">
+                  rel="noreferrer noopener"
+                >
                   GitHub repository
                 </a>
               )}
@@ -142,13 +156,18 @@ function ProjectDetail() {
                   className="text-primary hover:text-primary/80"
                   href={project.links.caseStudy}
                   target="_blank"
-                  rel="noreferrer noopener">
+                  rel="noreferrer noopener"
+                >
                   Case study
                 </a>
               )}
-              {!project.links.live && !project.links.github && !project.links.caseStudy && (
-                <span className="text-muted-foreground">No public links available.</span>
-              )}
+              {!project.links.live &&
+                !project.links.github &&
+                !project.links.caseStudy && (
+                  <span className="text-muted-foreground">
+                    No public links available.
+                  </span>
+                )}
             </div>
           </div>
         </aside>
