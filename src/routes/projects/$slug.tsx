@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { projects } from "@/data/projects";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { formatRelativeDate } from "@/lib/utils";
 
 export const Route = createFileRoute("/projects/$slug")({
@@ -23,6 +24,7 @@ function ProjectDetail() {
           ? "grid-cols-2"
           : "grid-cols-3";
   const [floatingPos, setFloatingPos] = useState({ x: 0, y: 0 });
+  const [activeShot, setActiveShot] = useState<string | null>(null);
   const targetPos = useRef({ x: 0, y: 0 });
   const animationRef = useRef<number | null>(null);
 
@@ -222,13 +224,19 @@ function ProjectDetail() {
                 {project.screenshots?.length ? (
                   <div className={`grid gap-4 ${screenshotGridClass}`}>
                     {project.screenshots.map((shot) => (
-                      <img
+                      <button
                         key={shot}
-                        src={shot}
-                        alt={`${project.title} screenshot`}
-                        className="aspect-square w-full rounded-2xl border border-border object-cover shadow-sm"
-                        loading="lazy"
-                      />
+                        type="button"
+                        className="group relative cursor-pointer overflow-hidden rounded-2xl border border-border bg-transparent p-0 text-left shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                        onClick={() => setActiveShot(shot)}
+                      >
+                        <img
+                          src={shot}
+                          alt={`${project.title} screenshot`}
+                          className="aspect-square w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                          loading="lazy"
+                        />
+                      </button>
                     ))}
                   </div>
                 ) : (
@@ -280,6 +288,21 @@ function ProjectDetail() {
           </div>
         </section>
       </div>
+
+      <Dialog
+        open={Boolean(activeShot)}
+        onOpenChange={(open) => !open && setActiveShot(null)}
+      >
+        <DialogContent className="flex w-auto max-w-[95vw] items-center justify-center border-border/60 bg-background/95 p-4 shadow-2xl sm:p-6">
+          {activeShot && (
+            <img
+              src={activeShot}
+              alt={`${project.title} screenshot full view`}
+              className="max-h-[80vh] w-auto max-w-[90vw] rounded-lg object-contain"
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
