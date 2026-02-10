@@ -42,6 +42,7 @@ import {
   KeyRound,
   Hash,
 } from "lucide-react";
+import { formatRelativeDate } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   component: Profile,
@@ -68,18 +69,6 @@ function Profile() {
       { displayName },
       { onSuccess: () => setIsEditing(false) },
     );
-  };
-
-  // Helper for dates
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return "Never";
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
   };
 
   if (!user) return null;
@@ -201,14 +190,14 @@ function Profile() {
             <Label className="text-muted-foreground text-xs uppercase">
               Joined
             </Label>
-            <div>{formatDate(user.createdAt)}</div>
+            <div>{formatRelativeDate(user.createdAt, { fallback: "Never" })}</div>
           </div>
 
           <div className="space-y-1">
             <Label className="text-muted-foreground text-xs uppercase">
               Last Login
             </Label>
-            <div>{formatDate(user.lastLoginAt)}</div>
+            <div>{formatRelativeDate(user.lastLoginAt, { fallback: "Never" })}</div>
           </div>
         </CardContent>
       </Card>

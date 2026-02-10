@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getAllBlogsQueryOptions } from "@/api/blogApi";
-import { normalizeBlogSlug } from "@/lib/utils";
+import { formatRelativeDate, normalizeBlogSlug } from "@/lib/utils";
 
 export const Route = createFileRoute("/blog/")({
   component: BlogIndex,
@@ -187,11 +187,7 @@ function BlogCard({
           <p className="mt-2 text-sm text-muted-foreground">{blog.summary}</p>
         )}
         <div className="mt-4 text-xs text-muted-foreground">
-          {new Date(blog.createdAt).toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-          })}
+          {formatRelativeDate(blog.createdAt)}
         </div>
       </article>
     </Link>

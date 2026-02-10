@@ -8,7 +8,7 @@ import {
 import Typewriter from "@/components/typewriter";
 import type { SelectBlogMetadata } from "@server/schema/blogs.schema";
 import { featuredProjects } from "@/data/projects";
-import { normalizeBlogSlug } from "@/lib/utils";
+import { formatRelativeDate, normalizeBlogSlug } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
   component: Homepage,
@@ -247,15 +247,6 @@ function Homepage() {
     }, 200);
   }, []);
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  };
-
   const handleBlogClick = (slug: string) => {
     navigate({ to: "/blog/$slug", params: { slug: normalizeBlogSlug(slug) } });
   };
@@ -427,7 +418,7 @@ function Homepage() {
                     </div>
 
                     <div className="text-sm mt-4">
-                      {blog.authorName} • {formatDate(blog.createdAt)}
+                      {blog.authorName} • {formatRelativeDate(blog.createdAt)}
                     </div>
                   </CardContent>
                 </HighlightCard>

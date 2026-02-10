@@ -22,6 +22,7 @@ import {
   type GitHubPunchCardPoint,
 } from "@/api/githubApi";
 import { useQuery } from "@tanstack/react-query";
+import { formatRelativeDate } from "@/lib/utils";
 
 const COLORS = [
   "#1E3A8A",
@@ -53,11 +54,7 @@ export function GitHubRepoCommitData() {
     return data
       .filter((activity) => activity.total > 0) // Only include weeks with commits
       .map((activity) => ({
-        week: new Date(activity.week * 1000).toLocaleDateString("en-US", {
-          day: "2-digit",
-          month: "short",
-          year: "2-digit",
-        }), // Format as MMM-DD-YY
+        week: formatRelativeDate(new Date(activity.week * 1000)),
         total: activity.total,
       }));
   };
@@ -108,11 +105,7 @@ export function GitHubRepoCodeFrequency() {
     return data
       .filter(([, additions, deletions]) => additions !== 0 || deletions !== 0) // Keep only entries with changes
       .map(([date, additions, deletions]) => ({
-        week: new Date(date * 1000).toLocaleDateString("en-US", {
-          day: "2-digit",
-          month: "short",
-          year: "2-digit",
-        }),
+        week: formatRelativeDate(new Date(date * 1000)),
         additions,
         deletions,
       }));

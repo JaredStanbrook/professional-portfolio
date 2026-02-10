@@ -8,7 +8,7 @@ import { getUserQueryOptions } from "@/api/authApi";
 import { getBlogContentQueryOptions } from "@/api/blogApi";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { blogFilenameFromSlug } from "@/lib/utils";
+import { blogFilenameFromSlug, formatRelativeDate } from "@/lib/utils";
 
 export const Route = createFileRoute("/blog/$slug")({
   component: BlogView,
@@ -21,15 +21,6 @@ function BlogView() {
 
   const { data: userData } = useQuery(getUserQueryOptions);
   const { data: blog, isPending, error } = useQuery(getBlogContentQueryOptions(filename));
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
 
   if (isPending) {
     return (
@@ -99,14 +90,14 @@ function BlogView() {
               <span className="text-sm text-muted-foreground">{blog.metadata.authorName}</span>
               <span className="text-muted-foreground text-sm">•</span>
               <span className="text-sm text-muted-foreground">
-                {formatDate(blog.metadata.createdAt)}
+                {formatRelativeDate(blog.metadata.createdAt)}
               </span>
 
               {blog.metadata.createdAt !== blog.metadata.updatedAt && (
                 <>
                   <span className="text-muted-foreground text-sm">•</span>
                   <span className="text-sm text-muted-foreground italic">
-                    Updated {formatDate(blog.metadata.updatedAt)}
+                    Updated {formatRelativeDate(blog.metadata.updatedAt)}
                   </span>
                 </>
               )}

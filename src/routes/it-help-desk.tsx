@@ -27,6 +27,7 @@ import {
   PolarAngleAxis,
   PolarRadiusAxis,
 } from "recharts";
+import { formatRelativeDate } from "@/lib/utils";
 
 export const Route = createFileRoute("/it-help-desk")({
   component: SupportDashboard,
@@ -51,15 +52,19 @@ interface CollaborationData {
 function SupportDashboard() {
   // Count of interactions by date
   const dailyInteractions: DailyInteraction[] = [
-    { date: "Aug 23", count: 1 },
-    { date: "Aug 30", count: 10 },
-    { date: "Sep 13", count: 12 },
-    { date: "Sep 20", count: 5 },
-    { date: "Oct 4", count: 5 },
-    { date: "Oct 15", count: 1 },
-    { date: "Oct 25", count: 6 },
-    { date: "Nov 1", count: 1 },
+    { date: "2025-08-23", count: 1 },
+    { date: "2025-08-30", count: 10 },
+    { date: "2025-09-13", count: 12 },
+    { date: "2025-09-20", count: 5 },
+    { date: "2025-10-04", count: 5 },
+    { date: "2025-10-15", count: 1 },
+    { date: "2025-10-25", count: 6 },
+    { date: "2025-11-01", count: 1 },
   ];
+  const dailyInteractionChartData = dailyInteractions.map((entry) => ({
+    ...entry,
+    dateLabel: formatRelativeDate(entry.date),
+  }));
 
   // Types of issues helped with
   const issueTypes: IssueType[] = [
@@ -208,11 +213,11 @@ function SupportDashboard() {
                 <div className="flex-grow">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart
-                      data={dailyInteractions}
+                      data={dailyInteractionChartData}
                       margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                     >
                       <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-                      <XAxis dataKey="date" stroke="#4a4a4a" />
+                      <XAxis dataKey="dateLabel" stroke="#4a4a4a" />
                       <YAxis stroke="#4a4a4a" />
                       <Tooltip
                         contentStyle={{
