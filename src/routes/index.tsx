@@ -304,14 +304,14 @@ function Homepage() {
           </p>
 
           <p className="mt-2 text-lg md:text-xl text-muted-foreground text-justify">
-            Making complex systems feel calmer.
+            I like making things work a little better.
           </p>
         </div>
 
         <div className="flex flex-col justify-center w-full md:w-1/2 self-end">
           <p className="text-lg md:text-xl text-muted-foreground max-w-xl text-justify">
-            I care about collaboration, shared ownership, and doing the work
-            that makes good discussions possible.
+            A keen eye for detail, a mean sense of design, and a passion for
+            learning.
           </p>
         </div>
       </section>

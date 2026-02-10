@@ -97,7 +97,7 @@ function ProjectsArchive() {
             Project Archive
           </p>
           <h1 className="text-4xl font-semibold md:text-5xl">
-            Made with my bare hands.
+            Made with my bare hands. 🤚✋
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl">
             A curated archive of projects forged from a passion for learning and
@@ -257,7 +257,9 @@ function ProjectCard({ project }: { project: Project }) {
         </div>
       </div>
       <div className="mt-6 flex items-center justify-between text-xs text-muted-foreground">
-        <span>Started {formatRelativeDate(project.startedAt)}</span>
+        <span>
+          Started {formatRelativeDate(project.startedAt, { compact: true })}
+        </span>
         <Link
           to="/projects/$slug"
           params={{ slug: project.slug }}

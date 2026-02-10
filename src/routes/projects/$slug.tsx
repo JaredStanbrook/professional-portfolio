@@ -153,9 +153,6 @@ function ProjectDetail() {
                 {project.title}
               </h1>
 
-              <p className="text-lg text-muted-foreground max-w-2xl">
-                {project.summary}
-              </p>
               {(project.summary || project.problem || project.solution) && (
                 <p className="text-lg text-muted-foreground max-w-2xl">
                   {[project.summary, project.problem, project.solution]

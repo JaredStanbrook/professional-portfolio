@@ -63,12 +63,11 @@ function BlogIndex() {
           Blog
         </p>
         <h1 className="text-4xl font-semibold md:text-5xl">
-          Stored as Markdown files. Presented as stories. From Jared.
+          Stored as .mdx. Told as stories.
         </h1>
         <p className="text-lg text-muted-foreground max-w-2xl">
-          Research notes, build logs, and reflections from real-world security
-          and infrastructure work. Thoughts, guides, and reflections gathered
-          along the way — lessons learned, notes kept, ideas tested.
+          Build logs, research notes, and reflections gathered across projects —
+          what stuck, what changed, and what I learned along the way.
         </p>
       </header>
 
