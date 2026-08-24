@@ -1,0 +1,99 @@
+name: Deploy
+
+on:
+    workflow_dispatch:
+        inputs:
+            environment:
+                description: Wrangler environment to deploy
+                type: choice
+                options:
+                    - production
+                    - staging
+                default: production
+            run_migrations:
+                description: Apply pending D1 migrations before deploying
+                type: boolean
+                default: false
+    workflow_call:
+        inputs:
+            environment:
+                type: string
+                default: production
+            run_migrations:
+                type: boolean
+                default: false
+
+concurrency:
+    group: deploy-${{ inputs.environment }}
+    cancel-in-progress: false
+
+jobs:
+    deploy:
+        name: Deploy to Cloudflare (${{ inputs.environment }})
+        runs-on: ubuntu-latest
+
+        env:
+            CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+            CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Setup Bun
+              uses: oven-sh/setup-bun@v2
+              with:
+                  bun-version: latest
+
+            - name: Install dependencies
+              run: bun install
+
+            # wrangler.jsonc is gitignored (it holds D1/KV/R2 ids), so CI has to
+            # restore it from a secret before wrangler can do anything.
+            - name: Restore wrangler.jsonc
+              env:
+                  WRANGLER_CONFIG: ${{ secrets.WRANGLER_CONFIG }}
+              run: |
+                  if [ -f wrangler.jsonc ]; then
+                      echo "Using wrangler.jsonc from the repository."
+                  elif [ -n "$WRANGLER_CONFIG" ]; then
+                      printf '%s' "$WRANGLER_CONFIG" > wrangler.jsonc
+                      echo "Wrote wrangler.jsonc from the WRANGLER_CONFIG secret."
+                  else
+                      echo "::error::No wrangler.jsonc found and the WRANGLER_CONFIG secret is empty. Add your wrangler.jsonc (see wrangler.jsonc.example) as a repository secret named WRANGLER_CONFIG."
+                      exit 1
+                  fi
+
+            - name: Resolve wrangler environment flag
+              id: wrangler
+              run: |
+                  if [ "${{ inputs.environment }}" = "production" ]; then
+                      echo "flag=--env production" >> "$GITHUB_OUTPUT"
+                  else
+                      echo "flag=" >> "$GITHUB_OUTPUT"
+                  fi
+
+            - name: Generate worker types
+              run: bunx wrangler types ${{ steps.wrangler.outputs.flag }}
+
+            - name: Apply D1 migrations
+              if: inputs.run_migrations
+              run: |
+                  bunx drizzle-kit generate
+                  bunx wrangler d1 migrations apply DB --remote ${{ steps.wrangler.outputs.flag }}
+
+            - name: Build
+              run: bun run build
+
+            - name: Deploy to Cloudflare Workers
+              run: bunx wrangler deploy ${{ steps.wrangler.outputs.flag }}
+
+            - name: Summary
+              run: |
+                  {
+                      echo "### Deployed :rocket:"
+                      echo
+                      echo "- **Environment:** \`${{ inputs.environment }}\`"
+                      echo "- **Commit:** \`${{ github.sha }}\`"
+                      echo "- **Migrations applied:** \`${{ inputs.run_migrations }}\`"
+                  } >> "$GITHUB_STEP_SUMMARY"
