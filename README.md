@@ -111,8 +111,29 @@ cp wrangler.jsonc.example wrangler.jsonc
 
 1. **Create Remote Migrations & Build for production & Deploy to Cloudflare**
    ```bash
-   bun run build:prod
+   bun run deploy
    ```
+
+### Deploying from GitHub Actions
+
+The [`Deploy`](./.github/workflows/deploy.yml) workflow can be run on demand from
+**Actions → Deploy → Run workflow**. It builds the project and runs
+`wrangler deploy` against the environment you pick:
+
+| Input            | Default      | Notes                                                          |
+| ---------------- | ------------ | -------------------------------------------------------------- |
+| `environment`    | `production` | `production` deploys `jared.stanbrook.me`; `staging` deploys the top-level config (`dev.jared.stanbrook.me`). |
+| `run_migrations` | `false`      | Generates and applies pending D1 migrations before deploying.   |
+
+Pushes to `main` reuse the same workflow automatically (production, with migrations).
+
+**Required repository secrets** (Settings → Secrets and variables → Actions):
+
+| Secret                  | Purpose                                                                     |
+| ----------------------- | --------------------------------------------------------------------------- |
+| `CLOUDFLARE_API_TOKEN`  | API token with Workers Scripts, D1, KV, and R2 edit permissions.             |
+| `CLOUDFLARE_ACCOUNT_ID` | Your Cloudflare account ID.                                                  |
+| `WRANGLER_CONFIG`       | The full contents of your local `wrangler.jsonc`. Required because that file is gitignored, so CI has no other way to learn your D1/KV/R2 ids. |
 
 ---
 
