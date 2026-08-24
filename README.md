@@ -88,31 +88,49 @@ bun dev
 
 ## 🚢 Deployment
 
-> **⚠️ Configuration Required:**  
-> Before running or deploying this project, you must create your own `wrangler.jsonc` file at the project root.
->
-> - Use the provided [`wrangler.jsonc.example`](./wrangler.jsonc.example) as a template.
-> - Replace placeholder values with your own Cloudflare resources:
->   - **D1 Database:** Set your own `database_name`, `database_id`, and `migrations_dir`.
->   - **KV Namespaces:** Add your KV namespace `binding` and `id`.
->   - **R2 Buckets:** Add your R2 `binding` and `bucket_name`.
->   - **Routes:** Update `pattern` and `custom_domain` for your deployment domains.
-> - For more details, see the [Cloudflare Wrangler documentation](https://developers.cloudflare.com/workers/wrangler/configuration/).
+`wrangler.jsonc` is **committed** in this repo. CI only ever sees what is in the
+repository, so an untracked config is why a build fails with *"Missing entry-point
+to Worker script or to assets directory"* — the dashboard holds bindings and
+secrets, but `main` and `assets.directory` live only in this file.
 
-**Example:**
+It is not a secret: resource ids are inert without an account-scoped API token.
+Real secrets (`JWT_SECRET`, `GITHUB_API_TOKEN`, `SMTP_PASS`, `SMS_PROVIDER_API_KEY`)
+belong in `.dev.vars` locally and Cloudflare encrypted secrets in production —
+never in `vars`.
 
-```bash
-cp wrangler.jsonc.example wrangler.jsonc
-# Edit wrangler.jsonc with your Cloudflare D1, KV, and R2 details
-```
+Forking? Copy [`wrangler.jsonc.example`](./wrangler.jsonc.example) over it and
+replace the ids, the invite list and the domains. Binding names are not
+free-form: they must match `worker/types.ts` (`DB`, `KV`, `BLOG`,
+`RATE_LIMITER`, `ASSETS`) or the worker reads `undefined` at runtime.
 
-> **Note:**  
-> Your project will not build or deploy until you have configured these Cloudflare resources in `wrangler.jsonc`.
+> **⚠️ `vars` are replaced on every deploy.**
+> `wrangler deploy` overwrites the worker's plain-text variables with whatever
+> is in `vars`. Anything set as a *plain-text* variable in the Cloudflare
+> dashboard but omitted here is wiped on the next deploy; encrypted secrets are
+> preserved. Environments inherit nothing, so `env.staging` repeats every key.
 
-1. **Create Remote Migrations & Build for production & Deploy to Cloudflare**
+### Database migrations
+
+`drizzle/` is gitignored, so a fresh checkout has **no migration history**.
+`bun run migrate:remote` runs `drizzle-kit generate` first, which in that state
+emits a single `0000_*.sql` creating all nine tables — applying it to a database
+that already has them fails. Run migrations from a working copy that holds the
+real history, and treat CI migrations as off until `drizzle/` is committed
+(which is what Drizzle expects; migration files are meant to be version
+controlled).
+
+1. **Build and deploy to Cloudflare**
+
    ```bash
-   bun run deploy
+   bun run deploy                     # -> jared.stanbrook.me (production)
+   bunx wrangler deploy --env staging # -> dev.jared.stanbrook.me
    ```
+
+   Production is the **top-level** config, so it takes no `--env` flag, and the
+   Cloudflare Workers Builds default deploy command (`npx wrangler deploy`) is
+   already correct. Named environments deploy a *separate* worker script
+   (`professionalportfolio-staging`) with its own secrets — they do not share
+   secrets or custom domains with the top-level worker.
 
 ### Deploying from GitHub Actions
 
@@ -122,10 +140,10 @@ The [`Deploy`](./.github/workflows/deploy.yml) workflow can be run on demand fro
 
 | Input            | Default      | Notes                                                          |
 | ---------------- | ------------ | -------------------------------------------------------------- |
-| `environment`    | `production` | `production` deploys `jared.stanbrook.me`; `staging` deploys the top-level config (`dev.jared.stanbrook.me`). |
-| `run_migrations` | `false`      | Generates and applies pending D1 migrations before deploying.   |
+| `environment`    | `production` | `production` deploys the top-level config (`jared.stanbrook.me`); `staging` deploys `env.staging` (`dev.jared.stanbrook.me`) as a separate worker. |
+| `run_migrations` | `false`      | Applies pending D1 migrations first. Leave off — see *Database migrations* above. |
 
-Pushes to `main` reuse the same workflow automatically (production, with migrations).
+Pushes to `main` reuse the same workflow automatically (production, migrations off).
 
 **Required repository secrets** (Settings → Secrets and variables → Actions):
 
@@ -133,7 +151,7 @@ Pushes to `main` reuse the same workflow automatically (production, with migrati
 | ----------------------- | --------------------------------------------------------------------------- |
 | `CLOUDFLARE_API_TOKEN`  | API token with Workers Scripts, D1, KV, and R2 edit permissions.             |
 | `CLOUDFLARE_ACCOUNT_ID` | Your Cloudflare account ID.                                                  |
-| `WRANGLER_CONFIG`       | The full contents of your local `wrangler.jsonc`. Required because that file is gitignored, so CI has no other way to learn your D1/KV/R2 ids. |
+| `WRANGLER_CONFIG`       | *Optional fallback.* Only needed if you choose not to commit `wrangler.jsonc`; the workflow writes it from this secret when the file is absent. |
 
 ---
 

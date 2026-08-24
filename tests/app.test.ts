@@ -4,7 +4,7 @@ import { SELF } from "cloudflare:test";
 describe("Hono App - Integration Tests", () => {
   describe("CORS", () => {
     it("should handle OPTIONS preflight requests", async () => {
-      const response = await SELF.fetch("http://example.com/api/auth/csrf-token", {
+      const response = await SELF.fetch("http://example.com/api/auth/methods", {
         method: "OPTIONS",
       });
 
@@ -15,13 +15,13 @@ describe("Hono App - Integration Tests", () => {
 
   describe("Base Path", () => {
     it("should route /api/auth requests correctly", async () => {
-      const response = await SELF.fetch("http://example.com/api/auth/csrf-token");
+      const response = await SELF.fetch("http://example.com/api/auth/methods");
 
       expect(response.status).toBeLessThan(500);
     });
 
     it("should route /api/blog requests correctly", async () => {
-      const response = await SELF.fetch("http://example.com/api/blog/posts");
+      const response = await SELF.fetch("http://example.com/api/blog/");
 
       expect(response.status).toBeLessThan(500);
     });
@@ -44,7 +44,7 @@ describe("Hono App - Integration Tests", () => {
 
   describe("HTTP Methods", () => {
     it("should allow GET requests", async () => {
-      const response = await SELF.fetch("http://example.com/api/auth/csrf-token", {
+      const response = await SELF.fetch("http://example.com/api/auth/methods", {
         method: "GET",
       });
 

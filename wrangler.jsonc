@@ -1,16 +1,3 @@
-// Template for `wrangler.jsonc`, which IS committed in this repo -- CI only
-// ever sees what is in the repository, so an untracked config means
-// `wrangler deploy` fails with "Missing entry-point to Worker script".
-//
-// This file exists so a fork can see the expected shape. Keep it in step with
-// wrangler.jsonc; only the ids, the invite list and the domains differ.
-//
-// Binding names are not free-form: they must match worker/types.ts
-// (DB, KV, BLOG, RATE_LIMITER, ASSETS) or the worker reads undefined at runtime.
-//
-// Not secret: resource ids are inert without an account-scoped API token.
-// Real secrets (JWT_SECRET, GITHUB_API_TOKEN, SMTP_PASS, SMS_PROVIDER_API_KEY)
-// go in .dev.vars locally and Cloudflare encrypted secrets in production.
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "professionalportfolio",
@@ -49,7 +36,7 @@
     {
       "binding": "DB",
       "database_name": "professional-portfolio-db",
-      "database_id": "<your-d1-database-id>",
+      "database_id": "ecb3b2b7-8d46-455b-b645-29c109e8b8a5",
       "migrations_dir": "drizzle",
     },
   ],
@@ -57,7 +44,7 @@
   "kv_namespaces": [
     {
       "binding": "KV",
-      "id": "<your-kv-namespace-id>",
+      "id": "0fb3123f10344b61825a07a4e8f1053f",
     },
   ],
 
@@ -85,7 +72,7 @@
     "SESSION_DURATION": "86400000",
     "SESSION_RENEWAL_THRESHOLD": "3600000",
     "MAX_SESSIONS_PER_USER": "5",
-    "ALLOWED_EMAILS": "you@example.com",
+    "ALLOWED_EMAILS": "jared@stanbrook.me",
     "MAX_FAILED_LOGIN_ATTEMPTS": "5",
     "LOCKOUT_DURATION": "900000",
     "REQUIRE_EMAIL_VERIFICATION": "false",
@@ -130,7 +117,7 @@
         {
           "binding": "DB",
           "database_name": "professional-portfolio-db",
-          "database_id": "<your-d1-database-id>",
+          "database_id": "ecb3b2b7-8d46-455b-b645-29c109e8b8a5",
           "migrations_dir": "drizzle",
         },
       ],
@@ -138,7 +125,7 @@
       "kv_namespaces": [
         {
           "binding": "KV",
-          "id": "<your-kv-namespace-id>",
+          "id": "0fb3123f10344b61825a07a4e8f1053f",
         },
       ],
 
@@ -170,7 +157,7 @@
         "SESSION_DURATION": "86400000",
         "SESSION_RENEWAL_THRESHOLD": "3600000",
         "MAX_SESSIONS_PER_USER": "5",
-        "ALLOWED_EMAILS": "you@example.com",
+        "ALLOWED_EMAILS": "jared@stanbrook.me",
         "MAX_FAILED_LOGIN_ATTEMPTS": "5",
         "LOCKOUT_DURATION": "900000",
         "REQUIRE_EMAIL_VERIFICATION": "false",

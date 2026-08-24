@@ -11,7 +11,7 @@ on:
                     - staging
                 default: production
             run_migrations:
-                description: Apply pending D1 migrations before deploying
+                description: "Apply pending D1 migrations first (unsafe while drizzle/ is gitignored - see README)"
                 type: boolean
                 default: false
     workflow_call:
@@ -67,15 +67,20 @@ jobs:
             - name: Resolve wrangler environment flag
               id: wrangler
               run: |
+                  # Production is the top-level config, so it takes no --env flag:
+                  # `--env <name>` would deploy a separate worker script
+                  # (professionalportfolio-<name>) with its own secrets.
                   if [ "${{ inputs.environment }}" = "production" ]; then
-                      echo "flag=--env production" >> "$GITHUB_OUTPUT"
-                  else
                       echo "flag=" >> "$GITHUB_OUTPUT"
+                  else
+                      echo "flag=--env ${{ inputs.environment }}" >> "$GITHUB_OUTPUT"
                   fi
 
             - name: Generate worker types
               run: bunx wrangler types ${{ steps.wrangler.outputs.flag }}
 
+            # Only sound once the drizzle/ migration history is committed;
+            # regenerating it here produces a create-everything migration.
             - name: Apply D1 migrations
               if: inputs.run_migrations
               run: |
