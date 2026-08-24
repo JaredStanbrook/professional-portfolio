@@ -67,10 +67,13 @@ jobs:
             - name: Resolve wrangler environment flag
               id: wrangler
               run: |
+                  # Production is the top-level config, so it takes no --env flag:
+                  # `--env <name>` would deploy a separate worker script
+                  # (professionalportfolio-<name>) with its own secrets.
                   if [ "${{ inputs.environment }}" = "production" ]; then
-                      echo "flag=--env production" >> "$GITHUB_OUTPUT"
-                  else
                       echo "flag=" >> "$GITHUB_OUTPUT"
+                  else
+                      echo "flag=--env ${{ inputs.environment }}" >> "$GITHUB_OUTPUT"
                   fi
 
             - name: Generate worker types

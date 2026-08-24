@@ -120,14 +120,15 @@ git add wrangler.jsonc && git commit -m "Adds wrangler configuration"
 1. **Build and deploy to Cloudflare**
 
    ```bash
-   bun run deploy                        # -> dev.jared.stanbrook.me (default env)
-   bunx wrangler deploy --env production # -> jared.stanbrook.me
+   bun run deploy                     # -> jared.stanbrook.me (production)
+   bunx wrangler deploy --env staging # -> dev.jared.stanbrook.me
    ```
 
-   The `deploy` script targets the top-level config. The live domain lives under
-   `env.production`, so a production release needs the `--env production` flag.
-   If you deploy via Cloudflare Workers Builds, set its **deploy command** to
-   `npx wrangler deploy --env production` for the same reason.
+   Production is the **top-level** config, so it takes no `--env` flag, and the
+   Cloudflare Workers Builds default deploy command (`npx wrangler deploy`) is
+   already correct. Named environments deploy a *separate* worker script
+   (`professionalportfolio-staging`) with its own secrets — they do not share
+   secrets or custom domains with the top-level worker.
 
 ### Deploying from GitHub Actions
 
@@ -137,7 +138,7 @@ The [`Deploy`](./.github/workflows/deploy.yml) workflow can be run on demand fro
 
 | Input            | Default      | Notes                                                          |
 | ---------------- | ------------ | -------------------------------------------------------------- |
-| `environment`    | `production` | `production` deploys `jared.stanbrook.me`; `staging` deploys the top-level config (`dev.jared.stanbrook.me`). |
+| `environment`    | `production` | `production` deploys the top-level config (`jared.stanbrook.me`); `staging` deploys `env.staging` (`dev.jared.stanbrook.me`) as a separate worker. |
 | `run_migrations` | `false`      | Generates and applies pending D1 migrations before deploying.   |
 
 Pushes to `main` reuse the same workflow automatically (production, with migrations).
