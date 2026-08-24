@@ -1,0 +1,188 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "professionalportfolio",
+  "compatibility_date": "2025-01-01",
+  "main": "worker/index.ts",
+
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "single-page-application",
+  },
+
+  "observability": {
+    "enabled": true,
+  },
+
+  "dev": {
+    "port": 3000,
+    "local_protocol": "http",
+  },
+
+  // ---------------------------------------------------------------------
+  // PRODUCTION lives at the top level, so plain `wrangler deploy` targets
+  // the live site and keeps using the existing `professionalportfolio`
+  // worker (and the secrets already set on it).
+  // ---------------------------------------------------------------------
+  "routes": [
+    {
+      "pattern": "jared.stanbrook.me",
+      "custom_domain": true,
+    },
+  ],
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "professional-portfolio-db",
+      "database_id": "ecb3b2b7-8d46-455b-b645-29c109e8b8a5",
+      "migrations_dir": "drizzle",
+    },
+  ],
+
+  "kv_namespaces": [
+    {
+      "binding": "KV",
+      "id": "0fb3123f10344b61825a07a4e8f1053f",
+    },
+  ],
+
+  "r2_buckets": [
+    {
+      "binding": "BLOG",
+      "bucket_name": "blog-r2",
+    },
+  ],
+
+  "ratelimits": [
+    {
+      "name": "RATE_LIMITER",
+      "namespace_id": "1001",
+      "simple": {
+        "limit": 100,
+        "period": 60,
+      },
+    },
+  ],
+
+  "vars": {
+    "ENVIRONMENT": "production",
+    "AUTH_METHODS": "passkey,password",
+    "SESSION_DURATION": "86400000",
+    "SESSION_RENEWAL_THRESHOLD": "3600000",
+    "MAX_SESSIONS_PER_USER": "5",
+    "ALLOWED_EMAILS": "jared@stanbrook.me",
+    "MAX_FAILED_LOGIN_ATTEMPTS": "5",
+    "LOCKOUT_DURATION": "900000",
+    "REQUIRE_EMAIL_VERIFICATION": "false",
+    "REQUIRE_PHONE_VERIFICATION": "false",
+    "ROLES_AVAILABLE": "user,editor,admin",
+    "ROLES_DEFAULT": "user",
+    "ROLES_RESTRICTED": "admin",
+    "PERMISSIONS_AVAILABLE": "blogs.create,blogs.read,blogs.update,blogs.delete,blogs.update.any,blogs.delete.any",
+    "ROLES_INHERENT": "user:blogs.read,blogs.create,blogs.update;editor:blogs.read,blogs.create,blogs.update.any;admin:*",
+    "RP_NAME": "Jared Stanbrook",
+    "RP_ID": "jared.stanbrook.me",
+    "ORIGIN": "https://jared.stanbrook.me",
+    "PASSWORD_MIN_LENGTH": "8",
+    "PASSWORD_REQUIRE_UPPERCASE": "true",
+    "PASSWORD_REQUIRE_LOWERCASE": "true",
+    "PASSWORD_REQUIRE_NUMBERS": "true",
+    "PASSWORD_REQUIRE_SPECIAL": "true",
+    "PIN_LENGTH": "6",
+    "PIN_NUMBERS_ONLY": "true",
+    "TOTP_ISSUER": "Jared Stanbrook",
+    "TOTP_ALGORITHM": "SHA1",
+    "TOTP_DIGITS": "6",
+    "TOTP_PERIOD": "30",
+    "JWT_EXPIRY": "86400000",
+  },
+
+  // ---------------------------------------------------------------------
+  // Optional staging: `wrangler deploy --env staging`. NOTE this deploys a
+  // SEPARATE worker script named `professionalportfolio-staging` with its
+  // own secrets. Environments inherit nothing, so everything is repeated.
+  // ---------------------------------------------------------------------
+  "env": {
+    "staging": {
+      "routes": [
+        {
+          "pattern": "dev.jared.stanbrook.me",
+          "custom_domain": true,
+        },
+      ],
+
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "professional-portfolio-db",
+          "database_id": "ecb3b2b7-8d46-455b-b645-29c109e8b8a5",
+          "migrations_dir": "drizzle",
+        },
+      ],
+
+      "kv_namespaces": [
+        {
+          "binding": "KV",
+          "id": "0fb3123f10344b61825a07a4e8f1053f",
+        },
+      ],
+
+      "r2_buckets": [
+        {
+          "binding": "BLOG",
+          "bucket_name": "blog-r2",
+        },
+      ],
+
+      "ratelimits": [
+        {
+          "name": "RATE_LIMITER",
+          "namespace_id": "1001",
+          "simple": {
+            "limit": 100,
+            "period": 60,
+          },
+        },
+      ],
+
+      "observability": {
+        "enabled": true,
+      },
+
+      "vars": {
+        "ENVIRONMENT": "staging",
+        "AUTH_METHODS": "passkey,password",
+        "SESSION_DURATION": "86400000",
+        "SESSION_RENEWAL_THRESHOLD": "3600000",
+        "MAX_SESSIONS_PER_USER": "5",
+        "ALLOWED_EMAILS": "jared@stanbrook.me",
+        "MAX_FAILED_LOGIN_ATTEMPTS": "5",
+        "LOCKOUT_DURATION": "900000",
+        "REQUIRE_EMAIL_VERIFICATION": "false",
+        "REQUIRE_PHONE_VERIFICATION": "false",
+        "ROLES_AVAILABLE": "user,editor,admin",
+        "ROLES_DEFAULT": "user",
+        "ROLES_RESTRICTED": "admin",
+        "PERMISSIONS_AVAILABLE": "blogs.create,blogs.read,blogs.update,blogs.delete,blogs.update.any,blogs.delete.any",
+        "ROLES_INHERENT": "user:blogs.read,blogs.create,blogs.update;editor:blogs.read,blogs.create,blogs.update.any;admin:*",
+        "RP_NAME": "Jared Stanbrook",
+        "RP_ID": "dev.jared.stanbrook.me",
+        "ORIGIN": "https://dev.jared.stanbrook.me",
+        "PASSWORD_MIN_LENGTH": "8",
+        "PASSWORD_REQUIRE_UPPERCASE": "true",
+        "PASSWORD_REQUIRE_LOWERCASE": "true",
+        "PASSWORD_REQUIRE_NUMBERS": "true",
+        "PASSWORD_REQUIRE_SPECIAL": "true",
+        "PIN_LENGTH": "6",
+        "PIN_NUMBERS_ONLY": "true",
+        "TOTP_ISSUER": "Jared Stanbrook",
+        "TOTP_ALGORITHM": "SHA1",
+        "TOTP_DIGITS": "6",
+        "TOTP_PERIOD": "30",
+        "JWT_EXPIRY": "86400000",
+      },
+    },
+  },
+}
