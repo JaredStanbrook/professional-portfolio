@@ -11,7 +11,7 @@ on:
                     - staging
                 default: production
             run_migrations:
-                description: Apply pending D1 migrations before deploying
+                description: "Apply pending D1 migrations first (unsafe while drizzle/ is gitignored - see README)"
                 type: boolean
                 default: false
     workflow_call:
@@ -79,6 +79,8 @@ jobs:
             - name: Generate worker types
               run: bunx wrangler types ${{ steps.wrangler.outputs.flag }}
 
+            # Only sound once the drizzle/ migration history is committed;
+            # regenerating it here produces a create-everything migration.
             - name: Apply D1 migrations
               if: inputs.run_migrations
               run: |

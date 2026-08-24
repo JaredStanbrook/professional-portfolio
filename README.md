@@ -88,34 +88,36 @@ bun dev
 
 ## 🚢 Deployment
 
-> **⚠️ Configuration Required:**
-> Before running or deploying this project you must create a `wrangler.jsonc` at the project root,
-> and **commit it**. Any CI that deploys (Cloudflare Workers Builds, GitHub Actions) only ever sees
-> what is in the repository — if this file is untracked, `wrangler deploy` fails with
-> *"Missing entry-point to Worker script or to assets directory"*.
->
-> - Start from [`wrangler.jsonc.example`](./wrangler.jsonc.example).
-> - Binding names must match `worker/types.ts` exactly: `DB`, `KV`, `BLOG`, `RATE_LIMITER`, `ASSETS`.
-> - Fill in your D1 `database_id` and KV namespace `id`.
-> - See the [Cloudflare Wrangler documentation](https://developers.cloudflare.com/workers/wrangler/configuration/).
+`wrangler.jsonc` is **committed** in this repo. CI only ever sees what is in the
+repository, so an untracked config is why a build fails with *"Missing entry-point
+to Worker script or to assets directory"* — the dashboard holds bindings and
+secrets, but `main` and `assets.directory` live only in this file.
 
-**Example:**
+It is not a secret: resource ids are inert without an account-scoped API token.
+Real secrets (`JWT_SECRET`, `GITHUB_API_TOKEN`, `SMTP_PASS`, `SMS_PROVIDER_API_KEY`)
+belong in `.dev.vars` locally and Cloudflare encrypted secrets in production —
+never in `vars`.
 
-```bash
-cp wrangler.jsonc.example wrangler.jsonc
-# Fill in your D1 / KV ids, then commit it
-git add wrangler.jsonc && git commit -m "Adds wrangler configuration"
-```
-
-> **This file is not a secret.** Resource ids are inert without an account-scoped API token.
-> Actual secrets (`JWT_SECRET`, `GITHUB_API_TOKEN`, `SMTP_PASS`, `SMS_PROVIDER_API_KEY`) go in
-> `.dev.vars` locally and in Cloudflare's encrypted secrets in production — never in `vars`.
+Forking? Copy [`wrangler.jsonc.example`](./wrangler.jsonc.example) over it and
+replace the ids, the invite list and the domains. Binding names are not
+free-form: they must match `worker/types.ts` (`DB`, `KV`, `BLOG`,
+`RATE_LIMITER`, `ASSETS`) or the worker reads `undefined` at runtime.
 
 > **⚠️ `vars` are replaced on every deploy.**
-> `wrangler deploy` overwrites the worker's plain-text variables with whatever is in `vars`.
-> Anything you set as a *plain-text* variable in the Cloudflare dashboard but omit from
-> `wrangler.jsonc` is wiped on the next deploy. Encrypted secrets are preserved.
-> Environments do not inherit `vars`, so `env.production.vars` must repeat every key.
+> `wrangler deploy` overwrites the worker's plain-text variables with whatever
+> is in `vars`. Anything set as a *plain-text* variable in the Cloudflare
+> dashboard but omitted here is wiped on the next deploy; encrypted secrets are
+> preserved. Environments inherit nothing, so `env.staging` repeats every key.
+
+### Database migrations
+
+`drizzle/` is gitignored, so a fresh checkout has **no migration history**.
+`bun run migrate:remote` runs `drizzle-kit generate` first, which in that state
+emits a single `0000_*.sql` creating all nine tables — applying it to a database
+that already has them fails. Run migrations from a working copy that holds the
+real history, and treat CI migrations as off until `drizzle/` is committed
+(which is what Drizzle expects; migration files are meant to be version
+controlled).
 
 1. **Build and deploy to Cloudflare**
 
@@ -139,9 +141,9 @@ The [`Deploy`](./.github/workflows/deploy.yml) workflow can be run on demand fro
 | Input            | Default      | Notes                                                          |
 | ---------------- | ------------ | -------------------------------------------------------------- |
 | `environment`    | `production` | `production` deploys the top-level config (`jared.stanbrook.me`); `staging` deploys `env.staging` (`dev.jared.stanbrook.me`) as a separate worker. |
-| `run_migrations` | `false`      | Generates and applies pending D1 migrations before deploying.   |
+| `run_migrations` | `false`      | Applies pending D1 migrations first. Leave off — see *Database migrations* above. |
 
-Pushes to `main` reuse the same workflow automatically (production, with migrations).
+Pushes to `main` reuse the same workflow automatically (production, migrations off).
 
 **Required repository secrets** (Settings → Secrets and variables → Actions):
 

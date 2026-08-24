@@ -56,6 +56,36 @@ describe("Auth Routes", () => {
 
       expect(response.status).toBe(403);
     });
+
+    // Regression: the origin pattern used to be an unanchored alternation, so
+    // any origin merely starting with http://localhost was trusted.
+    it.each([
+      "http://localhost.attacker.example",
+      "http://localhost.evil.com",
+      "http://localhostx",
+    ])("should reject the lookalike origin %s", async (origin) => {
+      const response = await SELF.fetch(LOGOUT_URL, { method: "POST", headers: { Origin: origin } });
+
+      expect(response.status).toBe(403);
+    });
+
+    it("should accept localhost with a dev port", async () => {
+      const response = await SELF.fetch(LOGOUT_URL, {
+        method: "POST",
+        headers: { Origin: "http://localhost:5173" },
+      });
+
+      expect(response.status).toBe(200);
+    });
+
+    it("should accept the origin configured for this deployment", async () => {
+      const response = await SELF.fetch(LOGOUT_URL, {
+        method: "POST",
+        headers: { Origin: env.ORIGIN },
+      });
+
+      expect(response.status).toBe(200);
+    });
   });
 
   describe("POST /api/auth/passkey/register/options", () => {

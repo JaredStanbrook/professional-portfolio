@@ -142,8 +142,20 @@ export const auth = new Hono<AppEnv>()
   .use(
     "*",
     csrf({
-      origin: (origin) => {
-        return /^http:\/\/localhost|https:\/\/jared\.stanbrook\.me$/.test(origin);
+      origin: (origin, c) => {
+        // The site's own origin, from config rather than hardcoded, so each
+        // deployment trusts only itself.
+        if (origin === c.env.ORIGIN) return true;
+
+        // Local dev only. A page served from localhost must not be able to
+        // post to production with the visitor's cookies attached.
+        if (c.env.ENVIRONMENT === "production") return false;
+
+        // Both ends anchored: the previous pattern was
+        // /^http:\/\/localhost|https:\/\/jared\.stanbrook\.me$/, where ^ and $
+        // each bound only one branch of the alternation, so an origin such as
+        // http://localhost.attacker.com satisfied the first branch.
+        return /^http:\/\/localhost(:\d+)?$/.test(origin);
       },
     })
   )

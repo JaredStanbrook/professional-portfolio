@@ -78,5 +78,10 @@ jobs:
         uses: ./.github/workflows/deploy.yml
         with:
             environment: production
-            run_migrations: true
+            # Off deliberately. `drizzle/` is gitignored, so a CI checkout has no
+            # migration history: `drizzle-kit generate` would emit a fresh
+            # 0000_*.sql creating every table and applying it to the live D1
+            # would fail on tables that already exist. Run migrations manually
+            # until the migration history is committed.
+            run_migrations: false
         secrets: inherit
