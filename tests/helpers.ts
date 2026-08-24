@@ -28,7 +28,7 @@ export function createTestAuthenticator(userId: string) {
  * Helper to get allowed email from environment
  */
 export function getAllowedEmail(): string {
-  return env.ALLOWED_EMAIL;
+  return env.ALLOWED_EMAILS;
 }
 
 /**
@@ -36,8 +36,8 @@ export function getAllowedEmail(): string {
  */
 export function getTestEmails() {
   return {
-    allowed: env.ALLOWED_EMAIL,
-    allowedUppercase: env.ALLOWED_EMAIL.toUpperCase(),
+    allowed: env.ALLOWED_EMAILS,
+    allowedUppercase: env.ALLOWED_EMAILS.toUpperCase(),
     disallowed: "notallowed@example.com",
     invalid: "not-an-email",
     empty: "",

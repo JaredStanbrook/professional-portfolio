@@ -6,12 +6,16 @@ export default defineWorkersConfig({
       workers: {
         wrangler: { configPath: "./wrangler.jsonc" },
         miniflare: {
+          // Pinned so tests do not inherit production values from
+          // wrangler.jsonc. Note the worker reads ALLOWED_EMAILS (plural);
+          // the previous ALLOWED_EMAIL binding was never read by anything.
           bindings: {
             ENVIRONMENT: "test",
             RP_NAME: "Test App",
             RP_ID: "example.com",
             ORIGIN: "http://example.com",
-            ALLOWED_EMAIL: "test@example.com",
+            ALLOWED_EMAILS: "test@example.com",
+            AUTH_METHODS: "passkey,password",
           },
         },
       },
