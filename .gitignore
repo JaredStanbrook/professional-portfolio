@@ -94,7 +94,6 @@ out
 # Cloudflare / Bun
 .wrangler*
 bun.lock.d
-wrangler.jsonc
 worker-configuration.d.ts
 drizzle/
 .dev.vars*

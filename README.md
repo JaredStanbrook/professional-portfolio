@@ -88,31 +88,46 @@ bun dev
 
 ## 🚢 Deployment
 
-> **⚠️ Configuration Required:**  
-> Before running or deploying this project, you must create your own `wrangler.jsonc` file at the project root.
+> **⚠️ Configuration Required:**
+> Before running or deploying this project you must create a `wrangler.jsonc` at the project root,
+> and **commit it**. Any CI that deploys (Cloudflare Workers Builds, GitHub Actions) only ever sees
+> what is in the repository — if this file is untracked, `wrangler deploy` fails with
+> *"Missing entry-point to Worker script or to assets directory"*.
 >
-> - Use the provided [`wrangler.jsonc.example`](./wrangler.jsonc.example) as a template.
-> - Replace placeholder values with your own Cloudflare resources:
->   - **D1 Database:** Set your own `database_name`, `database_id`, and `migrations_dir`.
->   - **KV Namespaces:** Add your KV namespace `binding` and `id`.
->   - **R2 Buckets:** Add your R2 `binding` and `bucket_name`.
->   - **Routes:** Update `pattern` and `custom_domain` for your deployment domains.
-> - For more details, see the [Cloudflare Wrangler documentation](https://developers.cloudflare.com/workers/wrangler/configuration/).
+> - Start from [`wrangler.jsonc.example`](./wrangler.jsonc.example).
+> - Binding names must match `worker/types.ts` exactly: `DB`, `KV`, `BLOG`, `RATE_LIMITER`, `ASSETS`.
+> - Fill in your D1 `database_id` and KV namespace `id`.
+> - See the [Cloudflare Wrangler documentation](https://developers.cloudflare.com/workers/wrangler/configuration/).
 
 **Example:**
 
 ```bash
 cp wrangler.jsonc.example wrangler.jsonc
-# Edit wrangler.jsonc with your Cloudflare D1, KV, and R2 details
+# Fill in your D1 / KV ids, then commit it
+git add wrangler.jsonc && git commit -m "Adds wrangler configuration"
 ```
 
-> **Note:**  
-> Your project will not build or deploy until you have configured these Cloudflare resources in `wrangler.jsonc`.
+> **This file is not a secret.** Resource ids are inert without an account-scoped API token.
+> Actual secrets (`JWT_SECRET`, `GITHUB_API_TOKEN`, `SMTP_PASS`, `SMS_PROVIDER_API_KEY`) go in
+> `.dev.vars` locally and in Cloudflare's encrypted secrets in production — never in `vars`.
 
-1. **Create Remote Migrations & Build for production & Deploy to Cloudflare**
+> **⚠️ `vars` are replaced on every deploy.**
+> `wrangler deploy` overwrites the worker's plain-text variables with whatever is in `vars`.
+> Anything you set as a *plain-text* variable in the Cloudflare dashboard but omit from
+> `wrangler.jsonc` is wiped on the next deploy. Encrypted secrets are preserved.
+> Environments do not inherit `vars`, so `env.production.vars` must repeat every key.
+
+1. **Build and deploy to Cloudflare**
+
    ```bash
-   bun run deploy
+   bun run deploy                        # -> dev.jared.stanbrook.me (default env)
+   bunx wrangler deploy --env production # -> jared.stanbrook.me
    ```
+
+   The `deploy` script targets the top-level config. The live domain lives under
+   `env.production`, so a production release needs the `--env production` flag.
+   If you deploy via Cloudflare Workers Builds, set its **deploy command** to
+   `npx wrangler deploy --env production` for the same reason.
 
 ### Deploying from GitHub Actions
 
@@ -133,7 +148,7 @@ Pushes to `main` reuse the same workflow automatically (production, with migrati
 | ----------------------- | --------------------------------------------------------------------------- |
 | `CLOUDFLARE_API_TOKEN`  | API token with Workers Scripts, D1, KV, and R2 edit permissions.             |
 | `CLOUDFLARE_ACCOUNT_ID` | Your Cloudflare account ID.                                                  |
-| `WRANGLER_CONFIG`       | The full contents of your local `wrangler.jsonc`. Required because that file is gitignored, so CI has no other way to learn your D1/KV/R2 ids. |
+| `WRANGLER_CONFIG`       | *Optional fallback.* Only needed if you choose not to commit `wrangler.jsonc`; the workflow writes it from this secret when the file is absent. |
 
 ---
 
