@@ -126,14 +126,10 @@ export const Layout: FC<LayoutProps> = (props) => {
               })
         }
 
-        <!-- pt-14 clears the FIXED NavBar (h-14). Without it the top of every
-             page renders underneath the bar. A bare page has no NavBar, so it
-             needs no offset. -->
-        <main
-          hx-boost="true"
-          id="main-content"
-          class="relative flex-grow w-full ${props.meta.bare ? "" : "pt-14"}"
-        >
+        <!-- No top offset: the nav is a single floating button in the corner,
+             not a bar, so nothing covers the top of the page. Pages keep their
+             own top padding clear of it. -->
+        <main hx-boost="true" id="main-content" class="relative flex-grow w-full">
           ${props.children}
         </main>
         <div id="modal-container"></div>

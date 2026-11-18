@@ -125,8 +125,7 @@ describe("UI pages load", () => {
     expect(res.status).toBe(302);
     expect(res.headers.get("location")).toBe("/login");
 
-    // The sign-in card stops offering it. (The nav's "Get Started" link does
-    // not know; it lands on /register, which redirects here.)
+    // The sign-in card stops offering it.
     const login = await (await get(closed, "/login")).text();
     expect(login).not.toContain("have an account?");
 

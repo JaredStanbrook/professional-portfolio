@@ -1,181 +1,58 @@
-import { html } from "hono/html";
+import { html, raw } from "hono/html";
 import { PropsUser } from "@server/schema/auth.schema";
 
 // --- CONFIGURATION ---
 /**
- * Nav links per role. Everyone sees `default`; a signed-in user also sees the
+ * Nav items per role. Everyone sees `default`; a signed-in user also sees the
  * union of the lists for every role they hold, de-duplicated by href.
  *
- * This is the main thing to edit when you add a feature area to a new site.
+ * The menu is icons only, so every entry needs an icon that says what it is
+ * on its own (registered in worker/components/lib/icons.ts) and a name, which
+ * becomes the accessible label and the hover caption.
  */
-const menuConfig: Record<string, Array<{ to: string; name: string }>> = {
+type NavItem = { to: string; name: string; icon: string };
+
+const menuConfig: Record<string, NavItem[]> = {
   default: [
-    { to: "/", name: "Blog" },
-    { to: "/about", name: "About" },
-    { to: "/grade-calculator", name: "Grade Calculator" },
+    { to: "/", name: "Blog", icon: "book-open" },
+    { to: "/about", name: "About me", icon: "user" },
+    { to: "/grade-calculator", name: "Grade calculator", icon: "calculator" },
   ],
-  user: [{ to: "/editor", name: "Write" }],
-  editor: [{ to: "/editor", name: "Write" }],
+  user: [{ to: "/editor", name: "Write", icon: "notebook-pen" }],
+  editor: [{ to: "/editor", name: "Write", icon: "notebook-pen" }],
   admin: [
-    { to: "/editor", name: "Write" },
-    { to: "/admin/access", name: "Access links" },
-    { to: "/admin/logs", name: "System Logs" },
+    { to: "/editor", name: "Write", icon: "notebook-pen" },
+    { to: "/admin/access", name: "Access links", icon: "link" },
+    { to: "/admin/logs", name: "System logs", icon: "scroll-text" },
   ],
 };
 
-// --- COMPONENTS ---
+const getMenuItems = (user: PropsUser | null | undefined) => {
+  const items: NavItem[] = [];
+  const seen = new Set<string>();
+
+  for (const role of ["default", ...(user?.roles ?? [])]) {
+    for (const item of menuConfig[role] ?? []) {
+      if (seen.has(item.to)) continue;
+      seen.add(item.to);
+      items.push(item);
+    }
+  }
+  return items;
+};
+
+// --- STYLES ---
+// Every bubble — the launcher and each item — is the same frosted circle.
+const bubble =
+  "flex h-14 w-14 items-center justify-center rounded-full border border-border/60 bg-background/60 text-foreground shadow-lg backdrop-blur-md transition-colors hover:bg-accent/80 hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
 /**
- * OrbitMark
- * A planet with a tilted ring: the brand mark. Drawn in currentColor and
- * theme tokens so it follows light and dark without its own colours.
+ * The caption under an item. When it shows is in `.float-nav-caption`
+ * (worker/index.css): on hover and keyboard focus, and always on a touch
+ * screen, where there is no hover to reveal it.
  */
-export const OrbitMark = () => html`
-  <svg viewBox="0 0 32 32" class="h-7 w-7 shrink-0" aria-hidden="true">
-    <circle cx="16" cy="16" r="7" class="fill-primary" />
-    <ellipse
-      cx="16"
-      cy="16"
-      rx="14"
-      ry="5"
-      transform="rotate(-20 16 16)"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-    />
-    <circle cx="28.5" cy="11.5" r="2" class="fill-chart-2" />
-  </svg>
-`;
-
-/**
- * ThemeToggle
- * Robust logic with large touch targets for mobile.
- */
-export const ThemeToggle = () => html`
-  <button
-    type="button"
-    class="theme-toggle-btn inline-flex h-11 w-11 items-center justify-center rounded-lg border border-input bg-transparent hover:bg-accent hover:text-accent-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
-    aria-label="Toggle theme"
-  >
-    <i data-theme-icon="light" data-lucide="sun" class="hidden w-5 h-5"></i>
-    <i data-theme-icon="dark" data-lucide="moon" class="hidden w-5 h-5"></i>
-    <i data-theme-icon="system" data-lucide="laptop" class="hidden w-5 h-5"></i>
-  </button>
-
-  <script>
-    (function () {
-      // 1. GUARD: Prevent script from running twice if component is rendered multiple times
-      if (window.__theme_toggle_init) return;
-      window.__theme_toggle_init = true;
-
-      const THEMES = ["light", "dark", "system"];
-      const STORAGE_KEY = "vite-ui-theme";
-      const root = document.documentElement;
-
-      function getButtons() {
-        return document.querySelectorAll(".theme-toggle-btn");
-      }
-
-      let currentTheme = localStorage.getItem(STORAGE_KEY) || "system";
-      if (!THEMES.includes(currentTheme)) currentTheme = "system";
-
-      function applyTheme(theme) {
-        root.classList.remove(...THEMES);
-        if (theme === "system") {
-          const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-          root.classList.toggle("dark", prefersDark);
-        } else {
-          root.classList.add(theme);
-        }
-      }
-
-      function updateIcons(theme) {
-        // 2. SYNC: Update icons on ALL buttons (Desktop & Mobile)
-        const buttons = getButtons();
-        buttons.forEach((btn) => {
-          btn.querySelectorAll("[data-theme-icon]").forEach((icon) => {
-            icon.classList.toggle("hidden", icon.dataset.themeIcon !== theme);
-          });
-        });
-
-        // Provided by the client bundle (worker/components/main.ts).
-        if (window.renderIcons) window.renderIcons();
-      }
-
-      function setTheme(theme) {
-        localStorage.setItem(STORAGE_KEY, theme);
-        currentTheme = theme;
-        applyTheme(theme);
-        updateIcons(theme);
-      }
-
-      document.addEventListener("DOMContentLoaded", () => {
-        setTheme(currentTheme);
-
-        // 3. EVENT DELEGATION: Listen on document to catch clicks on any toggle button
-        document.addEventListener("click", (e) => {
-          const btn = e.target.closest(".theme-toggle-btn");
-          if (!btn) return;
-
-          const nextIdx = (THEMES.indexOf(currentTheme) + 1) % THEMES.length;
-          setTheme(THEMES[nextIdx]);
-        });
-      });
-
-      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
-        if (currentTheme === "system") applyTheme("system");
-      });
-    })();
-  </script>
-`;
-
-/**
- * UserMenu (Desktop)
- * Classic dropdown for the top bar.
- */
-const UserMenu = ({ user }: { user: PropsUser }) => html`
-  <div class="relative">
-    <details class="group relative">
-      <summary
-        class="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-primary/10 hover:bg-primary/20 transition-colors list-none marker:hidden [&::-webkit-details-marker]:hidden border border-transparent focus:border-ring ring-offset-background"
-      >
-        <span class="font-bold text-sm text-primary"
-          >${(user.email || "??").substring(0, 2).toUpperCase()}</span
-        >
-      </summary>
-
-      <div
-        class="fixed inset-0 z-40 hidden"
-        onclick="this.parentNode.removeAttribute('open')"
-      ></div>
-
-      <div
-        class="absolute right-0 top-full mt-2 w-56 rounded-lg border bg-popover p-1 text-popover-foreground shadow-md animate-in fade-in zoom-in-95 z-50"
-      >
-        <div class="px-2 py-1.5 text-sm">
-          <div class="flex flex-col space-y-1">
-            <p class="font-medium leading-none truncate">${user.displayName || "User"}</p>
-            <p class="text-xs leading-none text-muted-foreground truncate">${user.email}</p>
-          </div>
-        </div>
-        <div class="h-px bg-muted my-1"></div>
-        <a
-          href="/profile"
-          class="flex w-full items-center rounded-sm px-2 py-2 text-sm hover:bg-accent transition-colors no-underline"
-        >
-          <i data-lucide="user" class="mr-2 h-4 w-4"></i> Profile
-        </a>
-        <div class="h-px bg-muted my-1"></div>
-        <button
-          hx-post="/web/auth/logout"
-          class="flex w-full items-center rounded-sm px-2 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors"
-        >
-          <i data-lucide="log-out" class="mr-2 h-4 w-4"></i> Log out
-        </button>
-      </div>
-    </details>
-  </div>
-`;
+const caption =
+  "float-nav-caption pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-popover px-2 py-1 text-xs font-medium text-popover-foreground shadow-sm";
 
 // --- MAIN NAVBAR ---
 
@@ -185,198 +62,227 @@ interface NavBarProps {
   currentPath?: string;
 }
 
-const getMenuItems = (user: PropsUser | null | undefined) => {
-  const items: { to: string; name: string }[] = [];
-  const seen = new Set<string>();
+/**
+ * The whole nav: one frosted circle fixed in the top-right corner. Pressing
+ * it blurs the page and blobs the items out of it one at a time; they drift
+ * about the screen until one is picked, the backdrop is clicked, Escape is
+ * pressed, or the circle is pressed again.
+ *
+ * The motion is CSS (`.float-nav*` in worker/index.css); the inline script
+ * only picks where each item lands and flips `data-open`.
+ */
+export const NavBar = ({ appName, user, currentPath }: NavBarProps) => {
+  const isActive = (to: string) =>
+    to === "/"
+      ? currentPath === "/" || !!currentPath?.startsWith("/blog/")
+      : !!currentPath?.startsWith(to);
 
-  const roles = ["default", ...(user?.roles ?? [])];
-  for (const role of roles) {
-    for (const item of menuConfig[role] ?? []) {
-      if (seen.has(item.to)) continue;
-      seen.add(item.to);
-      items.push(item);
+  const item = (content: unknown, label: string) => html`
+    <li class="float-nav-item group" style="--i:0">
+      <div class="float-nav-drift">${content}</div>
+      <span class="${caption}">${label}</span>
+    </li>
+  `;
+
+  return html`
+    <div id="float-nav" class="float-nav" data-open="false">
+      <div
+        class="float-nav-backdrop fixed inset-0 z-[90] bg-background/40 backdrop-blur-sm"
+        aria-hidden="true"
+      ></div>
+
+      <button
+        id="float-nav-toggle"
+        type="button"
+        class="${bubble} fixed right-4 top-4 z-[110]"
+        aria-expanded="false"
+        aria-controls="float-nav-menu"
+        aria-label="Open menu"
+      >
+        <i data-lucide="menu" class="float-nav-icon-open h-6 w-6" aria-hidden="true"></i>
+        <i data-lucide="x" class="float-nav-icon-close hidden h-6 w-6" aria-hidden="true"></i>
+      </button>
+
+      <nav id="float-nav-menu" aria-label="${appName}" class="float-nav-menu">
+        <ul class="contents">
+          ${getMenuItems(user).map((it) =>
+            item(
+              html`<a
+                href="${it.to}"
+                class="${bubble} no-underline ${isActive(it.to) ? "ring-2 ring-primary" : ""}"
+                aria-label="${it.name}"
+                ${isActive(it.to) ? raw('aria-current="page"') : ""}
+              >
+                <i data-lucide="${it.icon}" class="h-6 w-6" aria-hidden="true"></i>
+              </a>`,
+              it.name,
+            ),
+          )}
+          ${
+            user
+              ? item(
+                  html`<a href="/profile" class="${bubble} no-underline" aria-label="Profile">
+                    <i data-lucide="circle-user" class="h-6 w-6" aria-hidden="true"></i>
+                  </a>`,
+                  "Profile",
+                )
+              : ""
+          }
+          ${item(
+            html`<button type="button" class="${bubble} float-nav-theme" aria-label="Change theme">
+              <i
+                data-theme-icon="light"
+                data-lucide="sun"
+                class="hidden h-6 w-6"
+                aria-hidden="true"
+              ></i>
+              <i
+                data-theme-icon="dark"
+                data-lucide="moon"
+                class="hidden h-6 w-6"
+                aria-hidden="true"
+              ></i>
+              <i
+                data-theme-icon="system"
+                data-lucide="laptop"
+                class="h-6 w-6"
+                aria-hidden="true"
+              ></i>
+            </button>`,
+            "Theme",
+          )}
+          ${
+            user
+              ? item(
+                  html`<button
+                    type="button"
+                    hx-post="/web/auth/logout"
+                    class="${bubble} text-destructive hover:bg-destructive/15 hover:text-destructive"
+                    aria-label="Log out"
+                  >
+                    <i data-lucide="log-out" class="h-6 w-6" aria-hidden="true"></i>
+                  </button>`,
+                  "Log out",
+                )
+              : ""
+          }
+        </ul>
+      </nav>
+    </div>
+
+    ${floatNavScript}
+  `;
+};
+
+/**
+ * Open/close, scatter, and the theme cycle.
+ *
+ * A boosted navigation swaps <body>, which re-runs this script against fresh
+ * markup. The document-level listeners are added once; everything else looks
+ * the elements up when it needs them, so it always acts on the current page.
+ */
+const floatNavScript = raw(`<script>
+(function () {
+  var THEMES = ["light", "dark", "system"];
+  var KEY = "vite-ui-theme";
+  var root = document.documentElement;
+
+  function el(id) { return document.getElementById(id); }
+  function nav() { return el("float-nav"); }
+  function items() { return Array.prototype.slice.call(document.querySelectorAll("#float-nav .float-nav-item")); }
+  function rand(a, b) { return a + Math.random() * (b - a); }
+
+  // --- theme ---
+  function theme() { var t = localStorage.getItem(KEY) || "system"; return THEMES.indexOf(t) < 0 ? "system" : t; }
+  function applyTheme(t) {
+    root.classList.remove("light", "dark", "system");
+    if (t === "system") root.classList.toggle("dark", matchMedia("(prefers-color-scheme: dark)").matches);
+    else root.classList.add(t);
+    document.querySelectorAll("#float-nav [data-theme-icon]").forEach(function (i) {
+      i.classList.toggle("hidden", i.getAttribute("data-theme-icon") !== t);
+    });
+    var btn = document.querySelector("#float-nav .float-nav-theme");
+    if (btn) btn.setAttribute("aria-label", "Theme: " + t + ". Change theme");
+  }
+
+  /**
+   * Spread the items over the viewport: evenly round an ellipse, then
+   * jittered, so they look scattered but never stack. Each gets its own
+   * drift speed and phase so they do not bob in step.
+   */
+  function scatter() {
+    var list = items(), n = list.length;
+    var w = innerWidth, h = innerHeight, size = 56, pad = 24;
+    var cx = w / 2, cy = h / 2;
+    var rx = Math.max(70, Math.min(w / 2 - size - pad, 360));
+    var ry = Math.max(90, Math.min(h / 2 - size - pad, 280));
+    var start = rand(0, Math.PI * 2);
+    var btn = el("float-nav-toggle").getBoundingClientRect();
+    var ox = btn.left + btn.width / 2, oy = btn.top + btn.height / 2;
+    list.forEach(function (li, i) {
+      var a = start + (i / n) * Math.PI * 2 + rand(-0.25, 0.25);
+      var r = rand(0.7, 1);
+      var x = cx + Math.cos(a) * rx * r - size / 2;
+      var y = cy + Math.sin(a) * ry * r - size / 2;
+      x = Math.min(Math.max(pad, x), w - size - pad);
+      y = Math.min(Math.max(pad + 64, y), h - size - pad - 24);
+      li.style.setProperty("--i", i);
+      li.style.setProperty("--n", n);
+      li.style.setProperty("--from-x", ox - size / 2 + "px");
+      li.style.setProperty("--from-y", oy - size / 2 + "px");
+      li.style.setProperty("--x", x + "px");
+      li.style.setProperty("--y", y + "px");
+      li.style.setProperty("--dx", rand(-22, 22).toFixed(1) + "px");
+      li.style.setProperty("--dy", rand(-18, 18).toFixed(1) + "px");
+      li.style.setProperty("--drift", rand(5, 9).toFixed(2) + "s");
+      li.style.setProperty("--phase", rand(-9, 0).toFixed(2) + "s");
+    });
+  }
+
+  function setOpen(open) {
+    var n = nav(), btn = el("float-nav-toggle");
+    if (!n || !btn) return;
+    // Place first and flush, so the items start from the button rather than
+    // animating in from wherever their previous position variables left them.
+    if (open) { scatter(); void n.offsetWidth; }
+    n.dataset.open = String(open);
+    btn.setAttribute("aria-expanded", String(open));
+    btn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    btn.querySelector(".float-nav-icon-open").classList.toggle("hidden", open);
+    btn.querySelector(".float-nav-icon-close").classList.toggle("hidden", !open);
+    if (open) {
+      var first = n.querySelector(".float-nav-item a, .float-nav-item button");
+      if (first) setTimeout(function () { first.focus({ preventScroll: true }); }, 120);
     }
   }
 
-  return items;
-};
+  // Fresh markup from a swap: show the right theme icon, start closed.
+  applyTheme(theme());
+  if (window.renderIcons) window.renderIcons();
 
-export const NavBar = ({ appName, user, currentPath }: NavBarProps) => {
-  const menuItems = getMenuItems(user);
+  if (window.__floatNavInit) return;
+  window.__floatNavInit = true;
 
-  const isActive = (to: string) => {
-    if (to === "/") return currentPath === to;
-    return currentPath?.startsWith(to);
-  };
+  document.addEventListener("click", function (e) {
+    var t = e.target;
+    if (t.closest("#float-nav-toggle")) return setOpen(nav().dataset.open !== "true");
+    if (t.closest("#float-nav .float-nav-theme")) {
+      var next = THEMES[(THEMES.indexOf(theme()) + 1) % THEMES.length];
+      localStorage.setItem(KEY, next);
+      return applyTheme(next);
+    }
+    if (t.closest("#float-nav .float-nav-backdrop") || t.closest("#float-nav a")) setOpen(false);
+  });
 
-  return html`
-    <header
-      class="fixed top-0 left-0 right-0 z-40 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75"
-    >
-      <!-- h-14 minus the 9px stripe band, so the header stays 3.5rem and main's pt-14 still clears it. -->
-      <div class="flex h-[calc(3.5rem-9px)] items-center justify-between px-4">
-        <div class="flex items-center gap-6">
-          <a
-            href="/"
-            class="flex h-11 items-center gap-2.5 font-display text-base tracking-wide mr-4"
-          >
-            ${OrbitMark()} ${appName}
-          </a>
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Escape" || !nav() || nav().dataset.open !== "true") return;
+    setOpen(false);
+    el("float-nav-toggle").focus();
+  });
 
-          <nav class="hidden lg:flex items-center gap-6">
-            ${menuItems.map(
-              (item) => html`
-                <a
-                  href="${item.to}"
-                  class="text-sm font-medium transition-colors hover:text-primary ${
-                    isActive(item.to) ? "text-foreground" : "text-muted-foreground"
-                  }"
-                >
-                  ${item.name}
-                </a>
-              `,
-            )}
-          </nav>
-        </div>
-
-        <div class="flex items-center gap-4">
-          <div class="hidden lg:block">${ThemeToggle()}</div>
-
-          <div class="hidden lg:block">
-            ${
-              !user
-                ? html`
-                    <a
-                      href="/login"
-                      class="text-sm font-medium text-muted-foreground hover:text-primary"
-                      >Login</a
-                    >
-                  `
-                : UserMenu({ user })
-            }
-          </div>
-
-          <button
-            id="mobile-menu-toggle"
-            class="lg:hidden inline-flex h-11 w-11 items-center justify-center rounded-md text-foreground hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
-            aria-label="Open menu"
-          >
-            <i data-lucide="menu" class="h-6 w-6"></i>
-          </button>
-        </div>
-      </div>
-      <div class="retro-stripes h-[9px]" aria-hidden="true"></div>
-    </header>
-
-    <div
-      id="mobile-menu"
-      class="hidden fixed inset-0 z-[100] bg-background text-foreground lg:hidden flex flex-col animate-in slide-in-from-right-10 duration-200"
-    >
-      <div class="flex items-center justify-between px-4 h-14 border-b">
-        <span class="font-display text-base tracking-wide flex items-center gap-2.5">
-          ${OrbitMark()} Menu
-        </span>
-        <button
-          id="mobile-menu-close"
-          class="p-2 rounded-md hover:bg-accent focus:outline-none"
-          aria-label="Close menu"
-        >
-          <i data-lucide="x" class="h-6 w-6"></i>
-        </button>
-      </div>
-
-      <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-6">
-        <nav class="flex flex-col gap-2">
-          ${menuItems.map(
-            (item) => html`
-              <a
-                href="${item.to}"
-                class="flex items-center py-3 px-4 rounded-lg text-lg font-medium transition-colors hover:bg-accent ${
-                  isActive(item.to) ? "bg-accent text-foreground" : "text-muted-foreground"
-                }"
-              >
-                ${item.name}
-                ${
-                  isActive(item.to)
-                    ? html`<i data-lucide="chevron-right" class="ml-auto h-5 w-5 opacity-50"></i>`
-                    : ""
-                }
-              </a>
-            `,
-          )}
-        </nav>
-
-        <hr class="border-border/50" />
-
-        <div class="mt-auto flex flex-col gap-6">
-          <div class="flex items-center justify-between px-2">
-            <span class="text-sm font-medium">Appearance</span>
-            ${ThemeToggle()}
-          </div>
-
-          ${
-            !user
-              ? html`
-                  <a
-                    href="/login"
-                    class="inline-flex items-center justify-center rounded-lg h-12 border border-input bg-background px-4 py-2 text-base font-medium hover:bg-accent hover:text-accent-foreground"
-                  >
-                    Login
-                  </a>
-                `
-              : html`
-                  <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
-                    <div class="p-4 flex items-center gap-3 border-b">
-                      <div
-                        class="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary font-bold"
-                      >
-                        ${(user.email || "??").substring(0, 2).toUpperCase()}
-                      </div>
-                      <div class="flex flex-col min-w-0">
-                        <span class="font-medium truncate">${user.displayName || "User"}</span>
-                        <span class="text-xs text-muted-foreground truncate">${user.email}</span>
-                      </div>
-                    </div>
-                    <div class="p-2 grid grid-cols-2 gap-2">
-                      <a
-                        href="/profile"
-                        class="flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-accent transition-colors"
-                      >
-                        <i data-lucide="user" class="h-4 w-4"></i> Profile
-                      </a>
-                      <button
-                        hx-post="/web/auth/logout"
-                        class="flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors"
-                      >
-                        <i data-lucide="log-out" class="h-4 w-4"></i> Log out
-                      </button>
-                    </div>
-                  </div>
-                `
-          }
-        </div>
-      </div>
-    </div>
-
-    <script>
-      (function () {
-        const toggleBtn = document.getElementById("mobile-menu-toggle");
-        const closeBtn = document.getElementById("mobile-menu-close");
-        const menu = document.getElementById("mobile-menu");
-
-        function openMenu() {
-          menu.classList.remove("hidden");
-          document.body.style.overflow = "hidden"; // Prevent background scroll
-        }
-
-        function closeMenu() {
-          menu.classList.add("hidden");
-          document.body.style.overflow = "";
-        }
-
-        if (toggleBtn) toggleBtn.addEventListener("click", openMenu);
-        if (closeBtn) closeBtn.addEventListener("click", closeMenu);
-      })();
-    </script>
-  `;
-};
+  addEventListener("resize", function () { if (nav() && nav().dataset.open === "true") scatter(); });
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function () {
+    if (theme() === "system") applyTheme("system");
+  });
+})();
+</script>`);

@@ -209,14 +209,14 @@ const EntryCard: FC<{ entry: Entry }> = ({ entry }) => (
 );
 
 const SectionHeading: FC<{ name: string }> = ({ name }) => (
-  <div class="sticky top-14 z-20 -mx-4 mb-4 bg-background/75 px-4 py-5 backdrop-blur sm:-mx-6 sm:px-6 lg:sr-only">
+  <div class="sticky top-0 z-20 -mx-4 mb-4 bg-background/75 px-4 py-5 backdrop-blur sm:-mx-6 sm:px-6 lg:sr-only">
     <h2 class="text-sm font-bold uppercase tracking-widest text-foreground">{name}</h2>
   </div>
 );
 
 export const AboutPage: FC = () => (
   <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:flex lg:justify-between lg:gap-4 lg:px-8">
-    <header class="pt-12 lg:sticky lg:top-14 lg:flex lg:max-h-[calc(100vh-3.5rem)] lg:w-1/3 lg:flex-col lg:justify-between lg:py-24">
+    <header class="pt-12 lg:sticky lg:top-0 lg:flex lg:max-h-screen lg:w-1/3 lg:flex-col lg:justify-between lg:py-24">
       <div>
         <h1 class="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
           Jared Stanbrook
@@ -269,7 +269,7 @@ export const AboutPage: FC = () => (
     </header>
 
     <div class="pt-16 lg:w-1/2 lg:py-24">
-      <section id="about" class="mb-16 scroll-mt-28 md:mb-24 lg:mb-36" aria-label="About me">
+      <section id="about" class="mb-16 scroll-mt-16 md:mb-24 lg:mb-36" aria-label="About me">
         <SectionHeading name="About" />
         <div class="space-y-4 text-muted-foreground">
           <p class="font-bold text-foreground">Welcome to my website!</p>
@@ -291,7 +291,7 @@ export const AboutPage: FC = () => (
 
       <section
         id="experience"
-        class="mb-16 scroll-mt-28 md:mb-24 lg:mb-36"
+        class="mb-16 scroll-mt-16 md:mb-24 lg:mb-36"
         aria-label="Work experience"
       >
         <SectionHeading name="Experience" />
@@ -313,7 +313,7 @@ export const AboutPage: FC = () => (
 
       <section
         id="projects"
-        class="mb-16 scroll-mt-28 md:mb-24 lg:mb-36"
+        class="mb-16 scroll-mt-16 md:mb-24 lg:mb-36"
         aria-label="Selected projects"
       >
         <SectionHeading name="Projects" />

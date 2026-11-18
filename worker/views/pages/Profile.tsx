@@ -39,8 +39,8 @@ export const ProfilePage: FC<ProfileProps> = (props) => {
     });
   };
 
-  // No top padding for the header here: Layout already offsets <main> for the
-  // fixed NavBar, and adding it again stacks the two.
+  // The nav is a floating corner button, so the page's own padding is all the
+  // offset it needs.
   return (
     <div class="max-w-5xl mx-auto space-y-8 p-4 py-8 animate-in fade-in duration-500">
       <div class="space-y-4 animate-in fade-in duration-300">

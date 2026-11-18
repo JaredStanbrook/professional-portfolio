@@ -177,7 +177,7 @@ export const GradeCalculator: FC<{ rows: Assessment[]; expected: string }> = ({
 );
 
 export const GradeCalculatorPage: FC<{ rows: Assessment[]; expected: string }> = (props) => (
-  <div class="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:py-16">
+  <div class="mx-auto max-w-3xl px-4 pb-10 pt-24 sm:px-6 sm:pt-10 lg:py-16">
     <div class="rounded-lg border bg-card p-6 text-card-foreground shadow-sm sm:p-8">
       <h1 class="text-3xl font-bold tracking-tight">Grade calculator</h1>
       <p class="mb-8 mt-2 text-sm text-muted-foreground">

@@ -134,7 +134,7 @@ export const HomePage: FC<{ posts: BlogListItem[] } & Locale> = ({ posts, locale
       aria-hidden="true"
     ></div>
 
-    <section class="relative z-40 pt-8">
+    <section class="relative z-40 pr-16 pt-8">
       <a
         id="hero-title"
         href="/about"

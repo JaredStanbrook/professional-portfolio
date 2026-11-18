@@ -352,3 +352,110 @@
 .prose :where(code):not(:where(pre *))::after {
   content: none;
 }
+
+/* The floating nav (worker/views/components/NavBar.tsx). Closed, every item
+   sits shrunk to nothing on the launcher button; open, each springs out to
+   the spot the script picked (--x, --y), one after another (--i), then drifts
+   in place. Closing runs the stagger backwards and hides them only once they
+   are back, so nothing hidden can take keyboard focus. */
+.float-nav-backdrop {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.float-nav[data-open="true"] .float-nav-backdrop {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.float-nav-item {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 100;
+  --close-delay: calc((var(--n, 1) - 1 - var(--i, 0)) * 40ms);
+  transform: translate(var(--from-x, 0), var(--from-y, 0)) scale(0);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    transform 0.4s cubic-bezier(0.55, 0, 0.75, 0) var(--close-delay),
+    opacity 0.25s ease var(--close-delay),
+    visibility 0s linear calc(var(--close-delay) + 0.4s);
+}
+.float-nav[data-open="true"] .float-nav-item {
+  transform: translate(var(--x), var(--y)) scale(1);
+  opacity: 1;
+  visibility: visible;
+  transition:
+    transform 0.65s cubic-bezier(0.34, 1.7, 0.5, 1) calc(var(--i, 0) * 90ms),
+    opacity 0.2s ease calc(var(--i, 0) * 90ms),
+    visibility 0s linear 0s;
+}
+
+/* A squash on landing sells the "blob", then a slow drift. */
+.float-nav-drift {
+  animation: float-nav-drift var(--drift, 7s) ease-in-out var(--phase, 0s) infinite alternate;
+  animation-play-state: paused;
+}
+.float-nav[data-open="true"] .float-nav-drift {
+  animation-play-state: running;
+}
+/* Hold still under the pointer or keyboard focus, so a drifting item is
+   never a moving target at the moment someone goes to press it. */
+.float-nav[data-open="true"] .float-nav-item:hover .float-nav-drift,
+.float-nav[data-open="true"] .float-nav-item:focus-within .float-nav-drift {
+  animation-play-state: paused;
+}
+.float-nav[data-open="true"] .float-nav-drift > * {
+  animation: float-nav-blob 0.7s ease-out calc(var(--i, 0) * 90ms + 0.15s) both;
+}
+@keyframes float-nav-drift {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(var(--dx, 12px), var(--dy, 10px));
+  }
+}
+@keyframes float-nav-blob {
+  0% {
+    border-radius: 50%;
+  }
+  30% {
+    border-radius: 58% 42% 55% 45% / 45% 58% 42% 55%;
+  }
+  60% {
+    border-radius: 45% 55% 42% 58% / 55% 45% 58% 42%;
+  }
+  100% {
+    border-radius: 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .float-nav-item,
+  .float-nav[data-open="true"] .float-nav-item {
+    transform: translate(var(--x, 0), var(--y, 0));
+    transition:
+      opacity 0.2s ease,
+      visibility 0s linear;
+  }
+  .float-nav-drift,
+  .float-nav[data-open="true"] .float-nav-drift > * {
+    animation: none;
+  }
+}
+
+.float-nav-caption {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.float-nav-item:hover .float-nav-caption,
+.float-nav-item:focus-within .float-nav-caption {
+  opacity: 1;
+}
+@media (pointer: coarse) {
+  .float-nav-caption {
+    opacity: 0.9;
+  }
+}
