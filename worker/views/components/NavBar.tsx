@@ -8,7 +8,7 @@ import { PropsUser } from "@server/schema/auth.schema";
  *
  * The menu is icons only, so every entry needs an icon that says what it is
  * on its own (registered in worker/components/lib/icons.ts) and a name, which
- * becomes the accessible label and the hover caption.
+ * becomes the accessible label and the caption under the icon.
  */
 type NavItem = { to: string; name: string; icon: string };
 
@@ -47,12 +47,11 @@ const bubble =
   "flex h-14 w-14 items-center justify-center rounded-full border border-border/60 bg-background/60 text-foreground shadow-lg backdrop-blur-md transition-colors hover:bg-accent/80 hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
 /**
- * The caption under an item. When it shows is in `.float-nav-caption`
- * (worker/index.css): on hover and keyboard focus, and always on a touch
- * screen, where there is no hover to reveal it.
+ * The name under each icon. Every item is the same width with its caption
+ * centred, so the labels line up along each row of the grid.
  */
 const caption =
-  "float-nav-caption pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-popover px-2 py-1 text-xs font-medium text-popover-foreground shadow-sm";
+  "pointer-events-none mt-2 block truncate text-center text-xs font-medium text-foreground";
 
 // --- MAIN NAVBAR ---
 
@@ -64,9 +63,10 @@ interface NavBarProps {
 
 /**
  * The whole nav: one frosted circle fixed in the top-right corner. Pressing
- * it blurs the page and blobs the items out of it one at a time; they drift
- * about the screen until one is picked, the backdrop is clicked, Escape is
- * pressed, or the circle is pressed again.
+ * it blurs the page and blobs the items out of it one at a time into an even
+ * grid in the middle of the screen, where they bob gently in a wave until one
+ * is picked, the backdrop is clicked, Escape is pressed, or the circle is
+ * pressed again.
  *
  * The motion is CSS (`.float-nav*` in worker/index.css); the inline script
  * only picks where each item lands and flips `data-open`.
@@ -78,9 +78,11 @@ export const NavBar = ({ appName, user, currentPath }: NavBarProps) => {
       : !!currentPath?.startsWith(to);
 
   const item = (content: unknown, label: string) => html`
-    <li class="float-nav-item group" style="--i:0">
-      <div class="float-nav-drift">${content}</div>
-      <span class="${caption}">${label}</span>
+    <li class="float-nav-item">
+      <div class="float-nav-drift flex flex-col items-center">
+        ${content}
+        <span class="${caption}" aria-hidden="true">${label}</span>
+      </div>
     </li>
   `;
 
@@ -175,7 +177,7 @@ export const NavBar = ({ appName, user, currentPath }: NavBarProps) => {
 };
 
 /**
- * Open/close, scatter, and the theme cycle.
+ * Open/close, the grid layout, and the theme cycle.
  *
  * A boosted navigation swaps <body>, which re-runs this script against fresh
  * markup. The document-level listeners are added once; everything else looks
@@ -190,7 +192,6 @@ const floatNavScript = raw(`<script>
   function el(id) { return document.getElementById(id); }
   function nav() { return el("float-nav"); }
   function items() { return Array.prototype.slice.call(document.querySelectorAll("#float-nav .float-nav-item")); }
-  function rand(a, b) { return a + Math.random() * (b - a); }
 
   // --- theme ---
   function theme() { var t = localStorage.getItem(KEY) || "system"; return THEMES.indexOf(t) < 0 ? "system" : t; }
@@ -206,45 +207,51 @@ const floatNavScript = raw(`<script>
   }
 
   /**
-   * Spread the items over the viewport: evenly round an ellipse, then
-   * jittered, so they look scattered but never stack. Each gets its own
-   * drift speed and phase so they do not bob in step.
+   * Lay the items out as an even grid centred on the screen — up to four
+   * columns, three on a phone, with a short last row centred — and park each
+   * one on the launcher, which is where it springs out from and returns to.
    */
-  function scatter() {
-    var list = items(), n = list.length;
-    var w = innerWidth, h = innerHeight, size = 56, pad = 24;
-    var cx = w / 2, cy = h / 2;
-    var rx = Math.max(70, Math.min(w / 2 - size - pad, 360));
-    var ry = Math.max(90, Math.min(h / 2 - size - pad, 280));
-    var start = rand(0, Math.PI * 2);
-    var btn = el("float-nav-toggle").getBoundingClientRect();
-    var ox = btn.left + btn.width / 2, oy = btn.top + btn.height / 2;
+  var CELL_W = 112, CELL_H = 104, SIZE = 56;
+  function arrange() {
+    var list = items(), n = list.length, btn = el("float-nav-toggle");
+    if (!n || !btn) return;
+    var w = innerWidth, h = innerHeight;
+    var cols = Math.min(n, w >= 640 ? 4 : 3);
+    var rows = Math.ceil(n / cols);
+    var top = Math.max(88, (h - rows * CELL_H) / 2);
+    var b = btn.getBoundingClientRect();
     list.forEach(function (li, i) {
-      var a = start + (i / n) * Math.PI * 2 + rand(-0.25, 0.25);
-      var r = rand(0.7, 1);
-      var x = cx + Math.cos(a) * rx * r - size / 2;
-      var y = cy + Math.sin(a) * ry * r - size / 2;
-      x = Math.min(Math.max(pad, x), w - size - pad);
-      y = Math.min(Math.max(pad + 64, y), h - size - pad - 24);
+      var row = Math.floor(i / cols), col = i % cols;
+      var inRow = row === rows - 1 ? n - row * cols : cols;
+      var left = (w - inRow * CELL_W) / 2;
       li.style.setProperty("--i", i);
       li.style.setProperty("--n", n);
-      li.style.setProperty("--from-x", ox - size / 2 + "px");
-      li.style.setProperty("--from-y", oy - size / 2 + "px");
-      li.style.setProperty("--x", x + "px");
-      li.style.setProperty("--y", y + "px");
-      li.style.setProperty("--dx", rand(-22, 22).toFixed(1) + "px");
-      li.style.setProperty("--dy", rand(-18, 18).toFixed(1) + "px");
-      li.style.setProperty("--drift", rand(5, 9).toFixed(2) + "s");
-      li.style.setProperty("--phase", rand(-9, 0).toFixed(2) + "s");
+      li.style.setProperty("--x", left + col * CELL_W + "px");
+      li.style.setProperty("--y", top + row * CELL_H + "px");
+      li.style.setProperty("--from-x", b.left + b.width / 2 - CELL_W / 2 + "px");
+      li.style.setProperty("--from-y", b.top + b.height / 2 - SIZE / 2 + "px");
     });
+  }
+
+  /**
+   * Move the items without animating the move. Changing the position
+   * variables of a closed item would otherwise run the close transition, so
+   * an item opened mid-way would set off from somewhere between its old spot
+   * and the button rather than from the button.
+   */
+  function arrangeInstantly() {
+    var list = items();
+    list.forEach(function (li) { li.style.transition = "none"; });
+    arrange();
+    void document.body.offsetWidth;
+    list.forEach(function (li) { li.style.transition = ""; });
+    void document.body.offsetWidth;
   }
 
   function setOpen(open) {
     var n = nav(), btn = el("float-nav-toggle");
     if (!n || !btn) return;
-    // Place first and flush, so the items start from the button rather than
-    // animating in from wherever their previous position variables left them.
-    if (open) { scatter(); void n.offsetWidth; }
+    if (open) arrangeInstantly();
     n.dataset.open = String(open);
     btn.setAttribute("aria-expanded", String(open));
     btn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
@@ -256,8 +263,10 @@ const floatNavScript = raw(`<script>
     }
   }
 
-  // Fresh markup from a swap: show the right theme icon, start closed.
+  // Fresh markup from a swap: show the right theme icon, park the items on
+  // the button, start closed.
   applyTheme(theme());
+  arrangeInstantly();
   if (window.renderIcons) window.renderIcons();
 
   if (window.__floatNavInit) return;
@@ -280,7 +289,10 @@ const floatNavScript = raw(`<script>
     el("float-nav-toggle").focus();
   });
 
-  addEventListener("resize", function () { if (nav() && nav().dataset.open === "true") scatter(); });
+  // Open: re-grid in place. Closed: keep the items parked on the button.
+  addEventListener("resize", function () {
+    if (nav() && nav().dataset.open === "true") arrange(); else arrangeInstantly();
+  });
   matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function () {
     if (theme() === "system") applyTheme("system");
   });

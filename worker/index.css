@@ -355,8 +355,8 @@
 
 /* The floating nav (worker/views/components/NavBar.tsx). Closed, every item
    sits shrunk to nothing on the launcher button; open, each springs out to
-   the spot the script picked (--x, --y), one after another (--i), then drifts
-   in place. Closing runs the stagger backwards and hides them only once they
+   its cell of the grid the script laid out (--x, --y), one after another
+   (--i), then bobs in a slow wave. Closing runs the stagger backwards and hides them only once they
    are back, so nothing hidden can take keyboard focus. */
 .float-nav-backdrop {
   opacity: 0;
@@ -370,6 +370,10 @@
 
 .float-nav-item {
   position: fixed;
+  width: 7rem; /* CELL_W in NavBar.tsx */
+  /* Grow from the icon's centre, not the item's (which includes the caption),
+     so a closed item collapses exactly onto the launcher. */
+  transform-origin: 50% 28px;
   left: 0;
   top: 0;
   z-index: 100;
@@ -392,21 +396,16 @@
     visibility 0s linear 0s;
 }
 
-/* A squash on landing sells the "blob", then a slow drift. */
+/* A squash on landing sells the "blob", then the whole grid bobs together,
+   in step, so icons and captions stay lined up along each row. */
 .float-nav-drift {
-  animation: float-nav-drift var(--drift, 7s) ease-in-out var(--phase, 0s) infinite alternate;
+  animation: float-nav-drift 1.8s ease-in-out infinite alternate;
   animation-play-state: paused;
 }
 .float-nav[data-open="true"] .float-nav-drift {
   animation-play-state: running;
 }
-/* Hold still under the pointer or keyboard focus, so a drifting item is
-   never a moving target at the moment someone goes to press it. */
-.float-nav[data-open="true"] .float-nav-item:hover .float-nav-drift,
-.float-nav[data-open="true"] .float-nav-item:focus-within .float-nav-drift {
-  animation-play-state: paused;
-}
-.float-nav[data-open="true"] .float-nav-drift > * {
+.float-nav[data-open="true"] .float-nav-drift > :first-child {
   animation: float-nav-blob 0.7s ease-out calc(var(--i, 0) * 90ms + 0.15s) both;
 }
 @keyframes float-nav-drift {
@@ -414,7 +413,7 @@
     transform: translate(0, 0);
   }
   to {
-    transform: translate(var(--dx, 12px), var(--dy, 10px));
+    transform: translateY(-6px);
   }
 }
 @keyframes float-nav-blob {
@@ -441,21 +440,7 @@
       visibility 0s linear;
   }
   .float-nav-drift,
-  .float-nav[data-open="true"] .float-nav-drift > * {
+  .float-nav[data-open="true"] .float-nav-drift > :first-child {
     animation: none;
-  }
-}
-
-.float-nav-caption {
-  opacity: 0;
-  transition: opacity 0.15s ease;
-}
-.float-nav-item:hover .float-nav-caption,
-.float-nav-item:focus-within .float-nav-caption {
-  opacity: 1;
-}
-@media (pointer: coarse) {
-  .float-nav-caption {
-    opacity: 0.9;
   }
 }
