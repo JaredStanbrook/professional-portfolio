@@ -15,22 +15,22 @@ import { Layout } from "@views/Layout";
  * page, and gives them a way back in. Add links to your site's main pages.
  */
 const NotFoundPage: FC = () => (
-  <div class="mx-auto max-w-xl px-4 py-24 text-center">
+  <div class="mx-auto max-w-xl px-4 py-32 text-center">
     <p class="text-sm font-semibold text-muted-foreground">404</p>
     <h1 class="mt-2 text-3xl font-bold tracking-tight">That page isn't here</h1>
     <p class="mt-4 text-muted-foreground">The link may be old, or the address mistyped.</p>
     <div class="mt-8 flex flex-wrap justify-center gap-3">
       <a
         href="/"
-        class="inline-flex h-11 items-center justify-center rounded-lg bg-primary px-5 text-sm font-medium text-primary-foreground no-underline hover:bg-primary/90"
+        class="inline-flex h-11 items-center justify-center rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground no-underline hover:bg-primary/90"
       >
-        Read the blog
+        See my work
       </a>
       <a
-        href="/about"
-        class="inline-flex h-11 items-center justify-center rounded-lg border border-input px-5 text-sm font-medium no-underline hover:bg-accent hover:text-accent-foreground"
+        href="/blog"
+        class="inline-flex h-11 items-center justify-center rounded-full bg-muted px-5 text-sm font-medium no-underline hover:bg-accent"
       >
-        About me
+        Read the writing
       </a>
     </div>
   </div>

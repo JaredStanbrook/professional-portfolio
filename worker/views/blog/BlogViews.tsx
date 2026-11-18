@@ -1,8 +1,7 @@
 // worker/views/blog/BlogViews.tsx
 //
-// Home (the post list), a single post, and the editor. Pure functions of
-// props; the only browser code is the hero's decorative cursor and
-// typewriter, inlined below because they need no state the server has.
+// The post index (/blog), a single post, and the editor. Pure functions of
+// props. The home page, which lists the latest posts, is views/portfolio.
 
 import { raw } from "hono/html";
 import type { FC } from "hono/jsx";
@@ -31,14 +30,6 @@ export const formatPostDate = (value: string, locale: string, timeZone: string) 
   });
 };
 
-/** Longer reads get bigger tiles. Whole class names, so Tailwind sees them. */
-const tileFor = (readTime: number) => {
-  if (readTime >= 15) return "md:col-span-2 md:row-span-2";
-  if (readTime >= 4) return "md:row-span-2";
-  if (readTime >= 3) return "md:col-span-2";
-  return "";
-};
-
 interface Locale {
   locale: string;
   timeZone: string;
@@ -48,174 +39,89 @@ const PostMetaLine: FC<{ post: BlogListItem } & Locale> = ({ post, locale, timeZ
   const created = formatPostDate(post.createdAt, locale, timeZone);
   const updated = formatPostDate(post.updatedAt, locale, timeZone);
   return (
-    <p class="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
-      <span class="inline-flex items-center rounded-full border border-primary/20 bg-primary/10 px-3 py-1 font-medium text-primary">
+    <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
+      <span class="rounded-full bg-signal px-3 py-1 font-medium text-signal-foreground">
         {post.subject}
       </span>
-      <span aria-hidden="true">•</span>
       <span>{post.readTime} min read</span>
-      <span aria-hidden="true">•</span>
-      <span>{post.authorName}</span>
-      <span aria-hidden="true">•</span>
-      <time datetime={post.createdAt}>{created}</time>
-      {updated && updated !== created && (
-        <>
-          <span aria-hidden="true">•</span>
-          <span class="italic">Updated {updated}</span>
-        </>
-      )}
-    </p>
+      <span>
+        By {post.authorName}, <time datetime={post.createdAt}>{created}</time>
+        {updated && updated !== created && <>, updated {updated}</>}
+      </span>
+    </div>
   );
 };
 
 // ==========================================
-// HOME
+// INDEX
 // ==========================================
 
-/**
- * Desktop: a soft dot follows the pointer and swells as it nears the name,
- * which then reads "Learn more about me." Phones get a typewriter instead,
- * since there is no pointer to follow. Both stand still under reduced motion.
- */
-const heroScript = raw(`<script>
-(function () {
-  var root = document.getElementById("hero");
-  if (!root || root.dataset.ready) return;
-  root.dataset.ready = "1";
-  var still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const yearOf = (value: string) => value.slice(0, 4);
 
-  var tw = document.getElementById("hero-typewriter");
-  if (tw && !still) {
-    var words = ["Hi, I'm Jared.", "Looking for my portfolio?", "Tap here!"];
-    var w = 0, n = 0, back = false, hold = 0;
-    var tick = setInterval(function () {
-      if (!document.body.contains(tw)) return clearInterval(tick);
-      var word = words[w];
-      if (!back) { if (n < word.length) n++; else if (++hold > 15) { back = true; hold = 0; } }
-      else if (n > 0) n--; else { back = false; w = (w + 1) % words.length; }
-      tw.textContent = word.slice(0, n);
-    }, 70);
-  }
-
-  var dot = document.getElementById("hero-cursor");
-  var title = document.getElementById("hero-title");
-  var label = document.getElementById("hero-label");
-  if (!dot || !title || still || !matchMedia("(pointer: fine)").matches) return;
-  var mouse = { x: -100, y: -100 }, pos = { x: -100, y: -100, s: 1 };
-  addEventListener("mousemove", function (e) { mouse.x = e.clientX; mouse.y = e.clientY; }, { passive: true });
-  (function frame() {
-    if (!document.body.contains(dot)) return;
-    var r = title.getBoundingClientRect();
-    var dx = Math.max(r.left - mouse.x, 0, mouse.x - r.right);
-    var dy = Math.max(r.top - mouse.y, 0, mouse.y - r.bottom);
-    var d = Math.sqrt(dx * dx + dy * dy);
-    var near = d <= 150, s = 1, tx = mouse.x, ty = mouse.y;
-    if (near) s = 1 + (1 - Math.pow(d / 150, 4)) * 35 * 0.3;
-    if (d < 400 && d > 0) {
-      var f = 1 - d / 400;
-      tx += (Math.max(r.left, Math.min(mouse.x, r.right)) - mouse.x) * f;
-      ty += (Math.max(r.top, Math.min(mouse.y, r.bottom)) - mouse.y) * f;
-    }
-    pos.x += (tx - pos.x) * 0.07; pos.y += (ty - pos.y) * 0.07; pos.s += (s - pos.s) * 0.07;
-    var size = 20 * pos.s;
-    dot.style.width = dot.style.height = size + "px";
-    dot.style.transform = "translate(" + (pos.x - size / 2) + "px," + (pos.y - size / 2) + "px)";
-    label.textContent = near ? "Learn more about me." : "I'm Jared";
-    requestAnimationFrame(frame);
-  })();
-})();
-</script>`);
-
-export const HomePage: FC<{ posts: BlogListItem[] } & Locale> = ({ posts, locale, timeZone }) => (
-  <div id="hero" class="mx-auto max-w-6xl px-4 pb-8 sm:px-6 lg:px-8">
-    <div
-      id="hero-cursor"
-      class="pointer-events-none fixed left-0 top-0 z-30 hidden rounded-full bg-primary/70 mix-blend-multiply md:block dark:mix-blend-screen"
-      aria-hidden="true"
-    ></div>
-
-    <section class="relative z-40 pr-16 pt-8">
-      <a
-        id="hero-title"
-        href="/about"
-        class="block w-fit text-2xl font-extrabold tracking-tight text-foreground no-underline md:text-4xl"
-      >
-        <span id="hero-label" class="hidden md:inline">
-          I'm Jared
-        </span>
-        <span class="md:hidden">
-          <span id="hero-typewriter">Hi, I'm Jared.</span>
-          <span class="ml-1 animate-pulse border-r-2 border-foreground" aria-hidden="true"></span>
-        </span>
-      </a>
-      <hr class="mt-2 border-t-2 border-foreground/30" />
-    </section>
-
-    <section class="grid gap-8 pt-12 md:grid-cols-2">
-      <div>
-        <h1 class="mb-4 text-3xl font-bold text-foreground md:text-5xl">Welcome</h1>
-        <p class="mb-2 text-lg font-semibold uppercase text-foreground md:text-xl">My Blog</p>
-        <p class="text-lg text-muted-foreground md:text-xl">
-          Sharing my progress, projects, and insights.
-        </p>
-      </div>
-      <p class="self-end text-lg text-muted-foreground md:text-xl">
-        Dive into my journey as I explore, experiment, and grow. Here you'll find hands-on labs,
-        project breakdowns, and reflections on what I'm learning as a student and aspiring
-        professional.
+/** Every post, newest first, grouped by the year it was published. */
+export const BlogIndexPage: FC<{ posts: BlogListItem[] } & Locale> = ({
+  posts,
+  locale,
+  timeZone,
+}) => {
+  const years = [...new Set(posts.map((p) => yearOf(p.createdAt)))];
+  return (
+    <div class="mx-auto max-w-6xl px-4 pb-10 pt-24 sm:px-6 sm:pt-28 lg:px-8">
+      <h1 class="max-w-3xl text-[clamp(2.75rem,8vw,5.5rem)] leading-[0.95]">Writing</h1>
+      <p class="mt-6 max-w-xl text-xl leading-snug text-muted-foreground">
+        Labs, project write-ups and notes on what I'm learning in networking, security and the web.
       </p>
-    </section>
-
-    <section class="py-8" aria-labelledby="recent-heading">
-      <div class="my-4 flex items-center gap-4">
-        <h2 id="recent-heading" class="text-xl font-semibold tracking-widest text-foreground">
-          Recent
-        </h2>
-        <hr class="w-full border-t-2 border-foreground/30" />
-      </div>
 
       {posts.length === 0 ? (
-        <p class="py-12 text-center text-muted-foreground">No posts yet.</p>
+        <p class="mt-16 text-muted-foreground">Nothing published yet.</p>
       ) : (
-        <ul class="grid auto-rows-fr grid-cols-1 gap-6 md:grid-cols-3">
-          {posts.map((post) => (
-            <li class={`flex ${tileFor(post.readTime)}`}>
-              <a
-                href={`/blog/${filenameToSlug(post.filename)}`}
-                class="flex w-full flex-col justify-between rounded-lg border-2 border-border bg-card p-4 text-card-foreground no-underline transition-colors hover:border-primary focus-visible:border-primary focus-visible:outline-none"
-              >
-                <div>
-                  <p class="mb-2 text-xs">
-                    <span class="rounded-full bg-foreground px-2 py-1 font-semibold text-background">
-                      {post.subject}
-                    </span>
-                    <span class="ml-1 text-muted-foreground">• {post.readTime} min read</span>
-                  </p>
-                  <h3 class="mb-2 text-lg font-semibold">{post.title}</h3>
-                </div>
-                <p class="mt-4 text-sm text-muted-foreground">
-                  {post.authorName} • {formatPostDate(post.createdAt, locale, timeZone)}
-                </p>
-              </a>
-            </li>
-          ))}
-        </ul>
+        years.map((year) => (
+          <section class="mt-16 grid gap-4 lg:grid-cols-12 lg:gap-8" aria-labelledby={`y${year}`}>
+            <h2
+              id={`y${year}`}
+              class="text-2xl tabular-nums text-muted-foreground lg:col-span-3 lg:pt-4"
+            >
+              {year}
+            </h2>
+            <ul class="lg:col-span-9">
+              {posts
+                .filter((p) => yearOf(p.createdAt) === year)
+                .map((post) => (
+                  <li>
+                    <a
+                      href={`/blog/${filenameToSlug(post.filename)}`}
+                      class="group -mx-4 block rounded-xl px-4 py-4 no-underline hover:bg-card"
+                    >
+                      <span class="block text-2xl font-semibold leading-tight text-foreground [font-stretch:112%] group-hover:text-primary">
+                        {post.title}
+                      </span>
+                      <span class="mt-2 block text-sm text-muted-foreground">
+                        {post.subject}, {post.readTime} min read,{" "}
+                        <time datetime={post.createdAt}>
+                          {formatPostDate(post.createdAt, locale, timeZone)}
+                        </time>
+                      </span>
+                    </a>
+                  </li>
+                ))}
+            </ul>
+          </section>
+        ))
       )}
-    </section>
-    {heroScript}
-  </div>
-);
+    </div>
+  );
+};
 
 // ==========================================
 // SINGLE POST
 // ==========================================
 
+const quietButton =
+  "inline-flex h-11 items-center gap-2 rounded-full bg-muted px-5 text-sm font-medium text-foreground no-underline hover:bg-accent";
+
 const backLink = (
-  <a
-    href="/"
-    class="inline-flex h-11 items-center gap-2 rounded-lg border border-input px-4 text-sm font-medium no-underline hover:bg-accent hover:text-accent-foreground"
-  >
-    <i data-lucide="arrow-left" class="h-4 w-4" aria-hidden="true"></i> All posts
+  <a href="/blog" class={quietButton}>
+    <i data-lucide="arrow-left" class="h-4 w-4" aria-hidden="true"></i> All writing
   </a>
 );
 
@@ -226,20 +132,17 @@ export const PostPage: FC<{ post: BlogListItem; html: string; canEdit: boolean }
   locale,
   timeZone,
 }) => (
-  <article class="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:py-16">
-    <div class="mb-10 flex flex-wrap gap-3">
+  <article class="mx-auto max-w-3xl px-4 pb-10 pt-24 sm:px-6 sm:pt-28">
+    <div class="mb-12 flex flex-wrap gap-3">
       {backLink}
       {canEdit && (
-        <a
-          href={`/editor/${filenameToSlug(post.filename)}`}
-          class="inline-flex h-11 items-center gap-2 rounded-lg border border-input px-4 text-sm font-medium no-underline hover:bg-accent hover:text-accent-foreground"
-        >
+        <a href={`/editor/${filenameToSlug(post.filename)}`} class={quietButton}>
           <i data-lucide="pencil" class="h-4 w-4" aria-hidden="true"></i> Edit
         </a>
       )}
     </div>
     <PostMetaLine post={post} locale={locale} timeZone={timeZone} />
-    <h1 class="mb-8 mt-6 text-4xl font-bold leading-tight text-foreground md:text-6xl">
+    <h1 class="mb-10 mt-6 text-[clamp(2.4rem,6vw,4.25rem)] leading-[1.02] text-foreground">
       {post.title}
     </h1>
     <PostBody html={html} />
@@ -251,7 +154,7 @@ export const PostPage: FC<{ post: BlogListItem; html: string; canEdit: boolean }
  * so what the author sees is what gets published.
  */
 export const PostBody: FC<{ html: string }> = ({ html }) => (
-  <div class="prose prose-lg max-w-none prose-code:rounded prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-pre:border prose-pre:border-border prose-img:rounded-lg">
+  <div class="prose prose-lg max-w-none prose-code:rounded prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-pre:rounded-xl prose-img:rounded-xl">
     {raw(html)}
   </div>
 );
@@ -265,22 +168,22 @@ export const EditorListPage: FC<{ posts: BlogListItem[] } & Locale> = ({
   locale,
   timeZone,
 }) => (
-  <div class="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+  <div class="mx-auto max-w-4xl px-4 pb-10 pt-24 sm:px-6">
     <div class="mb-8 flex flex-wrap items-center justify-between gap-4">
-      <h1 class="text-3xl font-bold tracking-tight">Posts</h1>
+      <h1 class="text-4xl">Posts</h1>
       <a
         href="/editor/new"
-        class="inline-flex h-11 items-center gap-2 rounded-lg bg-primary px-5 text-sm font-medium text-primary-foreground no-underline hover:bg-primary/90"
+        class="inline-flex h-11 items-center gap-2 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground no-underline hover:bg-primary/90"
       >
         <i data-lucide="plus" class="h-4 w-4" aria-hidden="true"></i> New post
       </a>
     </div>
     {posts.length === 0 ? (
-      <p class="rounded-lg border border-dashed p-8 text-center text-muted-foreground">
-        Nothing written yet.
+      <p class="rounded-2xl bg-card p-8 text-center text-muted-foreground">
+        Nothing written yet. Start with a new post.
       </p>
     ) : (
-      <ul class="divide-y rounded-lg border bg-card text-card-foreground">
+      <ul class="divide-y divide-background rounded-2xl bg-card text-card-foreground">
         {posts.map((post) => (
           <li class="flex flex-wrap items-center justify-between gap-3 p-4">
             <div class="min-w-0">
@@ -291,7 +194,7 @@ export const EditorListPage: FC<{ posts: BlogListItem[] } & Locale> = ({
                 {post.title}
               </a>
               <p class="text-sm text-muted-foreground">
-                {post.subject} • {formatPostDate(post.createdAt, locale, timeZone)}
+                {post.subject}, {formatPostDate(post.createdAt, locale, timeZone)}
               </p>
             </div>
             <a
@@ -342,13 +245,10 @@ export const EditorPage: FC<{
   previewHtml: string;
   errors?: EditorErrors;
 }> = ({ values, isNew, previewHtml, errors = {} }) => (
-  <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6">
+  <div class="mx-auto max-w-7xl px-4 pb-10 pt-24 sm:px-6">
     <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
-      <h1 class="text-3xl font-bold tracking-tight">{isNew ? "New post" : "Edit post"}</h1>
-      <a
-        href={isNew ? "/editor" : `/blog/${values.slug}`}
-        class="inline-flex h-11 items-center rounded-lg border border-input px-4 text-sm font-medium no-underline hover:bg-accent hover:text-accent-foreground"
-      >
+      <h1 class="text-4xl">{isNew ? "New post" : "Edit post"}</h1>
+      <a href={isNew ? "/editor" : `/blog/${values.slug}`} class={quietButton}>
         Cancel
       </a>
     </div>
@@ -428,7 +328,7 @@ export const EditorPage: FC<{
         <div class="flex flex-wrap items-center gap-3">
           <button
             type="submit"
-            class="inline-flex h-11 items-center justify-center rounded-lg bg-primary px-6 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+            class="inline-flex h-11 items-center justify-center rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground hover:bg-primary/90"
           >
             {isNew ? "Publish" : "Save changes"}
           </button>
@@ -436,13 +336,10 @@ export const EditorPage: FC<{
       </form>
 
       <section aria-labelledby="preview-heading" class="min-w-0">
-        <h2
-          id="preview-heading"
-          class="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground"
-        >
+        <h2 id="preview-heading" class="mb-3 text-lg text-muted-foreground">
           Preview
         </h2>
-        <div id="preview" class="rounded-lg border bg-card p-6 text-card-foreground">
+        <div id="preview" class="rounded-2xl bg-card p-6 text-card-foreground sm:p-8">
           <PostBody html={previewHtml} />
         </div>
       </section>
@@ -452,7 +349,7 @@ export const EditorPage: FC<{
       <form
         method="post"
         action={`/editor/${values.slug}/delete`}
-        class="mt-12 rounded-lg border border-destructive/30 p-4"
+        class="mt-12 rounded-2xl bg-destructive/10 p-5"
         onsubmit="return confirm('Delete this post for good? This removes the file as well.')"
       >
         <p class="mb-3 text-sm text-muted-foreground">
@@ -460,7 +357,7 @@ export const EditorPage: FC<{
         </p>
         <button
           type="submit"
-          class="inline-flex h-11 items-center gap-2 rounded-lg border border-destructive/40 px-4 text-sm font-medium text-destructive hover:bg-destructive/10"
+          class="inline-flex h-11 items-center gap-2 rounded-full bg-background px-5 text-sm font-medium text-destructive hover:bg-destructive/15"
         >
           <i data-lucide="trash-2" class="h-4 w-4" aria-hidden="true"></i> Delete post
         </button>

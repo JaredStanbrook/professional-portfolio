@@ -1,8 +1,8 @@
 # Professional Portfolio
 
-Jared Stanbrook's site at [jared.stanbrook.me](https://jared.stanbrook.me): a
-Markdown blog, an about/CV page, the IT service desk write-up and a grade
-calculator.
+Jared Stanbrook's portfolio at [jared.stanbrook.me](https://jared.stanbrook.me):
+selected work, experience and writing on the home page, a Markdown blog, the
+IT service desk write-up and a grade calculator.
 
 Built on the [Frugal template](https://github.com/JaredStanbrook/frug-template)
 (release recorded in `frugal.json`): one Cloudflare Worker that server-renders
@@ -11,14 +11,14 @@ and Tailwind theme tokens for light and dark.
 
 ## Where things live
 
-| Path                                | Holds                                                          |
-| ----------------------------------- | -------------------------------------------------------------- |
-| `worker/routes/blog.tsx`            | Home (post list), `/blog/:slug`, and the `/editor`             |
-| `worker/services/blog.service.ts`   | Front matter, Markdown rendering, R2 + D1 reads and writes     |
-| `worker/routes/pages.tsx`           | `/about`, `/it-help-desk`, `/grade-calculator`                 |
-| `worker/views/pages/About.tsx`      | CV content: experience and projects are arrays at the top      |
-| `worker/services/github.service.ts` | Cached GitHub commit stats for the help desk page              |
-| `worker/index.css`                  | The theme: every colour is a token with a light and dark value |
+| Path                                | Holds                                                           |
+| ----------------------------------- | --------------------------------------------------------------- |
+| `worker/routes/blog.tsx`            | Home (the portfolio), `/blog`, `/blog/:slug`, and the `/editor` |
+| `worker/services/blog.service.ts`   | Front matter, Markdown rendering, R2 + D1 reads and writes      |
+| `worker/routes/pages.tsx`           | `/it-help-desk`, `/grade-calculator`; `/about` redirects home   |
+| `worker/views/portfolio/content.ts` | Everything the portfolio says: projects, roles, links, bio      |
+| `worker/services/github.service.ts` | Cached GitHub commit stats for the help desk page               |
+| `worker/index.css`                  | The theme: every colour is a token with a light and dark value  |
 
 Posts are `<slug>.mdx` objects in the `blog-r2` bucket, with a `blog_metadata`
 row each for the lists. Write them at `/editor` once signed in.

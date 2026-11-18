@@ -106,7 +106,7 @@ describe("UI pages load", () => {
 
     for (const path of [
       "/",
-      "/about",
+      "/blog",
       "/it-help-desk",
       "/grade-calculator",
       "/blog/first-post",
@@ -187,6 +187,12 @@ describe("UI pages load", () => {
     expect(html).toContain('href="/editor/first-post"');
   });
 
+  it("sends the old about page to the portfolio on the home page", async () => {
+    const res = await get(createTestApp(null), "/about");
+    expect(res.status).toBe(301);
+    expect(res.headers.get("location")).toBe("/");
+  });
+
   it("rejects a malformed post address without reaching storage", async () => {
     const res = await get(createTestApp(null), "/blog/..%2Fsecret");
     expect(res.status).toBe(404);
@@ -235,7 +241,7 @@ describe("UI pages load", () => {
       [multiMethod, "/login"],
       [multiMethod, "/register"],
       [signedIn, "/profile"],
-      [signedOut, "/about"],
+      [signedOut, "/blog"],
       [signedOut, "/it-help-desk"],
       [signedOut, "/grade-calculator"],
       [signedOut, "/blog/first-post"],

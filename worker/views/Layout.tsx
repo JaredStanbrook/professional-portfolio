@@ -80,19 +80,12 @@ export const Layout: FC<LayoutProps> = (props) => {
         )}
 
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <!-- The two weights above the fold. Without a preload the browser only
-             discovers them after parsing the stylesheet, and the headline
-             visibly swaps. crossorigin is required even same-origin. -->
+        <!-- The one font file. Without a preload the browser only discovers it
+             after parsing the stylesheet, and the headline visibly swaps.
+             crossorigin is required even same-origin. -->
         <link
           rel="preload"
-          href="/fonts/plex-sans-600.woff2"
-          as="font"
-          type="font/woff2"
-          crossorigin
-        />
-        <link
-          rel="preload"
-          href="/fonts/plex-sans-400.woff2"
+          href="/fonts/archivo-wdth.woff2"
           as="font"
           type="font/woff2"
           crossorigin
@@ -113,11 +106,12 @@ export const Layout: FC<LayoutProps> = (props) => {
 
         ${
           props.meta.bare
-            ? html`<header class="border-b">
-                <div class="flex h-14 items-center px-4 font-display text-base tracking-wide">
+            ? html`<header>
+                <div
+                  class="flex h-16 items-center px-4 font-display text-base font-semibold [font-stretch:112%]"
+                >
                   ${props.app.name}
                 </div>
-                <div class="retro-stripes h-[9px]" aria-hidden="true"></div>
               </header>`
             : NavBar({
                 appName: props.app.name,
@@ -139,17 +133,12 @@ export const Layout: FC<LayoutProps> = (props) => {
         ${
           props.meta.bare
             ? ""
-            : html`<footer class="mt-16">
-                <div class="retro-stripes h-[9px]" aria-hidden="true"></div>
+            : html`<footer class="mt-24 bg-muted/60">
                 <div
-                  class="flex flex-col items-center justify-between gap-2 px-4 py-6 md:h-24 md:flex-row md:px-8 md:py-0"
+                  class="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-10 text-sm text-muted-foreground sm:flex-row sm:items-baseline sm:justify-between sm:px-6 lg:px-8"
                 >
-                  <p class="font-display text-xs tracking-wide text-foreground">
-                    ${props.app.name}
-                  </p>
-                  <p class="text-center text-sm leading-loose text-muted-foreground md:text-right">
-                    ${props.app.tagline || props.app.name}
-                  </p>
+                  <p class="font-semibold text-foreground [font-stretch:112%]">${props.app.name}</p>
+                  <p>Made in Perth, served from Cloudflare's edge.</p>
                 </div>
               </footer>`
         }

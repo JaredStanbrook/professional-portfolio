@@ -2,31 +2,25 @@
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
 
-/* THEME: "Kiln"
-   Carried over from the original portfolio: a warm, near-white page with a
-   kiln-orange accent by day, and a deep blue-slate night where the accent
-   cools to sky blue. Soft, low shadows; the type does the work. */
+/* THEME: "Limestone"
+   Perth, Western Australia. By day the pale grey-green of coastal limestone
+   with ocean-ink text and a eucalyptus green for links and actions; by night
+   the Indian Ocean after dark, the green lifting to a soft leaf. One extra
+   colour, `signal` — the lime of a kangaroo paw — is only ever a fill behind
+   ink (the hero's cursor, text selection, the current section marker), never
+   text on the page background. Separation comes from tonal fills and space,
+   not lines: borders are kept for inputs and a few chart axes. */
 
 /* Self-hosted (SIL OFL 1.1): no font CDN, no third party on first paint.
-   IBM Plex Sans carries everything. Renaming a file busts its year-long cache. */
+   Archivo is one variable file with a width axis (62–125%) as well as weight,
+   so headlines run expanded, body text runs normal and the hero's name can
+   stretch letter by letter — one family, used at several widths. Renaming
+   the file busts its year-long cache. */
 @font-face {
-  font-family: "IBM Plex Sans";
-  src: url("/fonts/plex-sans-400.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "IBM Plex Sans";
-  src: url("/fonts/plex-sans-500.woff2") format("woff2");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "IBM Plex Sans";
-  src: url("/fonts/plex-sans-600.woff2") format("woff2");
-  font-weight: 600 700;
+  font-family: "Archivo";
+  src: url("/fonts/archivo-wdth.woff2") format("woff2");
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
   font-style: normal;
   font-display: swap;
 }
@@ -37,132 +31,138 @@
      checkbox stays light-on-dark and looks pasted on. */
   color-scheme: light;
 
-  --background: oklch(0.99 0.005 40); /* Warm paper */
-  --foreground: oklch(0.2 0.01 40);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.2 0.01 40);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.2 0.01 40);
+  --background: #e9ede8; /* Limestone */
+  --foreground: #0e2a35; /* Ocean ink */
+  --card: #f5f7f3; /* Lighter limestone: a panel is a fill, not an outline */
+  --card-foreground: #0e2a35;
+  --popover: #f5f7f3;
+  --popover-foreground: #0e2a35;
 
-  --primary: oklch(0.58 0.18 40); /* Kiln orange */
-  --primary-foreground: oklch(0.98 0.01 40);
+  --primary: #1d6650; /* Eucalyptus */
+  --primary-foreground: #f5f7f3;
 
-  --secondary: oklch(0.95 0.02 40);
-  --secondary-foreground: oklch(0.25 0.02 40);
+  --secondary: #dbe4dd;
+  --secondary-foreground: #0e2a35;
 
-  --muted: oklch(0.96 0.01 40);
-  --muted-foreground: oklch(0.47 0.02 40);
+  --muted: #dde4de;
+  --muted-foreground: #4a5f66;
 
-  --accent: oklch(0.93 0.04 40);
-  --accent-foreground: oklch(0.25 0.02 40);
+  --accent: #d2ddd5;
+  --accent-foreground: #0e2a35;
 
-  --destructive: oklch(0.55 0.22 25);
-  --destructive-foreground: oklch(0.98 0 0);
+  --destructive: #b3261e;
+  --destructive-foreground: #f5f7f3;
 
   /* Status roles, so a feature never has to reach for a raw palette colour.
      `bg-emerald-100 text-emerald-800` and friends have no dark counterpart —
      they render dark-on-dark the moment the theme flips — and that is exactly
      what happens when the theme offers no semantic token for "this went well"
      or "this needs attention". */
-  --success: oklch(0.52 0.11 160);
-  --success-foreground: oklch(0.98 0 0);
-  --warning: oklch(0.82 0.15 82);
-  --warning-foreground: oklch(0.25 0.05 80);
+  --success: #1d6650;
+  --success-foreground: #f5f7f3;
+  --warning: #e0b23c;
+  --warning-foreground: #0e2a35;
 
-  --border: oklch(0.88 0.02 40);
-  --input: oklch(0.82 0.02 40);
-  --ring: oklch(0.58 0.18 40);
+  /* Kangaroo-paw lime. A fill behind ink only: it fails as text on limestone. */
+  --signal: #c8e06a;
+  --signal-foreground: #0e2a35;
 
-  --chart-1: oklch(0.58 0.18 40);
-  --chart-2: oklch(0.5 0.1 230);
-  --chart-3: oklch(0.72 0.15 75);
-  --chart-4: oklch(0.55 0.15 350);
-  --chart-5: oklch(0.45 0.05 40);
+  --border: #c9d3cc;
+  --input: #9fb0a8;
+  --ring: #1d6650;
 
-  /* Shadow tint. Its own token because it wants a different weight per mode. */
-  --shadow-ink: hsl(30 60% 40% / 0.1);
+  --chart-1: #1d6650;
+  --chart-2: #2f6f8f;
+  --chart-3: #b48a1e;
+  --chart-4: #8c3b5d;
+  --chart-5: #4a5f66;
 
-  --sidebar: oklch(0.98 0.01 40);
-  --sidebar-foreground: oklch(0.2 0.01 40);
-  --sidebar-primary: oklch(0.58 0.18 40);
-  --sidebar-primary-foreground: oklch(0.98 0.01 40);
-  --sidebar-accent: oklch(0.93 0.04 40);
-  --sidebar-accent-foreground: oklch(0.25 0.02 40);
-  --sidebar-border: oklch(0.88 0.02 40);
-  --sidebar-ring: oklch(0.58 0.18 40);
+  --shadow-ink: rgb(14 42 53 / 0.12);
+
+  --sidebar: #e2e8e3;
+  --sidebar-foreground: #0e2a35;
+  --sidebar-primary: #1d6650;
+  --sidebar-primary-foreground: #f5f7f3;
+  --sidebar-accent: #d2ddd5;
+  --sidebar-accent-foreground: #0e2a35;
+  --sidebar-border: #c9d3cc;
+  --sidebar-ring: #1d6650;
 
   /* Named face first, then the system stack it falls back to while the
      woff2 loads (`font-display: swap`) or if it never does. */
   --font-sans:
-    "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
-    Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+    "Archivo", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
   --font-display: var(--font-sans);
   --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
   --font-mono:
     ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
 
-  --radius: 0.5rem;
+  --radius: 0.75rem;
   --shadow-2xs: 0 1px 2px 0 var(--shadow-ink);
   --shadow-xs: 0 2px 6px -2px var(--shadow-ink);
-  --shadow-sm: 0 5px 10px -2px var(--shadow-ink), 0 1px 2px -3px var(--shadow-ink);
-  --shadow: 0 5px 10px -2px var(--shadow-ink), 0 1px 2px -3px var(--shadow-ink);
-  --shadow-md: 0 5px 10px -2px var(--shadow-ink), 0 2px 4px -3px var(--shadow-ink);
-  --shadow-lg: 0 8px 16px -4px var(--shadow-ink), 0 4px 6px -3px var(--shadow-ink);
-  --shadow-xl: 0 12px 24px -6px var(--shadow-ink), 0 8px 10px -3px var(--shadow-ink);
-  --shadow-2xl: 0 24px 48px -12px var(--shadow-ink);
+  --shadow-sm: 0 6px 16px -8px var(--shadow-ink);
+  --shadow: 0 8px 20px -10px var(--shadow-ink);
+  --shadow-md: 0 12px 28px -12px var(--shadow-ink);
+  --shadow-lg: 0 18px 40px -16px var(--shadow-ink);
+  --shadow-xl: 0 24px 56px -20px var(--shadow-ink);
+  --shadow-2xl: 0 32px 72px -24px var(--shadow-ink);
 }
 
 .dark {
   color-scheme: dark;
 
-  --background: oklch(0.15 0.02 240); /* Blue slate */
-  --foreground: oklch(0.97 0.005 240);
-  --card: oklch(0.19 0.02 240);
-  --card-foreground: oklch(0.97 0.005 240);
-  --popover: oklch(0.19 0.02 240);
-  --popover-foreground: oklch(0.97 0.005 240);
+  --background: #0b1f28; /* The Indian Ocean after dark */
+  --foreground: #e4ece6;
+  --card: #112a35;
+  --card-foreground: #e4ece6;
+  --popover: #13303c;
+  --popover-foreground: #e4ece6;
 
-  --primary: oklch(0.7 0.15 240); /* Sky */
-  --primary-foreground: oklch(0.15 0.02 240);
+  --primary: #8cc9ae; /* Leaf */
+  --primary-foreground: #0b1f28;
 
-  --secondary: oklch(0.25 0.02 240);
-  --secondary-foreground: oklch(0.97 0.005 240);
+  --secondary: #173341;
+  --secondary-foreground: #e4ece6;
 
-  --muted: oklch(0.25 0.02 240);
-  --muted-foreground: oklch(0.72 0.02 240);
+  --muted: #153341;
+  --muted-foreground: #9db2b0;
 
-  --accent: oklch(0.3 0.05 240);
-  --accent-foreground: oklch(0.97 0.005 240);
+  --accent: #1a3a47;
+  --accent-foreground: #e4ece6;
 
-  --destructive: oklch(0.66 0.2 25);
-  --destructive-foreground: oklch(0.98 0 0);
+  --destructive: #f2867a;
+  --destructive-foreground: #0b1f28;
 
   /* Brighter, so both still clear 4.5:1 against a dark field. */
-  --success: oklch(0.76 0.13 165);
-  --success-foreground: oklch(0.15 0.02 240);
-  --warning: oklch(0.85 0.15 85);
-  --warning-foreground: oklch(0.15 0.02 240);
+  --success: #8cc9ae;
+  --success-foreground: #0b1f28;
+  --warning: #e8c45c;
+  --warning-foreground: #0b1f28;
 
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 18%);
-  --ring: oklch(0.7 0.15 240);
+  --signal: #c8e06a;
+  --signal-foreground: #0b1f28;
 
-  --chart-1: oklch(0.7 0.15 240);
-  --chart-2: oklch(0.75 0.12 195);
-  --chart-3: oklch(0.82 0.13 85);
-  --chart-4: oklch(0.72 0.15 350);
-  --chart-5: oklch(0.6 0.05 240);
+  --border: #23434f;
+  --input: #3b5d69;
+  --ring: #8cc9ae;
 
-  --shadow-ink: hsl(220 60% 4% / 0.5);
+  --chart-1: #8cc9ae;
+  --chart-2: #7fb3d5;
+  --chart-3: #e8c45c;
+  --chart-4: #e39ab8;
+  --chart-5: #9db2b0;
 
-  --sidebar: oklch(0.19 0.02 240);
-  --sidebar-foreground: oklch(0.97 0.005 240);
-  --sidebar-primary: oklch(0.7 0.15 240);
-  --sidebar-primary-foreground: oklch(0.15 0.02 240);
-  --sidebar-accent: oklch(0.3 0.05 240);
-  --sidebar-accent-foreground: oklch(0.97 0.005 240);
-  --sidebar-border: oklch(1 0 0 / 12%);
-  --sidebar-ring: oklch(0.7 0.15 240);
+  --shadow-ink: rgb(2 10 14 / 0.6);
+
+  --sidebar: #0e2530;
+  --sidebar-foreground: #e4ece6;
+  --sidebar-primary: #8cc9ae;
+  --sidebar-primary-foreground: #0b1f28;
+  --sidebar-accent: #1a3a47;
+  --sidebar-accent-foreground: #e4ece6;
+  --sidebar-border: #23434f;
+  --sidebar-ring: #8cc9ae;
 }
 
 @theme inline {
@@ -186,6 +186,8 @@
   --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
+  --color-signal: var(--signal);
+  --color-signal-foreground: var(--signal-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -242,87 +244,36 @@
     border-color: var(--color-border, currentColor);
   }
 
-  h1 {
+  /* Headings run wide: the width axis is the house voice. Body text stays
+     at its normal width, where it reads best. */
+  h1,
+  h2,
+  h3 {
     font-family: var(--font-display);
-    letter-spacing: -0.02em;
+    font-stretch: 112%;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
   }
-}
+  h1 {
+    font-weight: 800;
+  }
+  h2,
+  h3 {
+    font-weight: 650;
+  }
 
-/* A hairline of the accent under the header and above the footer, fading
-   out at both ends. Drawn from tokens, so it follows the theme. */
-@utility retro-stripes {
-  background-image: linear-gradient(to right, transparent, var(--primary) 20% 80%, transparent);
-  opacity: 0.6;
-}
+  ::selection {
+    background: var(--signal);
+    color: var(--signal-foreground);
+  }
 
-/* Container for scrolling text */
-.scroll-text-container {
-  width: 100%;
-  overflow: hidden;
-  position: relative;
-  display: block;
-}
-
-/* Scrolling text itself */
-.scroll-text {
-  display: inline-block;
-  white-space: nowrap;
-  will-change: transform;
-  /* Animation: scroll left, jump to right, scroll left again */
-  -webkit-animation: infinite-marquee 8s linear infinite;
-  -moz-animation: infinite-marquee 8s linear infinite;
-  animation: infinite-marquee 8s linear infinite;
-}
-
-@keyframes infinite-marquee {
-  0% {
-    transform: translateX(0%);
+  html {
+    scroll-behavior: smooth;
   }
-  45% {
-    transform: translateX(-100%);
-    visibility: hidden;
-  }
-  46% {
-    transform: translateX(100%);
-    visibility: hidden;
-  }
-  100% {
-    transform: translateX(0%);
-    visibility: visible;
-  }
-}
-@-webkit-keyframes infinite-marquee {
-  0% {
-    -webkit-transform: translateX(0%);
-  }
-  45% {
-    -webkit-transform: translateX(-100%);
-    visibility: hidden;
-  }
-  46% {
-    -webkit-transform: translateX(100%);
-    visibility: hidden;
-  }
-  100% {
-    visibility: visible;
-    -webkit-transform: translateX(0%);
-  }
-}
-@-moz-keyframes infinite-marquee {
-  0% {
-    -moz-transform: translateX(0%);
-  }
-  45% {
-    -moz-transform: translateX(-100%);
-    visibility: hidden;
-  }
-  46% {
-    -moz-transform: translateX(100%);
-    visibility: hidden;
-  }
-  100% {
-    -moz-transform: translateX(0%);
-    visibility: visible;
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
   }
 }
 
@@ -442,5 +393,55 @@
   .float-nav-drift,
   .float-nav[data-open="true"] .float-nav-drift > :first-child {
     animation: none;
+  }
+}
+
+/* The home page's name (worker/views/portfolio/Home.tsx). Each letter has
+   its own width (--w) and weight (--g), which the hero script moves towards
+   the pointer. On load the letters open from condensed to normal, one after
+   another: the page's single orchestrated moment. */
+.hero-name {
+  font-stretch: 100%;
+  letter-spacing: -0.035em;
+}
+.hero-letter {
+  display: inline-block;
+  font-stretch: var(--w, 100%);
+  font-weight: var(--g, 800);
+  transition:
+    font-stretch 0.35s ease-out,
+    font-weight 0.35s ease-out;
+  animation: hero-open 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) calc(var(--k, 0) * 45ms) backwards;
+}
+@keyframes hero-open {
+  from {
+    font-stretch: 62%;
+    font-weight: 300;
+    opacity: 0;
+  }
+}
+
+/* The email at the foot of the home page: a thick lime underline that rises
+   behind the text on hover. */
+.contact-link {
+  background-image: linear-gradient(var(--signal), var(--signal));
+  background-repeat: no-repeat;
+  background-size: 100% 0.18em;
+  background-position: 0 92%;
+  transition: background-size 0.25s ease;
+}
+.contact-link:hover,
+.contact-link:focus-visible {
+  background-size: 100% 100%;
+  color: var(--signal-foreground);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-letter {
+    animation: none;
+    transition: none;
+  }
+  .contact-link {
+    transition: none;
   }
 }

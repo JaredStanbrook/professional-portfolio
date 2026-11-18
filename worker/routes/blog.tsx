@@ -1,6 +1,7 @@
 // worker/routes/blog.tsx
 //
-// Public: the home page (post list) and /blog/:slug.
+// Public: the home page (the portfolio, with the latest posts), /blog and
+// /blog/:slug.
 // Signed in: /editor, to write, edit and delete posts.
 
 import { Hono } from "hono";
@@ -10,7 +11,7 @@ import type { AppEnv } from "@server/types";
 import { requireUser } from "@server/middleware/guard.middleware";
 import { AccessControl } from "@server/services/access.service";
 import { flashToast } from "@server/lib/htmx-helpers";
-import { websiteSchema } from "@server/lib/structured-data";
+import { personSchema, websiteSchema } from "@server/lib/structured-data";
 import { SLUG_PATTERN, blogFormSchema, type BlogForm } from "@server/schema/blog.schema";
 import {
   deletePost,
@@ -21,13 +22,14 @@ import {
   savePost,
 } from "@server/services/blog.service";
 import {
+  BlogIndexPage,
   EditorListPage,
   EditorPage,
-  HomePage,
   PostBody,
   PostPage,
   type EditorErrors,
 } from "@views/blog/BlogViews";
+import { HomePage } from "@views/portfolio/Home";
 
 const access = new AccessControl();
 
@@ -57,13 +59,22 @@ export const blogRoute = new Hono<AppEnv>();
 
 blogRoute.get("/", async (c) => {
   const posts = await listPosts(c.var.db);
-  return c.render(<HomePage posts={posts} {...localeOf(c)} />, {
+  return c.render(<HomePage posts={posts.slice(0, 3)} {...localeOf(c)} />, {
     // "{tagline} · {name}" — the site's own entry in search results.
     title: c.var.app.tagline || undefined,
     description:
-      "Jared Stanbrook's blog: hands-on labs, project breakdowns and notes on networking, security and web development from Perth, Western Australia.",
+      "Jared Stanbrook, IT specialist in Perth, Western Australia: selected projects in networking, security and web development, work experience, and writing.",
     type: "website",
-    jsonLd: [websiteSchema(c.var.app)],
+    jsonLd: [websiteSchema(c.var.app), personSchema(c.var.app)],
+  });
+});
+
+blogRoute.get("/blog", async (c) => {
+  const posts = await listPosts(c.var.db);
+  return c.render(<BlogIndexPage posts={posts} {...localeOf(c)} />, {
+    title: "Writing",
+    description:
+      "Every post by Jared Stanbrook: hands-on labs, project write-ups and notes on networking, security and web development.",
   });
 });
 

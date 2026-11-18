@@ -42,7 +42,7 @@ export const Register: FC<RegisterProps> = (props) => {
     <div class="max-w-7xl px-4 mx-auto pt-14">
       <div class="container grow flex flex-col items-center justify-center py-12">
         <auth-register
-          class="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[400px] p-8 border rounded-lg shadow-xl bg-card text-card-foreground"
+          class="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[400px] p-8 rounded-2xl bg-card text-card-foreground"
           default-tab={defaultTab}
           csrf-token={csrfToken || ""}
           min-password-length={minLength}

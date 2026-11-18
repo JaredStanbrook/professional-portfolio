@@ -143,12 +143,15 @@ describe("home page", () => {
     expect(html).toContain(`<title>${appConfig.tagline} · ${appConfig.name}</title>`);
   });
 
-  it("describes the site with WebSite JSON-LD and nothing invented", async () => {
+  it("describes the site and its owner with JSON-LD, and nothing invented", async () => {
+    const html = await page();
     const blocks = [
-      ...(await page()).matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g),
+      ...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g),
     ].map((m) => JSON.parse(m[1]));
-    expect(blocks.map((b) => b["@type"])).toEqual(["WebSite"]);
+    expect(blocks.map((b) => b["@type"])).toEqual(["WebSite", "Person"]);
     expect(blocks[0].url).toBe("https://example.com/");
-    expect(blocks[0]).not.toHaveProperty("aggregateRating");
+    for (const b of blocks) expect(b).not.toHaveProperty("aggregateRating");
+    // Structured data must match the visible page: the email is on it.
+    expect(html).toContain(blocks[1].email.replace("mailto:", ""));
   });
 });

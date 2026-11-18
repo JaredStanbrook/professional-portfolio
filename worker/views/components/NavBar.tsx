@@ -14,8 +14,8 @@ type NavItem = { to: string; name: string; icon: string };
 
 const menuConfig: Record<string, NavItem[]> = {
   default: [
-    { to: "/", name: "Blog", icon: "book-open" },
-    { to: "/about", name: "About me", icon: "user" },
+    { to: "/", name: "Portfolio", icon: "user" },
+    { to: "/blog", name: "Writing", icon: "book-open" },
     { to: "/grade-calculator", name: "Grade calculator", icon: "calculator" },
   ],
   user: [{ to: "/editor", name: "Write", icon: "notebook-pen" }],
@@ -44,7 +44,7 @@ const getMenuItems = (user: PropsUser | null | undefined) => {
 // --- STYLES ---
 // Every bubble — the launcher and each item — is the same frosted circle.
 const bubble =
-  "flex h-14 w-14 items-center justify-center rounded-full border border-border/60 bg-background/60 text-foreground shadow-lg backdrop-blur-md transition-colors hover:bg-accent/80 hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+  "flex h-14 w-14 items-center justify-center rounded-full bg-card/70 text-foreground shadow-lg backdrop-blur-md transition-colors hover:bg-accent/80 hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
 /**
  * The name under each icon. Every item is the same width with its caption
@@ -73,9 +73,7 @@ interface NavBarProps {
  */
 export const NavBar = ({ appName, user, currentPath }: NavBarProps) => {
   const isActive = (to: string) =>
-    to === "/"
-      ? currentPath === "/" || !!currentPath?.startsWith("/blog/")
-      : !!currentPath?.startsWith(to);
+    to === "/" ? currentPath === "/" : !!currentPath?.startsWith(to);
 
   const item = (content: unknown, label: string) => html`
     <li class="float-nav-item">

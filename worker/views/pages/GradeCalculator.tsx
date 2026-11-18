@@ -21,11 +21,9 @@ const inputClass =
   "h-11 w-full rounded-lg border border-input bg-background px-3 text-sm tabular-nums focus:outline-none focus:ring-2 focus:ring-ring";
 
 const Stat: FC<{ label: string; value: string; target?: boolean }> = ({ label, value, target }) => (
-  <div
-    class={`rounded-lg border p-4 ${target ? "border-primary/40 bg-primary/10" : "bg-muted/50"}`}
-  >
-    <p class="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</p>
-    <p class={`mt-1 text-2xl font-bold tabular-nums ${target ? "text-primary" : ""}`}>{value}</p>
+  <div class={`rounded-xl p-4 ${target ? "bg-signal text-signal-foreground" : "bg-muted"}`}>
+    <p class={`text-sm ${target ? "" : "text-muted-foreground"}`}>{label}</p>
+    <p class="mt-1 text-2xl font-bold tabular-nums">{value}</p>
   </div>
 );
 
@@ -144,7 +142,7 @@ export const GradeCalculator: FC<{ rows: Assessment[]; expected: string }> = ({
         hx-target="#grade-calc"
         hx-select="#grade-calc"
         hx-swap="outerHTML"
-        class="inline-flex h-11 items-center gap-2 rounded-lg border border-input px-4 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
+        class="inline-flex h-11 items-center gap-2 rounded-full bg-muted px-5 text-sm font-medium hover:bg-accent"
       >
         <i data-lucide="plus" class="h-4 w-4" aria-hidden="true"></i> Add assessment
       </button>
@@ -168,7 +166,7 @@ export const GradeCalculator: FC<{ rows: Assessment[]; expected: string }> = ({
     <noscript>
       <button
         type="submit"
-        class="inline-flex h-11 items-center justify-center rounded-lg bg-primary px-6 text-sm font-medium text-primary-foreground"
+        class="inline-flex h-11 items-center justify-center rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground"
       >
         Calculate
       </button>
@@ -177,9 +175,9 @@ export const GradeCalculator: FC<{ rows: Assessment[]; expected: string }> = ({
 );
 
 export const GradeCalculatorPage: FC<{ rows: Assessment[]; expected: string }> = (props) => (
-  <div class="mx-auto max-w-3xl px-4 pb-10 pt-24 sm:px-6 sm:pt-10 lg:py-16">
-    <div class="rounded-lg border bg-card p-6 text-card-foreground shadow-sm sm:p-8">
-      <h1 class="text-3xl font-bold tracking-tight">Grade calculator</h1>
+  <div class="mx-auto max-w-3xl px-4 pb-10 pt-24 sm:px-6 sm:pt-28">
+    <div class="rounded-2xl bg-card p-6 text-card-foreground sm:p-10">
+      <h1 class="text-4xl">Grade calculator</h1>
       <p class="mb-8 mt-2 text-sm text-muted-foreground">
         Work out the average you need on what is left to reach your target. Nothing is saved.
       </p>

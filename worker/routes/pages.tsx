@@ -1,26 +1,21 @@
 // worker/routes/pages.tsx
 //
-// The public pages that are not the blog: /about, /it-help-desk and the
-// grade calculator.
+// The public pages that are not the blog: /it-help-desk and the grade
+// calculator. /about now lives on the home page.
 
 import { Hono } from "hono";
 
 import type { AppEnv } from "@server/types";
 import type { Assessment } from "@server/lib/grades";
 import { repoStat } from "@server/services/github.service";
-import { AboutPage } from "@views/pages/About";
 import { GithubStats, HelpDeskPage } from "@views/pages/HelpDesk";
 import { DEFAULT_ROWS, GradeCalculatorPage } from "@views/pages/GradeCalculator";
 
 export const pagesRoute = new Hono<AppEnv>();
 
-pagesRoute.get("/about", (c) =>
-  c.render(<AboutPage />, {
-    title: "About",
-    description:
-      "Jared Stanbrook, IT specialist in Perth, Western Australia: experience in networking, security and web development, and selected projects.",
-  }),
-);
+// The about page became the home page. Old links and search results land on
+// it rather than on a 404.
+pagesRoute.get("/about", (c) => c.redirect("/", 301));
 
 pagesRoute.get("/it-help-desk", (c) =>
   c.render(<HelpDeskPage />, {

@@ -60,9 +60,7 @@ const badges = [
 ];
 
 const Panel: FC<{ title: string; children: unknown; class?: string }> = (props) => (
-  <section
-    class={`rounded-lg border bg-card p-6 text-card-foreground shadow-sm ${props.class ?? ""}`}
-  >
+  <section class={`rounded-2xl bg-card p-6 text-card-foreground sm:p-8 ${props.class ?? ""}`}>
     <h2 class="mb-4 text-lg font-semibold">{props.title}</h2>
     {props.children}
   </section>
@@ -82,7 +80,7 @@ const DataTable: FC<{ rows: Datum[]; label: string; unit: string }> = ({ rows, l
       </thead>
       <tbody>
         {rows.map((r) => (
-          <tr class="border-t">
+          <tr class="odd:bg-muted/50">
             <td class="py-1">{r.label}</td>
             <td class="py-1 text-right tabular-nums">{r.value}</td>
           </tr>
@@ -165,10 +163,12 @@ export const HelpDeskPage: FC = () => {
   const pct = (v: number) => `${((v / modeTotal) * 100).toFixed(0)}%`;
 
   return (
-    <div class="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:py-16">
+    <div class="mx-auto max-w-5xl px-4 pb-10 pt-24 sm:px-6 sm:pt-28">
       <header class="mb-10 max-w-2xl">
-        <p class="text-sm font-semibold uppercase tracking-wide text-primary">Aug — Nov 2024</p>
-        <h1 class="mt-2 text-4xl font-bold tracking-tight">Student IT Service Desk</h1>
+        <h1 class="text-[clamp(2.4rem,6vw,4.25rem)] leading-[1.02]">Student IT Service Desk</h1>
+        <p class="mt-4 text-sm text-muted-foreground">
+          Murdoch University, August to November 2024
+        </p>
         <p class="mt-4 text-muted-foreground">
           Workplace learning at Murdoch University: shifts in the library helping students with
           printing, software, connectivity and accounts, plus the small app I built to digitise the

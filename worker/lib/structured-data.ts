@@ -10,6 +10,7 @@
  */
 
 import type { AppConfig } from "../config/app.config";
+import { person, socials } from "../views/portfolio/content";
 
 /** The site itself. Home page only — it describes the whole domain once. */
 export const websiteSchema = (app: AppConfig) => ({
@@ -21,6 +22,29 @@ export const websiteSchema = (app: AppConfig) => ({
   inLanguage: app.locale,
   ...(app.tagline ? { description: app.tagline } : {}),
 });
+
+/**
+ * The person the site is about. Home page only, where every one of these
+ * facts is on the page: name, role, place, email and the profile links.
+ */
+export const personSchema = (app: AppConfig) => {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "@id": new URL("/#person", app.origin).toString(),
+    name: person.name,
+    jobTitle: person.role,
+    email: `mailto:${person.email}`,
+    url: new URL("/", app.origin).toString(),
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Perth",
+      addressRegion: "WA",
+      addressCountry: "AU",
+    },
+    sameAs: socials.map((s) => s.href),
+  };
+};
 
 /**
  * A page's visible question-and-answer list. Build it from the same array
