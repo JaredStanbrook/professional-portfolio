@@ -23,6 +23,14 @@ and Tailwind theme tokens for light and dark.
 Posts are `<slug>.mdx` objects in the `blog-r2` bucket, with a `blog_metadata`
 row each for the lists. Write them at `/editor` once signed in.
 
+## Résumé
+
+The résumé is code: `worker/views/resume/resume.ts` holds every word,
+`/resume` shows it as an A4 page, and `npm run resume` prints that page to
+`public/resume.pdf`, which the site links to. To change it, edit
+`resume.ts`, run `npm run resume`, and commit both files. The script refuses
+to write a résumé that runs past one page.
+
 ## Develop
 
 ```bash

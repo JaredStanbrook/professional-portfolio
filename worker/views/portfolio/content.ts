@@ -8,7 +8,8 @@ export const person = {
   role: "IT specialist",
   location: "Perth, Western Australia",
   email: "jared.stanbrook@proton.me",
-  resume: "https://stanbrook.me/jared_stanbrook_cyber_resume.pdf",
+  /** Built from worker/views/resume/resume.ts by `npm run resume`. */
+  resume: "/resume.pdf",
   /** The line under the name on the home page. */
   summary:
     "IT specialist in Perth. I look after networks, think hard about security, and build for the web.",

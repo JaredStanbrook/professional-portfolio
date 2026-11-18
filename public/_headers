@@ -26,3 +26,7 @@
 
 /favicon.svg
   Cache-Control: public, max-age=86400
+
+# Same URL every time it changes, so keep it short.
+/resume.pdf
+  Cache-Control: public, max-age=3600

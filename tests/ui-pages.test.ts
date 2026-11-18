@@ -187,6 +187,18 @@ describe("UI pages load", () => {
     expect(html).toContain('href="/editor/first-post"');
   });
 
+  it("renders the résumé as its own document, kept out of search", async () => {
+    const res = await get(createTestApp(null), "/resume");
+    const html = await res.text();
+    expect(res.status).toBe(200);
+    expect(res.headers.get("x-robots-tag")).toBe("noindex");
+    expect(html.startsWith("<!doctype html>")).toBe(true);
+    expect(html).toContain("Help Desk Technician");
+    expect(html).toContain('href="/resume.pdf"');
+    // A document, not a site page: no nav, no theme.
+    expect(html).not.toContain("float-nav");
+  });
+
   it("sends the old about page to the portfolio on the home page", async () => {
     const res = await get(createTestApp(null), "/about");
     expect(res.status).toBe(301);

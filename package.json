@@ -21,6 +21,8 @@
     "configure": "tsx scripts/configure.ts",
     "// template": "Template versions: `npm run template` shows what changed since frugal.json's version; `-- upgrade` applies it. See docs/template-versions.md.",
     "template": "tsx scripts/template.ts",
+    "// resume": "Prints worker/views/resume (data in resume.ts) to public/resume.pdf. Needs Playwright's Chromium; commit the PDF it writes.",
+    "resume": "tsx scripts/resume-pdf.tsx",
     "lint": "eslint .",
     "format": "prettier --check .",
     "format:write": "prettier --write .",

@@ -9,9 +9,21 @@ import type { AppEnv } from "@server/types";
 import type { Assessment } from "@server/lib/grades";
 import { repoStat } from "@server/services/github.service";
 import { GithubStats, HelpDeskPage } from "@views/pages/HelpDesk";
+import { ResumeDocument } from "@views/resume/Resume";
 import { DEFAULT_ROWS, GradeCalculatorPage } from "@views/pages/GradeCalculator";
 
 export const pagesRoute = new Hono<AppEnv>();
+
+/**
+ * The résumé as a page: a copy of the PDF, with a download button. It is its
+ * own document (no site layout, always black on white) and kept out of search
+ * results, since the PDF is the version meant to be passed around.
+ */
+pagesRoute.get("/resume", (c) => {
+  c.header("X-Robots-Tag", "noindex");
+  const canonical = new URL("/resume", c.var.app.origin).toString();
+  return c.html(`<!doctype html>${(<ResumeDocument canonical={canonical} />).toString()}`);
+});
 
 // The about page became the home page. Old links and search results land on
 // it rather than on a 404.
