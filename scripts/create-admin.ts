@@ -1,106 +1,159 @@
-// scripts/create-admin.ts
-import { spawn } from "child_process";
-import fs from "fs";
-import prompts from "prompts";
-import crypto from "crypto";
-import { hashPassword } from "../worker/utils/crypto";
+import { spawnSync } from "node:child_process";
 
-// ==========================================
-// ⚙️ CONFIGURATION
-// ==========================================
-const DB_NAME = "DB"; // Match the database_name in your wrangler.toml
-const TABLE_USERS = "users";
-const TABLE_ROLES = "user_roles";
+import { hashPassword, randomBase64Url } from "../worker/lib/crypto";
 
-// ==========================================
-// 🚀 MAIN SCRIPT
-// ==========================================
-async function main() {
+type Mode = "local" | "remote";
+
+const usage = () => {
+  console.log(
+    [
+      "Usage:",
+      "  npm run create-admin:local -- --email you@domain.com --password 'Secret123!'",
+      "  npm run create-admin:remote -- --email you@domain.com --password 'Secret123!'",
+      "",
+      "Options:",
+      "  --email           Email address for the admin user (required)",
+      "  --password        Password for the admin user (required unless --generate)",
+      "  --generate        Generate a strong password and print it",
+      "  --display-name    Optional display name",
+      "  --username        Optional username",
+      "  --local           Run against local D1",
+      "  --remote          Run against remote D1",
+      "  --reset-password  Update password if user already exists",
+      "",
+    ].join("\n"),
+  );
+};
+
+const parseArgs = () => {
   const args = process.argv.slice(2);
-  const isRemote = args.includes("--remote");
-  const env = isRemote ? "REMOTE" : "LOCAL";
+  const get = (flag: string) => {
+    const idx = args.indexOf(flag);
+    if (idx === -1) return undefined;
+    return args[idx + 1];
+  };
+  const has = (flag: string) => args.includes(flag);
 
-  console.log(`\n👑 \x1b[33mCreate Admin User [${env}]\x1b[0m\n`);
+  const email = get("--email");
+  const password = get("--password");
+  const displayName = get("--display-name");
+  const username = get("--username");
+  const generate = has("--generate");
+  const resetPassword = has("--reset-password");
+  const mode: Mode = has("--remote") ? "remote" : "local";
+  const explicitMode = has("--remote") || has("--local");
 
-  // 1. Get Inputs
-  const response = await prompts([
-    {
-      type: "text",
-      name: "email",
-      message: "Admin Email:",
-      validate: (value) => (value.includes("@") ? true : "Invalid email"),
-    },
-    {
-      type: "text",
-      name: "username",
-      message: "Username:",
-      initial: "admin",
-    },
-    {
-      type: "text",
-      name: "displayName",
-      message: "Display Name:",
-      initial: "Administrator",
-    },
-    {
-      type: "password",
-      name: "password",
-      message: "Password:",
-      validate: (value) => (value.length < (isRemote ? 8 : 0) ? "Must be 8+ chars" : true),
-    },
-  ]);
+  return {
+    email,
+    password,
+    displayName,
+    username,
+    generate,
+    resetPassword,
+    mode,
+    explicitMode,
+  };
+};
 
-  if (!response.email || !response.password) {
-    console.log("❌ Cancelled");
-    process.exit(0);
+/**
+ * Wrangler resolves a D1 binding name against wrangler.jsonc, so targeting
+ * "DB" works for any site without this script needing to know the database's
+ * real name. Override with D1_DATABASE_NAME if you have several databases.
+ */
+const databaseTarget = () => process.env.D1_DATABASE_NAME || "DB";
+
+const escapeSql = (value: string) => value.replace(/'/g, "''");
+
+const run = async () => {
+  const { email, password, displayName, username, generate, resetPassword, mode, explicitMode } =
+    parseArgs();
+
+  if (!email) {
+    console.error("Missing --email");
+    usage();
+    process.exit(1);
   }
 
-  console.log("\n⚙️  Generating credentials...");
+  if (!explicitMode) {
+    console.error("Missing --local or --remote");
+    usage();
+    process.exit(1);
+  }
 
-  // 2. Prepare Data
+  let finalPassword = password;
+  if (!finalPassword && generate) {
+    finalPassword = randomBase64Url(18);
+    console.log(`Generated password: ${finalPassword}`);
+  }
+
+  if (!finalPassword) {
+    console.error("Missing --password (or use --generate)");
+    usage();
+    process.exit(1);
+  }
+
+  const passwordHash = await hashPassword(finalPassword);
+  const now = new Date().toISOString();
   const userId = crypto.randomUUID();
   const roleId = crypto.randomUUID();
-  const passwordHash = await hashPassword(response.password);
-  const now = new Date().toISOString();
 
-  // 3. Generate SQL
-  // We use a temporary file because passing complex strings via CLI args is buggy
-  const sql = `
-    INSERT INTO ${TABLE_USERS} (id, email, username, display_name, password_hash, is_active, email_verified, created_at, updated_at)
-    VALUES ('${userId}', '${response.email}', '${response.username}', '${response.displayName}', '${passwordHash}', 1, 1, '${now}', '${now}');
+  const emailSql = escapeSql(email);
+  const displayNameSql = displayName ? `'${escapeSql(displayName)}'` : "NULL";
+  const usernameSql = username ? `'${escapeSql(username)}'` : "NULL";
+  const hashSql = escapeSql(passwordHash);
+  const nowSql = escapeSql(now);
 
-    INSERT INTO ${TABLE_ROLES} (id, user_id, role, assigned_at)
-    VALUES ('${roleId}', '${userId}', 'admin', '${now}');
+  const insertUser = `
+    INSERT OR IGNORE INTO users (
+      id, email, display_name, username, password_hash,
+      is_active, email_verified, created_at, updated_at
+    ) VALUES (
+      '${userId}', '${emailSql}', ${displayNameSql}, ${usernameSql},
+      '${hashSql}', 1, 1, '${nowSql}', '${nowSql}'
+    );
   `;
 
-  const filename = `temp_seed_${Date.now()}.sql`;
-  fs.writeFileSync(filename, sql);
+  const updatePassword = resetPassword
+    ? `
+    UPDATE users
+    SET password_hash = '${hashSql}', updated_at = '${nowSql}'
+    WHERE email = '${emailSql}';
+  `
+    : "";
 
-  // 4. Execute via Wrangler
-  console.log(`🚀 Executing against D1 (${env})...`);
+  const ensureAdminRole = `
+    INSERT INTO user_roles (id, user_id, role, assigned_at)
+    SELECT '${roleId}', u.id, 'admin', unixepoch() * 1000
+    FROM users u
+    WHERE u.email = '${emailSql}'
+      AND NOT EXISTS (
+        SELECT 1 FROM user_roles ur
+        WHERE ur.user_id = u.id AND ur.role = 'admin'
+      );
+  `;
 
-  const flags = isRemote ? ["--remote"] : ["--local"];
+  const sql = `${insertUser}${updatePassword}${ensureAdminRole}`;
+  const dbName = databaseTarget();
+  const modeFlag = mode === "remote" ? "--remote" : "--local";
 
-  const child = spawn(
-    "bunx",
-    ["wrangler", "d1", "execute", DB_NAME, ...flags, `--file=${filename}`],
-    { stdio: "inherit" }
+  const result = spawnSync(
+    "npx",
+    ["wrangler", "d1", "execute", dbName, modeFlag, "--command", sql, "--yes"],
+    { encoding: "utf-8" },
   );
 
-  child.on("close", (code) => {
-    // Cleanup temp file
-    if (fs.existsSync(filename)) {
-      fs.unlinkSync(filename);
-    }
+  if (result.stdout?.trim()) console.log(result.stdout.trim());
+  if (result.stderr?.trim()) console.error(result.stderr.trim());
 
-    if (code === 0) {
-      console.log(`\n✅ \x1b[32mSuccess! Admin user created.\x1b[0m`);
-      console.log(`   Email: ${response.email}`);
-      console.log(`   ID:    ${userId}`);
-    } else {
-      console.error(`\n❌ Failed to execute SQL.`);
-    }
-  });
-}
+  if (result.status !== 0) {
+    console.error(`create-admin failed (exit ${result.status})`);
+    process.exit(result.status ?? 1);
+  }
 
-main();
+  console.log(`Admin user ensured for ${email}`);
+};
+
+run().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

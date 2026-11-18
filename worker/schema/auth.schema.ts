@@ -2,7 +2,7 @@
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { relations, sql } from "drizzle-orm";
-import { email, z } from "zod";
+import { z } from "zod";
 
 // Helper for generating UUIDs
 const genId = () => crypto.randomUUID();
@@ -15,6 +15,18 @@ const base64UrlString = z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid Base64URL"
 export const users = sqliteTable("users", {
   id: text("id").primaryKey().$defaultFn(genId),
   username: text("username").unique(),
+
+  /**
+   * Always stored lowercased — `normaliseEmail` in the auth service is the one
+   * gate, and every read and write goes through it.
+   *
+   * SQLite compares text case-sensitively, so without that rule
+   * `Jared@example.com` and `jared@example.com` are two different accounts:
+   * this unique index happily permits both, and signing in with the wrong
+   * capitalisation of your own address answers "Invalid credentials" with no
+   * hint as to why. Normalising on the way in makes the index mean what it
+   * appears to mean.
+   */
   email: text("email").unique(),
   displayName: text("display_name"),
 
@@ -179,6 +191,19 @@ export const safeUserSchema = selectUserSchema.extend({
   roles: z.array(z.string()),
   permissions: z.array(z.string()),
 });
+export const userSummarySchema = selectUserSchema.pick({
+  id: true,
+  email: true,
+  displayName: true,
+});
+/**
+ * The user shape passed into layout and nav components. Extend this if the
+ * shell needs more than identity and permissions on every page.
+ */
+export const propsUserSchema = selectUserSchema.extend({
+  roles: z.array(z.string()),
+  permissions: z.array(z.string()),
+});
 
 export const updateUserProfileSchema = z.object({
   displayName: z.string().min(2).max(50).optional(),
@@ -214,9 +239,9 @@ export const registerPasskeyVerifySchema = z.object({
       clientDataJSON: base64UrlString,
       attestationObject: base64UrlString,
       transports: z.array(z.string()).optional(),
-      // extensions and other optional fields can be added if needed
     }),
-    clientExtensionResults: z.object({}).optional(),
+    // Change z.object({}) to z.any() to allow WebAuthn extension data
+    clientExtensionResults: z.any().optional(),
     authenticatorAttachment: z.enum(["platform", "cross-platform"]).optional(),
   }),
 });
@@ -239,7 +264,8 @@ export const loginPasskeyVerifySchema = z.object({
       signature: base64UrlString,
       userHandle: base64UrlString.optional(),
     }),
-    clientExtensionResults: z.object({}).optional(),
+    // Change z.object({}) to z.any() here as well
+    clientExtensionResults: z.any().optional(),
     authenticatorAttachment: z.enum(["platform", "cross-platform"]).optional(),
   }),
 });
@@ -307,6 +333,8 @@ export type SelectUser = z.infer<typeof selectUserSchema>;
 export type RegisterUser = z.infer<typeof registerUserSchema>;
 export type LoginUser = z.infer<typeof loginUserSchema>;
 export type SafeUser = z.infer<typeof safeUserSchema>;
+export type UserSummary = z.infer<typeof userSummarySchema>;
+export type PropsUser = z.infer<typeof propsUserSchema>;
 export type RegisterPasskeyVerify = z.infer<typeof registerPasskeyVerifySchema>;
 export type LoginPasskeyVerify = z.infer<typeof loginPasskeyVerifySchema>;
 export type ChangePassword = z.infer<typeof changePasswordSchema>;

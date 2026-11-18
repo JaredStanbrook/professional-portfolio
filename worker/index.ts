@@ -1,47 +1,105 @@
-// worker/index.ts
 import { Hono } from "hono";
 import { logger } from "hono/logger";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
-import { cloudflareRateLimiter } from "@hono-rate-limiter/cloudflare";
+
 import type { AppEnv } from "./types";
 
 import routes from "./app";
 
+import { requireSecrets } from "./middleware/secrets.middleware";
+import { configMiddleware } from "./middleware/config.middleware";
+import { dbMiddleware } from "./middleware/db.middleware";
+import { authMiddleware } from "./middleware/auth.middleware";
+import { describeError, isMissingSchema } from "./lib/errors";
+import { canonicalUrl } from "./middleware/canonical-url.middleware";
+import { renderNotFound } from "./views/pages/NotFound";
+
 const worker = new Hono<AppEnv>();
 
+// ---------------------------------------------------------
+// GLOBAL MIDDLEWARE
+// ---------------------------------------------------------
 worker.use("*", logger());
-worker.use(
+
+worker.use("*", (c, next) =>
   cors({
-    origin: "*",
-    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    // Same-origin by default: only the configured ORIGIN and localhost are
+    // allowed. Widen this deliberately if you add a separate frontend.
+    origin: (origin) => {
+      if (!origin) return c.env.ORIGIN;
+      if (origin.startsWith("http://localhost") || origin.startsWith("http://127.0.0.1")) {
+        return origin;
+      }
+      return origin === c.env.ORIGIN ? origin : c.env.ORIGIN;
+    },
+    allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowHeaders: ["Authorization", "Content-Type"],
+    exposeHeaders: ["HX-Trigger", "HX-Redirect", "HX-Push-Url", "HX-Refresh"],
     credentials: true,
-  })
-);
-worker.use((c, next) =>
-  cloudflareRateLimiter<AppEnv>({
-    rateLimitBinding: (c) => c.env.RATE_LIMITER,
-    keyGenerator: (c) => c.req.header("cf-connecting-ip") ?? "",
-  })(c, next)
+  })(c, next),
 );
 
+// One URL per page: HTTP → HTTPS and no trailing slash, both 301s. Before the
+// secrets check, since a redirect needs neither config nor the database.
+worker.use("*", canonicalUrl);
+
+// Before anything reads config or touches the database: a missing JWT_SECRET
+// makes sessions forgeable rather than merely broken, so nothing is served.
+worker.use("*", requireSecrets);
+
+// Applied globally so SSR pages get the same context as API routes.
+worker.use("*", configMiddleware);
+worker.use("*", dbMiddleware);
+worker.use("*", authMiddleware);
+
+// ---------------------------------------------------------
+// APPLICATION ROUTES
+// ---------------------------------------------------------
 worker.route("/", routes);
 
-worker.get("/*", async (c) => {
-  return c.env.ASSETS.fetch(c.req.raw);
-});
-
+// ---------------------------------------------------------
+// ERRORS & STATIC ASSETS
+// ---------------------------------------------------------
 worker.onError((err, c) => {
   if (err instanceof HTTPException) {
     return c.json({ error: err.message }, err.status);
   }
-  console.error(err);
+
+  // Flatten the cause chain: a Drizzle failure carries the useful part
+  // ("no such table: users") on `.cause`, and `console.error(err)` alone
+  // prints the wrapper without it.
+  console.error(`[unhandled] ${c.req.method} ${c.req.path} — ${describeError(err)}`);
+
+  if (isMissingSchema(err)) {
+    return c.json(
+      { error: "The database has not been set up yet. Apply the migrations, then try again." },
+      503,
+    );
+  }
+
   return c.json({ error: "Internal Server Error" }, 500);
 });
 
-worker.notFound((c) => {
-  return c.env.ASSETS.fetch(c.req.raw);
+// Anything the router did not claim falls through to the client bundle
+// (/static/*, favicon, and any other file in public/).
+//
+// A miss that a browser asked for as a page gets the 404 page rather than the
+// asset layer's empty body; a missing file or an API call keeps its plain 404.
+// Wrapped because under `vite dev` the binding is a stub that cannot take a
+// Request, and every genuinely missing page would otherwise look like a crash.
+worker.notFound(async (c) => {
+  const wantsPage = c.req.method === "GET" && (c.req.header("Accept") ?? "").includes("text/html");
+
+  let response: Response;
+  try {
+    response = await c.env.ASSETS.fetch(c.req.raw);
+  } catch (err) {
+    console.warn(`[assets] could not serve ${c.req.path}: ${describeError(err)}`);
+    response = c.text("Not found", 404);
+  }
+
+  return response.status === 404 && wantsPage ? renderNotFound(c) : response;
 });
 
 export default worker;

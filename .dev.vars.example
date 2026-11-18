@@ -1,89 +1,34 @@
-GITHUB_API_TOKEN=""
-ENVIRONMENT="test"
+# Copy to `.dev.vars` (git-ignored) for local development.
+#
+# Anything here overrides the matching key in wrangler.jsonc "vars".
+# Only secrets and local-only overrides belong in this file — everything
+# else lives in wrangler.jsonc so it is version-controlled.
+#
+# In production, set secrets with:
+#   bunx wrangler secret put JWT_SECRET
 
-# ==========================================
-# CORE AUTHENTICATION
-# ==========================================
-# Comma-separated list.
-# Options: passkey, password, pin, totp, email, sms
-AUTH_METHODS=passkey,password
+# Signs the auth_token JWT. Generate one with:
+#   openssl rand -base64 48
+JWT_SECRET="replace-with-a-long-random-string"
 
-# Session settings (in milliseconds)
-SESSION_DURATION=86400000
-SESSION_RENEWAL_THRESHOLD=3600000
-MAX_SESSIONS_PER_USER=5
+# --- Local-only auth overrides ---------------------------------------
+# WebAuthn requires RP_ID to match the hostname exactly, and ORIGIN to
+# match the full origin including port. `bun dev` serves on :3000.
+RP_ID="localhost"
+ORIGIN="http://localhost:3000"
 
-# ==========================================
-# SECURITY & ACCESS CONTROL
-# ==========================================
-# Invite-only mode (optional). If set, only this email can register.
-ALLOWED_EMAILS=jared@test.com, miles@test.com
+# The access gate: "off", "session" or "link". See wrangler.jsonc.
+ACCESS_GATE="off"
+ACCESS_GATE_PATHS=""
 
-# Brute force protection
-MAX_FAILED_LOGIN_ATTEMPTS=5
-LOCKOUT_DURATION=900000
+# Loosen registration while developing.
+ALLOWED_EMAILS=""
+REQUIRE_EMAIL_VERIFICATION="false"
 
-# Verification flags (true/false)
-REQUIRE_EMAIL_VERIFICATION=false
-REQUIRE_PHONE_VERIFICATION=false
-
-# ==========================================
-# ROLES & PERMISSIONS (RBAC)
-# ==========================================
-# 1. Available: All roles the system understands
-ROLES_AVAILABLE=user,editor,admin
-
-# 2. Default: Assigned automatically upon registration
-ROLES_DEFAULT=user
-
-# 3. Restricted: Cannot be requested via API (must be assigned via DB/Seed)
-ROLES_RESTRICTED=admin
-
-# 4. Permissions: All valid permission strings
-PERMISSIONS_AVAILABLE=blogs.create,blogs.read,blogs.update,blogs.delete,blogs.update.any,blogs.delete.any
-
-ROLES_INHERENT="user:blogs.read,blogs.create,blogs.update;editor:blogs.read,blogs.create,blogs.update.any;admin:*"
-# ==========================================
-# PASSKEY / WEBAUTHN CONFIG
-# ==========================================
-# Required if AUTH_METHODS includes 'passkey'
-# NOTE: For local dev, RP_ID must be 'localhost'
-RP_NAME=My Local App
-RP_ID=localhost
-ORIGIN=http://localhost:5173
-
-# ==========================================
-# PASSWORD CONFIG
-# ==========================================
-# Required if AUTH_METHODS includes 'password'
-PASSWORD_MIN_LENGTH=8
-PASSWORD_REQUIRE_UPPERCASE=true
-PASSWORD_REQUIRE_LOWERCASE=true
-PASSWORD_REQUIRE_NUMBERS=true
-PASSWORD_REQUIRE_SPECIAL=true
-
-# ==========================================
-# PIN CONFIG
-# ==========================================
-# Required if AUTH_METHODS includes 'pin'
-PIN_LENGTH=6
-PIN_NUMBERS_ONLY=true
-
-# ==========================================
-# TOTP CONFIG
-# ==========================================
-# Required if AUTH_METHODS includes 'totp'
-TOTP_ISSUER=MyLocalApp
-TOTP_ALGORITHM=SHA1
-TOTP_DIGITS=6
-TOTP_PERIOD=30
-
-# ==========================================
-# EMAIL / SMS PROVIDERS
-# ==========================================
-# Required only if 'email' or 'sms' methods are enabled above
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=dev@example.com
-SMTP_PASS=not_real_password
-SMS_PROVIDER_API_KEY=mock_key
+# --- Optional providers ----------------------------------------------
+# Only needed if AUTH_METHODS includes "email" or "sms".
+# SMTP_HOST="smtp.example.com"
+# SMTP_PORT="587"
+# SMTP_USER=""
+# SMTP_PASS=""
+# SMS_PROVIDER_API_KEY=""

@@ -1,21 +1,79 @@
 import path from "path";
 import { defineConfig } from "vite";
-import { tanstackRouter } from "@tanstack/router-plugin/vite";
-import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
+import devServer from "@hono/vite-dev-server";
+import adapter from "@hono/vite-dev-server/cloudflare";
+import build from "@hono/vite-build/node";
 
-// https://vite.dev/config/
-export default defineConfig({
-  plugins: [tanstackRouter({ target: "react", autoCodeSplitting: true }), react(), tailwindcss()],
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-      "@server": path.resolve(__dirname, "./worker"),
+export default defineConfig(({ mode }) => {
+  // 1. UPDATE ALIASES: Ensure Vite knows about @components
+  const aliases = {
+    "@server": path.resolve(__dirname, "./worker"),
+    "@components": path.resolve(__dirname, "./worker/components"), // Add this
+    "@views": path.resolve(__dirname, "./worker/views"),
+  };
+
+  // ------------------------------
+  // CLIENT BUILD
+  // ------------------------------
+  if (mode === "client") {
+    return {
+      resolve: { alias: aliases },
+      plugins: [tailwindcss()],
+      esbuild: {
+        jsxImportSource: "hono/jsx/dom",
+      },
+      build: {
+        outDir: "dist/client",
+        rollupOptions: {
+          // 2. CRITICAL FIX: Point to the new location of main.ts
+          input: "./worker/components/main.ts",
+          output: {
+            entryFileNames: "static/client.js",
+            // Lazily loaded components (see components/main.ts). Hashed, and
+            // under /static so public/_headers can cache them for a year.
+            chunkFileNames: "static/chunks/[name]-[hash].js",
+            assetFileNames: "static/[name].[ext]",
+          },
+        },
+      },
+    };
+  }
+
+  // ------------------------------
+  // SERVER BUILD
+  // ------------------------------
+  return {
+    resolve: { alias: aliases },
+    esbuild: {
+      jsxImportSource: "hono/jsx",
     },
-  },
-  server: {
-    proxy: {
-      "/api": { target: "http://127.0.0.1:3000", changeOrigin: true },
+    build: {
+      outDir: "dist/server",
+      emptyOutDir: true,
     },
-  },
+    plugins: [
+      build({
+        entry: "worker/index.ts",
+      }),
+      devServer({
+        adapter,
+        entry: "worker/index.ts",
+        // 3. EXCLUDE: Ensure Hono ignores your client-side source files
+        exclude: [
+          /^\/@.+$/,
+          /^\/node_modules\/.*/,
+          /^\/static\/.*/,
+          /^\/favicon\.ico$/,
+          /.*\.ts($|\?)/,
+          /.*\.tsx($|\?)/,
+          /.*\.css($|\?)/,
+          /.*\.png($|\?)/,
+          /.*\.jpg($|\?)/,
+          /.*\.svg($|\?)/,
+        ],
+      }),
+      tailwindcss(),
+    ],
+  };
 });

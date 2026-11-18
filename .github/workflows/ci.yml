@@ -1,87 +1,99 @@
 name: CI
 
+# Checks only. Deployment is handled by Cloudflare's Git integration
+# (Workers & Pages -> your Worker -> Settings -> Builds), which runs
+# `npm run build` then `npm run deploy` on every push.
+
 on:
-    push:
-        branches: [main, develop]
-    pull_request:
-        branches: [main, develop]
+  push:
+    branches:
+      - main
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-    test:
-        name: Test & Lint
-        runs-on: ubuntu-latest
+  lint-typecheck-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
-
-            - name: Setup Bun
-              uses: oven-sh/setup-bun@v2
-              with:
-                  bun-version: latest
-
-            - name: Install dependencies
-              run: bun install
-
-            # Generates worker-configuration.d.ts (gitignored) so the Cloudflare
-            # runtime types exist before linting and type checking.
-            - name: Generate worker types
-              run: bunx wrangler types
-
-            - name: Run linter
-              run: bun run lint
-
-            # Non-blocking: the codebase currently has pre-existing type errors,
-            # which is also why `bun run build` tolerates a failing tsc. Flip this
-            # to a hard gate once they are cleared.
-            - name: Run type check
-              run: bun run typecheck
-              continue-on-error: true
-
-            - name: Run tests
-              run: bun run test:run
-
-    build:
-        name: Build
-        runs-on: ubuntu-latest
-        needs: test
-
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
-
-            - name: Setup Bun
-              uses: oven-sh/setup-bun@v2
-              with:
-                  bun-version: latest
-
-            - name: Install dependencies
-              run: bun install
-
-            - name: Generate worker types
-              run: bunx wrangler types
-
-            - name: Build project
-              run: bun run build
-
-            - name: Upload build artifacts
-              uses: actions/upload-artifact@v4
-              with:
-                  name: dist
-                  path: dist/
-                  retention-days: 7
-
-    deploy:
-        name: Deploy to Cloudflare
-        needs: [test, build]
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        uses: ./.github/workflows/deploy.yml
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-            environment: production
-            # Off deliberately. `drizzle/` is gitignored, so a CI checkout has no
-            # migration history: `drizzle-kit generate` would emit a fresh
-            # 0000_*.sql creating every table and applying it to the live D1
-            # would fail on tables that already exist. Run migrations manually
-            # until the migration history is committed.
-            run_migrations: false
-        secrets: inherit
+          node-version-file: .node-version
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      # Runs only in the template repository, so it disappears in repos made
+      # from it. The template once got configured for a real site by mistake,
+      # which meant the next site inherited a live database id and its first
+      # deploy migrated someone else's data.
+      #
+      # The template also runs as a public demo, so its D1 and KV entries hold
+      # the demo's own ids on purpose (see scripts/configure.ts, which treats
+      # them as placeholders). Those exact ids pass; any other real id fails.
+      - name: Template placeholders intact
+        if: github.repository == 'JaredStanbrook/frug-template'
+        run: |
+          missing=0
+          for token in \
+            '"name": "frug-app"' \
+            '"database_name": "frugal-template-db"' \
+            '"database_id": "0d98fddd-9199-4c3f-81c1-d5180446c0b2"' \
+            '"id": "70192fe342234452b5bf9e741f89d368"' \
+            '"bucket_name": "change-me-files"'
+          do
+            if ! grep -qF "$token" wrangler.jsonc; then
+              echo "::error::Missing placeholder in wrangler.jsonc: $token"
+              missing=1
+            fi
+          done
+          if [ "$missing" -ne 0 ]; then
+            echo "::error::The template must ship placeholders only. Configure the repo made FROM the template, not the template itself — otherwise the next site inherits a live database id."
+            exit 1
+          fi
+          echo "Placeholders intact."
+
+      # Template repo only. Every change is a release that sites built from
+      # the template can upgrade to, so each pull request bumps frugal.json
+      # and describes itself in CHANGELOG.md. See docs/template-versions.md.
+      - name: Template version bumped and described
+        if: github.repository == 'JaredStanbrook/frug-template'
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          version=$(node -p "require('./frugal.json').version")
+          if ! grep -qF "## [$version]" CHANGELOG.md; then
+            echo "::error::CHANGELOG.md has no '## [$version]' section for frugal.json's version."
+            exit 1
+          fi
+          if [ -n "$BASE_REF" ]; then
+            git fetch --quiet --depth=1 origin "$BASE_REF"
+            # Empty when the base predates frugal.json: the first versioned release.
+            base=$(git show "origin/$BASE_REF:frugal.json" 2>/dev/null | node -p "JSON.parse(require('fs').readFileSync(0, 'utf8') || '{}').version")
+            if [ "$base" = "$version" ]; then
+              echo "::error::frugal.json is still $version, as on $BASE_REF. Bump it: every template change is a release."
+              exit 1
+            fi
+          fi
+          echo "Template version $version."
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Format check
+        run: npm run format
+
+      # `npm run build` runs `wrangler types` first, so the generated
+      # worker-configuration.d.ts exists before tsc needs it.
+      - name: Typecheck and build
+        run: npm run build
+
+      - name: Test
+        run: npm run test

@@ -2,7 +2,12 @@
 import { HTTPException } from "hono/http-exception";
 import type { SafeUser } from "../schema/auth.schema";
 
-type Resource = "blogs" | "invoices" | "expenses"; // Add your objects here
+/**
+ * Every resource the app authorizes against. Keep this in sync with the
+ * PERMISSIONS_AVAILABLE var in wrangler.jsonc — the permission strings are
+ * `${resource}.${action}` and `${resource}.${action}.any`.
+ */
+type Resource = "blogs" | "access"; // Add your objects here
 type Action = "read" | "create" | "update" | "delete";
 
 export class AccessControl {

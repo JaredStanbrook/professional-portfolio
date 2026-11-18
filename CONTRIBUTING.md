@@ -1,7 +1,10 @@
 # Contributing Guide
 
-Thank you for your interest in contributing to **Professional Portfolio**!  
+Thank you for your interest in contributing to **frug-template**!
 We welcome all contributions—whether it's bug fixes, new features, or documentation improvements.
+
+This repository is a **template**: code here is copied into new sites, so
+please keep contributions generic rather than encoding one site's domain.
 
 ---
 
@@ -11,51 +14,53 @@ We welcome all contributions—whether it's bug fixes, new features, or document
    Click "Fork" on GitHub and clone your fork:
 
    ```bash
-   git clone https://github.com/<your-username>/ProfessionalPortfolio.git
-   cd ProfessionalPortfolio
+   git clone https://github.com/<your-username>/frug-template.git
+   cd frug-template
    ```
 
-2. **Install Dependencies**  
-   Make sure you have [Bun](https://bun.sh/) installed, then run:
+2. **Install Dependencies**
 
    ```bash
-   bun install
+   npm install
    ```
 
-3. **Configure Cloudflare Resources**  
-   Copy the example config and edit it for your environment:
+   Bun works too (`bun install`) — every script is runtime-agnostic. The
+   committed lockfile is `package-lock.json`, because npm is what Cloudflare's
+   build image detects most reliably.
 
-   ```bash
-   cp wrangler.jsonc.example wrangler.jsonc
-   # Edit wrangler.jsonc with your Cloudflare D1, KV, and R2 details
-   ```
-
-4. **Set Up Environment Variables**  
-   Copy and edit the environment files as needed:
+3. **Set Up Local Secrets**
+   Copy the example file and set a `JWT_SECRET`:
 
    ```bash
    cp .dev.vars.example .dev.vars
-   cp .dev.vars.example .dev.vars.staging
+   # .dev.vars is git-ignored — never commit it
    ```
 
-5. **Genereate Schemas, and Wranlger Types**
+4. **Configure Cloudflare Resources** (only to deploy your own instance)
 
    ```bash
-   bun run gen
+   npm run configure -- --help
+   ```
 
+   Fills in `wrangler.jsonc` from your own D1 and KV ids. See `docs/deploy.md`.
+
+5. **Generate Schemas and Wrangler Types**
+
+   ```bash
+   npm run gen
    ```
 
 6. **Run Database Migrations (Optional for DB changes)**
 
    ```bash
-   bun run migrate:local
+   npm run migrate:local
    ```
 
 7. **Start the Development Servers**
    ```bash
-   bun dev
+   npm run dev
    ```
-   This will start both the frontend and the worker with hot reload.
+   This serves the worker with hot reload at http://localhost:3000.
 
 ---
 
@@ -69,15 +74,18 @@ We welcome all contributions—whether it's bug fixes, new features, or document
 
 2. **Make Your Changes**
 
-   - Add or update code in `src/` (frontend) or `worker/` (backend/API).
-   - If you add a new page or API route, follow the existing folder structure.
-   - Update or add tests if needed.
+   - Application code lives in `worker/`. See `AGENTS.md` for the layout
+     and `endpoints.md` for the route/service/view patterns.
+   - If you add a page or API route, follow the existing folder structure.
+   - Add the new path to `tests/ui-pages.test.ts`.
+   - Run `npm run gen` after changing `worker/schema/` or `wrangler.jsonc`.
 
 3. **Run Lint and Tests**
 
    ```bash
-   bun run lint
-   bun test
+   npm run lint
+   npm run build
+   npm run test
    ```
 
 4. **Commit Your Changes**  
@@ -148,7 +156,7 @@ To keep your feature branch up to date with the latest changes from `main`:
 ## 🧹 Code Style
 
 - Use the provided ESLint and Prettier configs.
-- Run `bun run lint` before pushing.
+- Run `npm run lint` before pushing.
 - Use TypeScript for all code.
 
 ---

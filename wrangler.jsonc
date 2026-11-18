@@ -1,18 +1,51 @@
 {
+  // =====================================================================
+  // Deployed from the Cloudflare dashboard — no terminal required.
+  //
+  // Ask Claude to fill this in (it runs `npm run configure`), or edit by
+  // hand. Find whatever is still unset:
+  //   grep -in "change.me\|0000000" wrangler.jsonc
+  //
+  // Full walkthrough: docs/deploy.md
+  // =====================================================================
   "$schema": "node_modules/wrangler/config-schema.json",
+
+  // CHANGE_ME — the Worker script name. This is the identity Cloudflare
+  // stores secrets, routes and deployments against, so renaming it later
+  // creates a *new* worker and orphans the old one's secrets.
   "name": "professionalportfolio",
+
   "compatibility_date": "2025-01-01",
   "main": "worker/index.ts",
 
   "assets": {
-    "directory": "./dist",
+    "directory": "./dist/client",
     "binding": "ASSETS",
     "html_handling": "auto-trailing-slash",
-    "not_found_handling": "single-page-application",
+    // This app server-renders every page, so unmatched paths are handled
+    // by the worker's own notFound, not by an SPA shell. "none" keeps the
+    // asset layer from swallowing 404s that should reach your router.
+    "not_found_handling": "none",
+    // With ACCESS_GATE on, files in public/ (images, media, og.png) are still
+    // served straight from Cloudflare without running the worker, so anyone
+    // with the URL can fetch them. To gate them too, uncomment this: every
+    // request then runs the worker first, except the bundle, fonts and
+    // favicon the locked page needs. It costs a worker request per file, so
+    // leave it off unless public/ holds something private. Keep it in step
+    // with OPEN_PREFIXES in worker/middleware/access-gate.middleware.ts.
+    // "run_worker_first": ["/*", "!/static/*", "!/fonts/*", "!/favicon.svg"],
   },
 
   "observability": {
     "enabled": true,
+  },
+
+  // A new id on every deploy, read at runtime. Layout.tsx appends it to
+  // /static/main.css, which is what makes the year-long cache in
+  // public/_headers safe: each deploy asks for a new URL. (A Vite `define`
+  // cannot do this — `wrangler deploy` bundles worker/ itself.)
+  "version_metadata": {
+    "binding": "CF_VERSION_METADATA",
   },
 
   "dev": {
@@ -21,10 +54,18 @@
   },
 
   // ---------------------------------------------------------------------
-  // PRODUCTION lives at the top level, so plain `wrangler deploy` targets
-  // the live site and keeps using the existing `professionalportfolio`
-  // worker (and the secrets already set on it).
+  // Everything below is production. Cloudflare builds and deploys this on
+  // every push once the repo is connected under Settings -> Builds.
+  //
+  // Adding a staging environment later means adding an "env": { "staging":
+  // {...} } block — but named environments INHERIT NOTHING, so every binding
+  // and var must be repeated inside it, and it deploys a SEPARATE worker with
+  // its own secrets. See the appendix in docs/deploy.md.
   // ---------------------------------------------------------------------
+
+  // CHANGE_ME — delete this block to publish on <name>.<subdomain>.workers.dev
+  // instead. `zone_name` is only required when the record is ambiguous;
+  // a custom_domain on a zone in the same account resolves without it.
   "routes": [
     {
       "pattern": "jared.stanbrook.me",
@@ -32,6 +73,12 @@
     },
   ],
 
+  // CHANGE_ME — Dashboard: Storage & Databases -> D1 -> Create.
+  //             The Database ID is on the database's overview page.
+  // The D1 and KV ids below, and the domain in `routes`, RP_ID and ORIGIN,
+  // belong to the template's own demo deployment.
+  // A site made from the template must replace them (`npm run configure`
+  // does), or it shares the demo's database and sessions.
   "d1_databases": [
     {
       "binding": "DB",
@@ -41,6 +88,7 @@
     },
   ],
 
+  // CHANGE_ME — Dashboard: Storage & Databases -> KV -> Create Instance.
   "kv_namespaces": [
     {
       "binding": "KV",
@@ -48,19 +96,26 @@
     },
   ],
 
+  // CHANGE_ME — Dashboard: R2 -> Create bucket.
+  // Optional: delete this block and `R2` in worker/types.ts if the site
+  // stores no files.
   "r2_buckets": [
     {
-      "binding": "BLOG",
+      "binding": "R2",
       "bucket_name": "blog-r2",
     },
   ],
 
+  // Edge rate limiting. `namespace_id` is an arbitrary number you pick per
+  // limiter within this worker — it is NOT a resource to provision, so
+  // nothing here needs changing. Used by the auth API to throttle login
+  // attempts by IP before they reach the database.
   "ratelimits": [
     {
       "name": "RATE_LIMITER",
       "namespace_id": "1001",
       "simple": {
-        "limit": 100,
+        "limit": 20,
         "period": 60,
       },
     },
@@ -68,121 +123,128 @@
 
   "vars": {
     "ENVIRONMENT": "production",
-    "AUTH_METHODS": "passkey,password",
+
+    // --- ACCESS GATE ---
+    // Lock the site to invited visitors while it is not public yet. Admins
+    // make and revoke links at /admin/access; a signed-in admin sees all.
+    //   "off"      open to everyone.
+    //   "session"  each link works once and then belongs to one browser.
+    //   "link"     a link keeps working, in any browser, until it expires.
+    "ACCESS_GATE": "off",
+    // Which paths the gate guards, comma separated: "/reports,/beta" locks
+    // those sections and leaves the rest of the site public. Empty: all of it.
+    // An opened link lands on the first one.
+    "ACCESS_GATE_PATHS": "",
+
+    // --- BRANDING ---
+    // CHANGE_ME — how the site names itself in the title, nav and footer.
+    "APP_NAME": "Jared Stanbrook",
+    "APP_TAGLINE": "IT specialist in Perth: blog, projects and experience",
+    "APP_LOCALE": "en-AU",
+    "APP_CURRENCY": "AUD",
+    // IANA zone, e.g. "Australia/Perth". Decides what "today" means when a
+    // page asks (`today(c.var.app.timezone)` in worker/lib/dates.ts). UTC is
+    // right for storage and wrong for "what's due today" in Perth before 8am.
+    "APP_TIMEZONE": "Australia/Perth",
+    // Default link-preview image for pages that set none, e.g. "/og.png"
+    // (1200×630, in public/). Empty means none. Generate one from the site's
+    // own name and colours with `node scripts/og-image.mjs`.
+    "APP_OG_IMAGE": "",
+
+    // --- CORE AUTH ---
+    // Enabled methods: passkey, password, pin, totp, email, sms
+    "AUTH_METHODS": "password,passkey,totp",
+
+    // Milliseconds.
     "SESSION_DURATION": "86400000",
     "SESSION_RENEWAL_THRESHOLD": "3600000",
     "MAX_SESSIONS_PER_USER": "5",
-    "ALLOWED_EMAILS": "jared@stanbrook.me",
+
+    // SECONDS — not milliseconds. This sets the JWT `exp` claim and the
+    // cookie Max-Age directly. Pasting a millisecond value here (86400000)
+    // yields a ~2.7 YEAR session, not a day. 86400 = 24 hours.
+    "JWT_EXPIRY": "86400",
+
+    // --- SECURITY ---
+    // JWT_SECRET is deliberately absent: it is a SECRET, not a var. Set it in
+    // the dashboard under Settings -> Variables and Secrets, type "Secret".
+    // Putting it here commits it to git and leaks it to anyone with repo
+    // access. See docs/deploy.md.
     "MAX_FAILED_LOGIN_ATTEMPTS": "5",
     "LOCKOUT_DURATION": "900000",
     "REQUIRE_EMAIL_VERIFICATION": "false",
     "REQUIRE_PHONE_VERIFICATION": "false",
+    // Comma-separated allowlist. Empty means open registration.
+    // Set this for an invite-only or single-user site.
+    "ALLOWED_EMAILS": "jared@stanbrook.me",
+
+    // One-owner site: set to "true" and sign-up accepts only
+    // BOOTSTRAP_ADMIN_EMAIL, and only while no account exists; after that
+    // /register is gone for good. Needs BOOTSTRAP_ADMIN_EMAIL set, or nobody
+    // can ever register. Leave "false" for sites with open sign-up.
+    "SINGLE_ACCOUNT": "false",
+
+    // First-run admin, so you never need a terminal to get one. Register
+    // normally with this exact email and that account becomes an admin — but
+    // ONLY while no admin exists yet, so it disarms itself the moment it
+    // works. Safe to leave set; tidier to clear afterwards.
+    "BOOTSTRAP_ADMIN_EMAIL": "jared@stanbrook.me",
+
+    // --- ROLES & PERMISSIONS ---
+    // CHANGE_ME — model your own resources here. Convention:
+    //   resource.action      → the action on rows the user owns
+    //   resource.action.any  → the action on anyone's rows
+    //   "*"                  → expands to all of PERMISSIONS_AVAILABLE
+    // Keep the resource names in sync with the `Resource` type in
+    // worker/services/access.service.ts.
     "ROLES_AVAILABLE": "user,editor,admin",
     "ROLES_DEFAULT": "user",
-    "ROLES_RESTRICTED": "admin",
-    "PERMISSIONS_AVAILABLE": "blogs.create,blogs.read,blogs.update,blogs.delete,blogs.update.any,blogs.delete.any",
-    "ROLES_INHERENT": "user:blogs.read,blogs.create,blogs.update;editor:blogs.read,blogs.create,blogs.update.any;admin:*",
+    // Roles that cannot be self-assigned at registration. Get your first
+    // admin with BOOTSTRAP_ADMIN_EMAIL below — no terminal needed.
+    "ROLES_RESTRICTED": "editor,admin",
+    "PERMISSIONS_AVAILABLE": "blogs.create,blogs.update,blogs.delete,blogs.update.any,blogs.delete.any,access.read,access.create,access.update",
+    "ROLES_INHERENT": "user:blogs.create,blogs.update,blogs.delete;editor:blogs.create,blogs.update,blogs.delete,blogs.update.any;admin:*",
+
+    // --- PASSKEY / WEBAUTHN ---
+    // CHANGE_ME — these MUST match the deployed domain or passkeys fail
+    // with no useful error. RP_ID is the bare hostname (no scheme, no
+    // port); ORIGIN is the full origin users load the site from.
     "RP_NAME": "Jared Stanbrook",
     "RP_ID": "jared.stanbrook.me",
     "ORIGIN": "https://jared.stanbrook.me",
-    "PASSWORD_MIN_LENGTH": "8",
-    "PASSWORD_REQUIRE_UPPERCASE": "true",
-    "PASSWORD_REQUIRE_LOWERCASE": "true",
-    "PASSWORD_REQUIRE_NUMBERS": "true",
-    "PASSWORD_REQUIRE_SPECIAL": "true",
+
+    // --- PASSWORD CONFIG ---
+    // These are enforced on registration, password change and reset. They used
+    // to be read into config and checked nowhere, so the values here made no
+    // difference to anything.
+    //
+    // Length over composition, per NIST SP 800-63B. Requiring an uppercase, a
+    // digit and a symbol adds little entropy and reliably produces
+    // "Password1!", while pushing people towards reuse and sticky notes; a
+    // longer minimum is worth more than all four rules together. Set any of
+    // them to "true" if a compliance checklist demands it.
+    "PASSWORD_MIN_LENGTH": "12",
+    "PASSWORD_REQUIRE_UPPERCASE": "false",
+    "PASSWORD_REQUIRE_LOWERCASE": "false",
+    "PASSWORD_REQUIRE_NUMBERS": "false",
+    "PASSWORD_REQUIRE_SPECIAL": "false",
+
+    // PBKDF2 rounds for new password hashes. 100000 is the MAXIMUM: Workers'
+    // WebCrypto refuses anything higher, and every sign-in then fails with
+    // "iteration counts above 100000 are not supported". Higher values are
+    // clamped to it. Each hash records its own cost, so lowering this never
+    // breaks existing passwords. See worker/lib/crypto.ts.
+    "PASSWORD_HASH_ITERATIONS": "100000",
+
+    // --- PIN CONFIG ---
     "PIN_LENGTH": "6",
     "PIN_NUMBERS_ONLY": "true",
+
+    // --- TOTP CONFIG ---
+    // TOTP_ISSUER is the name shown in the user's authenticator app.
     "TOTP_ISSUER": "Jared Stanbrook",
     "TOTP_ALGORITHM": "SHA1",
     "TOTP_DIGITS": "6",
     "TOTP_PERIOD": "30",
-    "JWT_EXPIRY": "86400000",
-  },
-
-  // ---------------------------------------------------------------------
-  // Optional staging: `wrangler deploy --env staging`. NOTE this deploys a
-  // SEPARATE worker script named `professionalportfolio-staging` with its
-  // own secrets. Environments inherit nothing, so everything is repeated.
-  // ---------------------------------------------------------------------
-  "env": {
-    "staging": {
-      "routes": [
-        {
-          "pattern": "dev.jared.stanbrook.me",
-          "custom_domain": true,
-        },
-      ],
-
-      "d1_databases": [
-        {
-          "binding": "DB",
-          "database_name": "professional-portfolio-db",
-          "database_id": "ecb3b2b7-8d46-455b-b645-29c109e8b8a5",
-          "migrations_dir": "drizzle",
-        },
-      ],
-
-      "kv_namespaces": [
-        {
-          "binding": "KV",
-          "id": "0fb3123f10344b61825a07a4e8f1053f",
-        },
-      ],
-
-      "r2_buckets": [
-        {
-          "binding": "BLOG",
-          "bucket_name": "blog-r2",
-        },
-      ],
-
-      "ratelimits": [
-        {
-          "name": "RATE_LIMITER",
-          "namespace_id": "1001",
-          "simple": {
-            "limit": 100,
-            "period": 60,
-          },
-        },
-      ],
-
-      "observability": {
-        "enabled": true,
-      },
-
-      "vars": {
-        "ENVIRONMENT": "staging",
-        "AUTH_METHODS": "passkey,password",
-        "SESSION_DURATION": "86400000",
-        "SESSION_RENEWAL_THRESHOLD": "3600000",
-        "MAX_SESSIONS_PER_USER": "5",
-        "ALLOWED_EMAILS": "jared@stanbrook.me",
-        "MAX_FAILED_LOGIN_ATTEMPTS": "5",
-        "LOCKOUT_DURATION": "900000",
-        "REQUIRE_EMAIL_VERIFICATION": "false",
-        "REQUIRE_PHONE_VERIFICATION": "false",
-        "ROLES_AVAILABLE": "user,editor,admin",
-        "ROLES_DEFAULT": "user",
-        "ROLES_RESTRICTED": "admin",
-        "PERMISSIONS_AVAILABLE": "blogs.create,blogs.read,blogs.update,blogs.delete,blogs.update.any,blogs.delete.any",
-        "ROLES_INHERENT": "user:blogs.read,blogs.create,blogs.update;editor:blogs.read,blogs.create,blogs.update.any;admin:*",
-        "RP_NAME": "Jared Stanbrook",
-        "RP_ID": "dev.jared.stanbrook.me",
-        "ORIGIN": "https://dev.jared.stanbrook.me",
-        "PASSWORD_MIN_LENGTH": "8",
-        "PASSWORD_REQUIRE_UPPERCASE": "true",
-        "PASSWORD_REQUIRE_LOWERCASE": "true",
-        "PASSWORD_REQUIRE_NUMBERS": "true",
-        "PASSWORD_REQUIRE_SPECIAL": "true",
-        "PIN_LENGTH": "6",
-        "PIN_NUMBERS_ONLY": "true",
-        "TOTP_ISSUER": "Jared Stanbrook",
-        "TOTP_ALGORITHM": "SHA1",
-        "TOTP_DIGITS": "6",
-        "TOTP_PERIOD": "30",
-        "JWT_EXPIRY": "86400000",
-      },
-    },
   },
 }

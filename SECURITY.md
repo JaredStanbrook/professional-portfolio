@@ -18,7 +18,6 @@ If you discover a security vulnerability, please follow these steps:
    Instead, use GitHub's [private vulnerability reporting](https://docs.github.com/en/code-security/security-advisories/guidance-on-reporting-and-writing/privately-reporting-a-security-vulnerability).
 
 2. **Include as much detail as possible:**
-
    - A description of the vulnerability.
    - Steps to reproduce.
    - Any relevant logs or screenshots.
@@ -28,6 +27,21 @@ If you discover a security vulnerability, please follow these steps:
 
 4. **Disclosure:**  
    Once the vulnerability is resolved, we will coordinate with you to disclose the issue responsibly.
+
+## In Scope
+
+- Authentication and authorization bypasses
+- Data exposure, IDORs, and access control flaws
+- Credential or secret exposure (password hashes, TOTP secrets, JWT keys)
+- Token/session handling and CSRF issues
+- Configuration or deployment mistakes that expose data
+
+## Out of Scope
+
+- Social engineering
+- Denial of service without a clear impact path
+- Physical attacks
+- Third-party service vulnerabilities outside this repository
 
 ## Security Updates
 

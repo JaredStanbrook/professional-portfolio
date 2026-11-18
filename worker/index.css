@@ -1,0 +1,354 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@plugin "@tailwindcss/typography";
+
+/* THEME: "Kiln"
+   Carried over from the original portfolio: a warm, near-white page with a
+   kiln-orange accent by day, and a deep blue-slate night where the accent
+   cools to sky blue. Soft, low shadows; the type does the work. */
+
+/* Self-hosted (SIL OFL 1.1): no font CDN, no third party on first paint.
+   IBM Plex Sans carries everything. Renaming a file busts its year-long cache. */
+@font-face {
+  font-family: "IBM Plex Sans";
+  src: url("/fonts/plex-sans-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "IBM Plex Sans";
+  src: url("/fonts/plex-sans-500.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "IBM Plex Sans";
+  src: url("/fonts/plex-sans-600.woff2") format("woff2");
+  font-weight: 600 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Tells the browser to render native controls (checkboxes, radios,
+     scrollbars, date pickers) in the matching scheme. Without it a native
+     checkbox stays light-on-dark and looks pasted on. */
+  color-scheme: light;
+
+  --background: oklch(0.99 0.005 40); /* Warm paper */
+  --foreground: oklch(0.2 0.01 40);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.2 0.01 40);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.2 0.01 40);
+
+  --primary: oklch(0.58 0.18 40); /* Kiln orange */
+  --primary-foreground: oklch(0.98 0.01 40);
+
+  --secondary: oklch(0.95 0.02 40);
+  --secondary-foreground: oklch(0.25 0.02 40);
+
+  --muted: oklch(0.96 0.01 40);
+  --muted-foreground: oklch(0.47 0.02 40);
+
+  --accent: oklch(0.93 0.04 40);
+  --accent-foreground: oklch(0.25 0.02 40);
+
+  --destructive: oklch(0.55 0.22 25);
+  --destructive-foreground: oklch(0.98 0 0);
+
+  /* Status roles, so a feature never has to reach for a raw palette colour.
+     `bg-emerald-100 text-emerald-800` and friends have no dark counterpart —
+     they render dark-on-dark the moment the theme flips — and that is exactly
+     what happens when the theme offers no semantic token for "this went well"
+     or "this needs attention". */
+  --success: oklch(0.52 0.11 160);
+  --success-foreground: oklch(0.98 0 0);
+  --warning: oklch(0.82 0.15 82);
+  --warning-foreground: oklch(0.25 0.05 80);
+
+  --border: oklch(0.88 0.02 40);
+  --input: oklch(0.82 0.02 40);
+  --ring: oklch(0.58 0.18 40);
+
+  --chart-1: oklch(0.58 0.18 40);
+  --chart-2: oklch(0.5 0.1 230);
+  --chart-3: oklch(0.72 0.15 75);
+  --chart-4: oklch(0.55 0.15 350);
+  --chart-5: oklch(0.45 0.05 40);
+
+  /* Shadow tint. Its own token because it wants a different weight per mode. */
+  --shadow-ink: hsl(30 60% 40% / 0.1);
+
+  --sidebar: oklch(0.98 0.01 40);
+  --sidebar-foreground: oklch(0.2 0.01 40);
+  --sidebar-primary: oklch(0.58 0.18 40);
+  --sidebar-primary-foreground: oklch(0.98 0.01 40);
+  --sidebar-accent: oklch(0.93 0.04 40);
+  --sidebar-accent-foreground: oklch(0.25 0.02 40);
+  --sidebar-border: oklch(0.88 0.02 40);
+  --sidebar-ring: oklch(0.58 0.18 40);
+
+  /* Named face first, then the system stack it falls back to while the
+     woff2 loads (`font-display: swap`) or if it never does. */
+  --font-sans:
+    "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  --font-display: var(--font-sans);
+  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-mono:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+  --radius: 0.5rem;
+  --shadow-2xs: 0 1px 2px 0 var(--shadow-ink);
+  --shadow-xs: 0 2px 6px -2px var(--shadow-ink);
+  --shadow-sm: 0 5px 10px -2px var(--shadow-ink), 0 1px 2px -3px var(--shadow-ink);
+  --shadow: 0 5px 10px -2px var(--shadow-ink), 0 1px 2px -3px var(--shadow-ink);
+  --shadow-md: 0 5px 10px -2px var(--shadow-ink), 0 2px 4px -3px var(--shadow-ink);
+  --shadow-lg: 0 8px 16px -4px var(--shadow-ink), 0 4px 6px -3px var(--shadow-ink);
+  --shadow-xl: 0 12px 24px -6px var(--shadow-ink), 0 8px 10px -3px var(--shadow-ink);
+  --shadow-2xl: 0 24px 48px -12px var(--shadow-ink);
+}
+
+.dark {
+  color-scheme: dark;
+
+  --background: oklch(0.15 0.02 240); /* Blue slate */
+  --foreground: oklch(0.97 0.005 240);
+  --card: oklch(0.19 0.02 240);
+  --card-foreground: oklch(0.97 0.005 240);
+  --popover: oklch(0.19 0.02 240);
+  --popover-foreground: oklch(0.97 0.005 240);
+
+  --primary: oklch(0.7 0.15 240); /* Sky */
+  --primary-foreground: oklch(0.15 0.02 240);
+
+  --secondary: oklch(0.25 0.02 240);
+  --secondary-foreground: oklch(0.97 0.005 240);
+
+  --muted: oklch(0.25 0.02 240);
+  --muted-foreground: oklch(0.72 0.02 240);
+
+  --accent: oklch(0.3 0.05 240);
+  --accent-foreground: oklch(0.97 0.005 240);
+
+  --destructive: oklch(0.66 0.2 25);
+  --destructive-foreground: oklch(0.98 0 0);
+
+  /* Brighter, so both still clear 4.5:1 against a dark field. */
+  --success: oklch(0.76 0.13 165);
+  --success-foreground: oklch(0.15 0.02 240);
+  --warning: oklch(0.85 0.15 85);
+  --warning-foreground: oklch(0.15 0.02 240);
+
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 18%);
+  --ring: oklch(0.7 0.15 240);
+
+  --chart-1: oklch(0.7 0.15 240);
+  --chart-2: oklch(0.75 0.12 195);
+  --chart-3: oklch(0.82 0.13 85);
+  --chart-4: oklch(0.72 0.15 350);
+  --chart-5: oklch(0.6 0.05 240);
+
+  --shadow-ink: hsl(220 60% 4% / 0.5);
+
+  --sidebar: oklch(0.19 0.02 240);
+  --sidebar-foreground: oklch(0.97 0.005 240);
+  --sidebar-primary: oklch(0.7 0.15 240);
+  --sidebar-primary-foreground: oklch(0.15 0.02 240);
+  --sidebar-accent: oklch(0.3 0.05 240);
+  --sidebar-accent-foreground: oklch(0.97 0.005 240);
+  --sidebar-border: oklch(1 0 0 / 12%);
+  --sidebar-ring: oklch(0.7 0.15 240);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono);
+  --font-serif: var(--font-serif);
+
+  --text-tiny: 0.625rem;
+
+  /* Derived from --radius (0.5rem) as 4/6/8/12px. The multiplier form these
+     replace produced NEGATIVE lengths for sm and md, which CSS rejects, so
+     `rounded-sm` and `rounded-md` silently rendered square. */
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+
+  --shadow-2xs: var(--shadow-2xs);
+  --shadow-xs: var(--shadow-xs);
+  --shadow-sm: var(--shadow-sm);
+  --shadow: var(--shadow);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-xl: var(--shadow-xl);
+  --shadow-2xl: var(--shadow-2xl);
+}
+
+/* Tailwind v4 made a bare `border` default to currentColor, so every card,
+   divider and the header rule rendered in the text colour — near-black in
+   light mode — unless it also named `border-border`. The theme owns the
+   border colour, so set it once here rather than on every element. */
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-border, currentColor);
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+}
+
+/* A hairline of the accent under the header and above the footer, fading
+   out at both ends. Drawn from tokens, so it follows the theme. */
+@utility retro-stripes {
+  background-image: linear-gradient(to right, transparent, var(--primary) 20% 80%, transparent);
+  opacity: 0.6;
+}
+
+/* Container for scrolling text */
+.scroll-text-container {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  display: block;
+}
+
+/* Scrolling text itself */
+.scroll-text {
+  display: inline-block;
+  white-space: nowrap;
+  will-change: transform;
+  /* Animation: scroll left, jump to right, scroll left again */
+  -webkit-animation: infinite-marquee 8s linear infinite;
+  -moz-animation: infinite-marquee 8s linear infinite;
+  animation: infinite-marquee 8s linear infinite;
+}
+
+@keyframes infinite-marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  45% {
+    transform: translateX(-100%);
+    visibility: hidden;
+  }
+  46% {
+    transform: translateX(100%);
+    visibility: hidden;
+  }
+  100% {
+    transform: translateX(0%);
+    visibility: visible;
+  }
+}
+@-webkit-keyframes infinite-marquee {
+  0% {
+    -webkit-transform: translateX(0%);
+  }
+  45% {
+    -webkit-transform: translateX(-100%);
+    visibility: hidden;
+  }
+  46% {
+    -webkit-transform: translateX(100%);
+    visibility: hidden;
+  }
+  100% {
+    visibility: visible;
+    -webkit-transform: translateX(0%);
+  }
+}
+@-moz-keyframes infinite-marquee {
+  0% {
+    -moz-transform: translateX(0%);
+  }
+  45% {
+    -moz-transform: translateX(-100%);
+    visibility: hidden;
+  }
+  46% {
+    -moz-transform: translateX(100%);
+    visibility: hidden;
+  }
+  100% {
+    -moz-transform: translateX(0%);
+    visibility: visible;
+  }
+}
+
+/* Blog posts. The typography plugin ships its own slate palette, which
+   ignores the theme in both modes. Point every prose colour at a token
+   instead, so posts follow light and dark like everything else. */
+.prose {
+  --tw-prose-body: var(--muted-foreground);
+  --tw-prose-headings: var(--foreground);
+  --tw-prose-lead: var(--muted-foreground);
+  --tw-prose-links: var(--primary);
+  --tw-prose-bold: var(--foreground);
+  --tw-prose-counters: var(--muted-foreground);
+  --tw-prose-bullets: var(--border);
+  --tw-prose-hr: var(--border);
+  --tw-prose-quotes: var(--muted-foreground);
+  --tw-prose-quote-borders: var(--primary);
+  --tw-prose-captions: var(--muted-foreground);
+  --tw-prose-kbd: var(--foreground);
+  --tw-prose-code: var(--foreground);
+  --tw-prose-pre-code: var(--foreground);
+  --tw-prose-pre-bg: var(--muted);
+  --tw-prose-th-borders: var(--border);
+  --tw-prose-td-borders: var(--border);
+}
+.prose :where(code):not(:where(pre *))::before,
+.prose :where(code):not(:where(pre *))::after {
+  content: none;
+}
