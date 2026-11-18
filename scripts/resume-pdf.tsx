@@ -1,7 +1,7 @@
 // scripts/resume-pdf.tsx — `npm run resume`
 //
 // Prints the résumé page to public/resume.pdf, the file the site links to.
-// Run it after editing worker/views/resume/resume.ts and commit the PDF:
+// Run it after editing worker/views/resume/data.ts and commit the PDF:
 // Cloudflare's build has no browser, so the PDF is built here, not there.
 //
 // Uses Playwright's Chromium, which is not a dependency of this repo: Claude
@@ -42,11 +42,11 @@ try {
   await page.setContent(html, { waitUntil: "load" });
 
   // One page or nothing: a résumé that spills onto a second page is a bug
-  // to fix in resume.ts, not something to ship.
+  // to fix in data.ts, not something to ship.
   const overflow = await page.$eval(".sheet", (el) => el.scrollHeight - el.clientHeight);
   if (overflow > 1) {
     throw new Error(
-      `The résumé is ${Math.ceil(overflow * 0.75)}pt longer than one A4 page. Shorten resume.ts.`,
+      `The résumé is ${Math.ceil(overflow * 0.75)}pt longer than one A4 page. Shorten data.ts.`,
     );
   }
 

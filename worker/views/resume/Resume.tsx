@@ -3,7 +3,7 @@
 // The résumé as one A4 page, a copy of the Word original down to the point.
 // It is a document, not a site page: its own <html>, no nav, no theme. Paper
 // is white and ink is black in either mode, because this is what prints and
-// what becomes public/resume.pdf. Content lives in ./resume.ts.
+// what becomes public/resume.pdf. Content lives in ./data.ts.
 //
 // Every measurement is in points, read off the original PDF: Arial 10pt on
 // 13.8pt lines, 11pt bold headings over a 1.44pt rule, a 20pt bold name, and
@@ -14,7 +14,7 @@
 import { raw } from "hono/html";
 import type { FC } from "hono/jsx";
 
-import { resume, type EducationEntry, type ResumeEntry } from "./resume";
+import { resume, type EducationEntry, type ResumeEntry } from "./data";
 
 const css = `
 @page { size: A4; margin: 0; }

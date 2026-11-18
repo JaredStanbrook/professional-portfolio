@@ -1,4 +1,4 @@
-// worker/views/resume/resume.ts
+// worker/views/resume/data.ts
 //
 // The résumé, as data. This is the file to change when the résumé changes:
 // the page at /resume renders it, and `npm run resume` prints that page to
