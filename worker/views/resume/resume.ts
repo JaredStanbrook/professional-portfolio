@@ -46,9 +46,12 @@ export const resume = {
   ] satisfies ContactItem[],
 
   profile:
-    "Cybersecurity-focused IT specialist with 6 years of hands-on experience in cybersecurity, web development, and systems troubleshooting. Passionate about applying secure coding principles, automation, and compliance-driven systems to real-world challenges. Proven success in team-based environments and client-facing roles.",
+    "Service desk professional and Cyber Security & Forensics graduate, currently a Service Desk Officer at Bunnings. Hands-on experience across Tier 1 support, troubleshooting, web development and network security projects, with a focus on secure, well-documented systems. Proven success in team-based and client-facing roles.",
 
   skills: [
+    "IT Support",
+    "Troubleshooting",
+    "Networking",
     "Python",
     "TypeScript",
     "JavaScript",
@@ -68,18 +71,19 @@ export const resume = {
     "CSS",
     "Git",
     "Bun.js",
-    "English",
     "Full-Stack",
   ],
 
   experience: [
     {
-      title: "Floor Staff",
-      meta: "The Guildford Hotel | Aug 2025 – Present",
+      title: "Service Desk Officer",
+      meta: "Bunnings | Jan 2026 – Present",
+      // Drafted, not from Jared: LinkedIn lists no duties for this role yet.
+      // Replace with his own when he sends them.
       bullets: [
-        "Serve food and drinks, clear tables, and take orders in a busy pub.",
-        "Ring up sales on POS and handle cash/card payments.",
-        "Keep the service area clean and restock during shifts.",
+        "Provide first-line IT support to team members, logging, prioritising and resolving incidents and requests.",
+        "Troubleshoot hardware, software, account access and connectivity issues, escalating with clear notes.",
+        "Follow service desk processes to meet response targets and keep support documentation accurate.",
       ],
     },
     {
@@ -91,8 +95,8 @@ export const resume = {
       ],
     },
     {
-      title: "Web Developer",
-      meta: "Envenge Group | Feb – Jun 2025",
+      title: "Web Developer (Internship)",
+      meta: "Enveng Group | Feb – May 2025",
       bullets: [
         "Developed a modular, accessible Django app for tracking obligations and compliance.",
         "Used Docker and VS Code dev container for consistent development.",
@@ -100,7 +104,7 @@ export const resume = {
       ],
     },
     {
-      title: "Help Desk Technician",
+      title: "Help Desk Technician (Internship)",
       meta: "Murdoch University IT Service Desk | Aug – Nov 2024",
       bullets: [
         "Tier 1 support to students across hardware/software, networking, and system access.",
@@ -117,8 +121,7 @@ export const resume = {
   education: [
     {
       title: "Bachelor of Information Technology",
-      note: "(Ongoing)",
-      lines: ["Murdoch University | 2021 – Present"],
+      lines: ["Murdoch University | 2021 – 2025"],
       labelled: [{ label: "Major", value: "Cyber Security & Forensics" }],
       dashed: ["Member: Murdoch IT Society | Programming Club"],
     },
@@ -128,7 +131,7 @@ export const resume = {
   projects: [
     {
       title: "Greenova",
-      meta: "Envenge Group | Feb 2025 – Jun 2025",
+      meta: "Enveng Group | Feb 2025 – May 2025",
       bullets: [
         "Developed features supporting access control, document management, and team collaboration.",
         "Used Docker containers and CI tools to ensure reproducible, secure deployments.",

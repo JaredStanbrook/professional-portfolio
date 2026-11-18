@@ -163,7 +163,7 @@ export const ResumeSheet: FC = () => (
     <p>{resume.profile}</p>
 
     <h2>Skills</h2>
-    <p>{resume.skills.join(" | ")}</p>
+    <p>{resume.skills.join("\u00a0| ")}</p>
 
     <h2>Experience</h2>
     <div>
