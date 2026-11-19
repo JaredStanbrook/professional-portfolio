@@ -5,18 +5,18 @@
 
 export const person = {
   name: "Jared Stanbrook",
-  role: "IT specialist",
+  role: "Service Desk Officer",
   location: "Perth, Western Australia",
   email: "jared.stanbrook@proton.me",
   /** Built from worker/views/resume/data.ts by `npm run resume`. */
   resume: "/resume.pdf",
   /** The line under the name on the home page. */
   summary:
-    "IT specialist in Perth. I look after networks, think hard about security, and build for the web.",
+    "Service desk officer in Perth. I fix people's tech problems, think hard about security, and build the tools that make the job faster.",
   about: [
-    "For as long as I can remember I've been immersed in computing, driven by curiosity about how it all works underneath.",
-    "It started with Python, then spread through high school into game development, web development and data analysis.",
-    "A university degree pulled my focus towards networking and security. These days those meet in web development, which is where I keep digging deeper.",
+    "I work on the service desk at Bunnings, and I've just finished a Bachelor of IT at Murdoch University, majoring in Cyber Security & Forensics.",
+    "Most of what I build starts as a problem I hit at work or at home: a launcher so the team's tools are one search away, a monitor for the sharehouse's sensors, a way to get a Windows workspace back after a restart.",
+    "I like systems that are secure by default, easy to support and well documented, because I'm usually the person answering the call when they aren't.",
   ],
 };
 
@@ -45,74 +45,98 @@ export interface Project {
   title: string;
   /** What it is, in a few words, shown beside the title. */
   kind: string;
+  /** Where the title links: the live site, or the repository if public. */
   href?: string;
   body: string;
   stack: string[];
   image?: string;
 }
 
+// Private repositories are described, never linked: no repository URL, no
+// internal names, nothing from their docs beyond what the product does.
 export const projects: Project[] = [
   {
+    title: "Zipr",
+    kind: "Desktop app and API, in private development",
+    body: "Turns repeatable tasks into shortcuts that run on your own computer, and lets a team share, version and sync them. A Rust and Tauri desktop client that works offline, and a Go API over multi-tenant PostgreSQL with row-level security, OAuth2 sign-in and a contract-tested REST interface.",
+    stack: ["Rust", "Tauri", "React", "Go", "PostgreSQL", "Redis", "OAuth2", "Docker"],
+  },
+  {
+    title: "Service desk launcher",
+    kind: "Internal tool for my team",
+    body: "A tray app with a quick-search overlay that puts the team's approved tools, links and workflows one keystroke away. Catalogues are plain files, usage is logged locally, and privileged actions sit behind admin-only panels.",
+    stack: ["C#", ".NET", "WinUI 3", "xUnit"],
+  },
+  {
     title: "Port Scanner Delta Reporter",
-    kind: "Network security, team project",
+    kind: "Network security, capstone project",
     href: "https://github.com/TeamFixIT/portscan-delta-reporter",
-    body: "Automated port scans that report what changed since the last run. Scheduled scanning, change detection, CSV exports and a dashboard for tracking exposure across many hosts.",
+    body: "Scheduled port scans across many hosts that report only what changed since the last run, with CSV exports and a dashboard for tracking exposure. I coordinated the six-person team that built it for Murdoch University.",
     stack: ["Python", "Flask", "SQLAlchemy", "Nmap"],
     image: "https://stanbrook.me/portscan-delta-reporter-preview.png",
   },
   {
-    title: "Tenant System",
-    kind: "Full-stack web app",
-    href: "https://github.com/JaredStanbrook/TenantSystem",
-    body: "Property management for tenants and landlords: bills and expenses, properties, tenants and sign-in, built to take the friction out of renting for both sides.",
-    stack: ["TypeScript", "React", "TanStack Router", "Tailwind CSS", "Hono", "Bun", "Drizzle ORM"],
-    image: "https://stanbrook.me/tenant-system-preview.png",
-  },
-  {
-    title: "Motion Sensor Monitor",
-    kind: "Raspberry Pi dashboard",
-    href: "https://github.com/JaredStanbrook/SmartAlertSystem",
-    body: "A live dashboard for motion and door sensors around the house, with activity charts, frequency analysis and a downloadable log, updated in real time over Socket.IO.",
-    stack: ["JavaScript", "Socket.IO", "Chart.js", "Express.js", "Raspberry Pi"],
+    title: "Sheoak Tree Smart Monitor",
+    kind: "Home monitoring on a Raspberry Pi",
+    href: "https://github.com/JaredStanbrook/sheoak-tree",
+    body: "Live sensor and relay state for a sharehouse, streamed to a dashboard. Presence is detected on the local network over ARP, mDNS and SNMP rather than GPS, and a mock hardware mode makes it demoable anywhere.",
+    stack: ["Python", "Flask", "SQLAlchemy", "Server-sent events", "scikit-learn", "Raspberry Pi"],
     image: "https://stanbrook.me/sensor-monitor-preview.png",
   },
   {
+    title: "Window Layout",
+    kind: "Windows workspace tool",
+    href: "https://github.com/JaredStanbrook/win-remember-me",
+    body: "Saves and restores a Windows workspace: window positions and snapped layouts, relaunching closed apps and reopening Edge tabs. Ships as an offline install bundle for machines without internet access.",
+    stack: ["Python", "pywin32", "PySide6", "Windows"],
+  },
+  {
+    title: "Frugal",
+    kind: "Cloudflare Workers starter, runs this site",
+    href: "https://github.com/JaredStanbrook/frug-template",
+    body: "The platform layer behind this site and four others: passkey, TOTP and password sign-in with lockout, roles and permissions, an audit log, and database migrations that deploy on every push.",
+    stack: ["TypeScript", "Hono", "Cloudflare Workers", "D1", "HTMX", "Tailwind CSS"],
+    image: "/images/projects/frugal.webp",
+  },
+  {
+    title: "Elevation Restoration",
+    kind: "Website for a local business",
+    href: "https://elevation.stanbrook.me",
+    body: "A headlight restoration business in Perth: online booking with availability worked out from existing bookings, before-and-after galleries, reviews and an owner's admin area.",
+    stack: ["TypeScript", "Hono", "Cloudflare Workers", "D1"],
+    image: "/images/projects/elevation-restoration.webp",
+  },
+  {
+    title: "Blender Timelapse",
+    kind: "Blender extension",
+    href: "https://github.com/JaredStanbrook/blender-timelapse",
+    body: "Records a fixed-camera timelapse of a model while you keep working, then exports it to video. Tested against 219 automated checks on Blender 5.2.",
+    stack: ["Python", "Blender API"],
+    image: "/images/projects/blender-timelapse.webp",
+  },
+  {
+    title: "Tenant System",
+    kind: "Full-stack web app",
+    href: "https://github.com/JaredStanbrook/tenant-system",
+    body: "Property management for tenants and landlords: bills and expenses, payment confirmations, properties and sign-in.",
+    stack: ["TypeScript", "Hono", "HTMX", "Drizzle ORM", "Cloudflare Workers"],
+    image: "https://stanbrook.me/tenant-system-preview.png",
+  },
+  {
     title: "Greenova",
-    kind: "Built at Envenge Group",
-    body: "A Django application for environmental management and compliance: obligations, documentation and who is responsible for what, with an accessible, modular interface.",
-    stack: ["Python", "Django", "Docker", "PicoCSS"],
+    kind: "Built at Enveng Group",
+    href: "https://github.com/enveng-group/dev_greenova",
+    body: "A Django application for environmental compliance: obligations, documents and who is responsible for what, developed in Docker dev containers.",
+    stack: ["Python", "Django", "Docker"],
     image: "https://stanbrook.me/greenova-preview.png",
-  },
-  {
-    title: "IT Service Desk Portal",
-    kind: "Built for a student help desk",
-    href: "/it-help-desk",
-    body: "Digitised the desk's client records and feedback forms so the student-run team could spend less time on paper and more on the person in front of them.",
-    stack: ["TypeScript", "React", "Hono", "SQLite", "Tailwind CSS"],
-    image: "https://stanbrook.me/it-service-desk-preview.png",
-  },
-  {
-    title: "MOBS",
-    kind: "Invoicing for my own business",
-    href: "https://github.com/JaredStanbrook/MyOwnBusinessSystem",
-    body: "My Own Business System: invoices for my work as an independent disability support worker, without the spreadsheet juggling.",
-    stack: ["Node.js", "Express.js", "MongoDB", "Pug"],
-    image: "https://stanbrook.me/mobs-preview.png",
-  },
-  {
-    title: "This site",
-    kind: "Portfolio and blog",
-    href: "https://github.com/JaredStanbrook/professional-portfolio",
-    body: "Server-rendered on Cloudflare Workers, with a Markdown blog kept in R2 and D1 and an editor to write it from anywhere.",
-    stack: ["TypeScript", "Hono", "HTMX", "Tailwind CSS", "Cloudflare Workers"],
-    image: "https://stanbrook.me/portfolio-preview.png",
   },
 ];
 
 export interface Role {
   period: string;
   title: string;
-  org: string;
+  /** Who it was for. Left out, the row shows the title alone. */
+  org?: string;
   href?: string;
   body: string;
   skills: string[];
@@ -120,48 +144,40 @@ export interface Role {
 
 export const experience: Role[] = [
   {
+    period: "Jan 2026–Present",
+    title: "Service Desk Officer",
+    org: "Bunnings",
+    body: "Full-time IT support for team members: logging, prioritising and resolving incidents and requests, and escalating with clear notes. Built an internal launcher that puts the team's tools one search away.",
+    skills: ["IT support", "Incident management", "Troubleshooting", "Active Directory"],
+  },
+  {
     period: "Jul–Dec 2025",
     title: "Project Activity Coordinator",
-    org: "TeamFixIT",
+    org: "TeamFixIT, Murdoch University",
     href: "https://teamfixit.github.io",
-    body: "Led a six-person, startup-style team designing a network security monitoring system for Murdoch University. Planned the work, delegated it, tracked milestones against the client's goals, ran design reviews and delivered the design document on a tight deadline.",
+    body: "Led a six-person capstone team building a network security monitoring tool for Murdoch University's IT staff. Planned and delegated the work, tracked milestones against the client's goals, ran design reviews and delivered on deadline.",
     skills: ["Project management", "Team leadership", "Systems design", "Client coordination"],
   },
   {
-    period: "Feb–Jun 2025",
-    title: "Web Developer",
-    org: "Envenge Group",
-    body: "Built a Django application for tracking environmental compliance and project obligations: backend logic, user roles and documentation workflows, in a fast-moving team working from Docker dev containers.",
+    period: "Feb–May 2025",
+    title: "Web Developer (internship)",
+    org: "Enveng Group",
+    body: "Built features for a Django compliance application: backend logic, user roles and documentation workflows, in a fast-moving team working from Docker dev containers.",
     skills: ["Django", "Docker", "Backend development", "Teamwork"],
   },
   {
     period: "Aug–Nov 2024",
-    title: "Student IT Service Desk",
+    title: "IT Service Desk (internship)",
     org: "Murdoch University",
     href: "/it-help-desk",
-    body: "Workplace learning on the library's help desk: printing, software installs, connectivity across every kind of device, and account support for students.",
+    body: "Tier 1 support on the library's help desk: printing, software installs, connectivity across every kind of device, and account access for students.",
     skills: ["Customer service", "Communication", "Troubleshooting"],
   },
   {
-    period: "Jan 2023–Aug 2024",
-    title: "Disability Support Worker",
-    org: "Independent",
-    body: "Supported NDIS clients towards their rehabilitation goals. A humbling change of pace from warehousing, and where I learned to run a small business of my own.",
-    skills: ["Communication", "Compassion", "Problem-solving"],
-  },
-  {
-    period: "Apr–Jun 2022",
-    title: "Geological Field Technician and Driller",
-    org: "Sahara",
-    body: "Three months on a drill rig: sharing the work to hit KPIs, precise data entry for geological sampling, and an Excel workbook built to keep the sample data accurate.",
-    skills: ["Safety", "Adaptability", "Data accuracy"],
-  },
-  {
-    period: "2021–Dec 2023",
-    title: "Forklift Driver, Inbound and Outbound, Production Line",
-    org: "Jasol",
-    body: "Started out relieving the warehouse team in busy periods and moved into chemical pumping on the production line and distribution, where an eye for systems helped improve how the line ran.",
-    skills: ["Logistics", "Reliability", "Process improvement"],
+    period: "2021–2025",
+    title: "Disability support, warehousing and drilling",
+    body: "Disability support worker running my own small business, forklift and production-line work at Jasol, and a contract on a drill rig at Sahara. Years of turning up, solving problems on the spot and looking after people.",
+    skills: ["Reliability", "Communication", "Problem-solving"],
   },
 ];
 

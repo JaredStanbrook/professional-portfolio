@@ -297,18 +297,22 @@ const RoleRow: FC<{ role: Role }> = ({ role: r }) => (
     <div class="sm:col-span-6">
       <h3 class="text-xl leading-tight">
         {r.title}
-        <span class="font-normal text-muted-foreground [font-stretch:100%]"> at </span>
-        {r.href ? (
-          <a
-            href={r.href}
-            {...(isExternal(r.href) ? newTab : {})}
-            class="group/link text-primary no-underline hover:underline"
-          >
-            {r.org}
-            {isExternal(r.href) && <OutArrow />}
-          </a>
-        ) : (
-          r.org
+        {r.org && (
+          <>
+            <span class="font-normal text-muted-foreground [font-stretch:100%]"> at </span>
+            {r.href ? (
+              <a
+                href={r.href}
+                {...(isExternal(r.href) ? newTab : {})}
+                class="group/link text-primary no-underline hover:underline"
+              >
+                {r.org}
+                {isExternal(r.href) && <OutArrow />}
+              </a>
+            ) : (
+              r.org
+            )}
+          </>
         )}
       </h3>
       <p class="mt-3 leading-relaxed text-muted-foreground">{r.body}</p>

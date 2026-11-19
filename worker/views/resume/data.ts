@@ -15,7 +15,7 @@ export interface ContactItem {
 /** A role or a project: bold title left, where and when right, then bullets. */
 export interface ResumeEntry {
   title: string;
-  /** Right-hand side, e.g. "Envenge Group | Feb – Jun 2025". */
+  /** Right-hand side, e.g. "Enveng Group | Feb – May 2025". */
   meta: string;
   bullets: string[];
 }
@@ -46,32 +46,30 @@ export const resume = {
   ] satisfies ContactItem[],
 
   profile:
-    "Service desk professional and Cyber Security & Forensics graduate, currently a Service Desk Officer at Bunnings. Hands-on experience across Tier 1 support, troubleshooting, web development and network security projects, with a focus on secure, well-documented systems. Proven success in team-based and client-facing roles.",
+    "Service desk professional and Cyber Security & Forensics graduate, currently a Service Desk Officer at Bunnings. Hands-on experience across Tier 1 support, troubleshooting and network security, and I build the tools that make support faster: desktop apps, web services and automation.",
 
   skills: [
     "IT Support",
     "Troubleshooting",
     "Networking",
-    "Python",
-    "TypeScript",
-    "JavaScript",
-    "React",
-    "Node.js",
-    "Express",
-    "Django",
-    "C++",
-    "C#",
-    "Docker",
+    "Active Directory",
+    "Windows",
     "Linux",
     "Bash",
-    "MongoDB",
+    "Docker",
+    "Git",
+    "Python",
+    "TypeScript",
+    "Go",
+    "Rust",
+    "C#/.NET",
+    "React",
+    "Node.js",
+    "Django",
+    "PostgreSQL",
     "MySQL",
     "SQLite",
-    "HTML",
-    "CSS",
-    "Git",
-    "Bun.js",
-    "Full-Stack",
+    "Cloudflare Workers",
   ],
 
   experience: [
@@ -83,7 +81,7 @@ export const resume = {
       bullets: [
         "Provide first-line IT support to team members, logging, prioritising and resolving incidents and requests.",
         "Troubleshoot hardware, software, account access and connectivity issues, escalating with clear notes.",
-        "Follow service desk processes to meet response targets and keep support documentation accurate.",
+        "Built an internal desktop launcher (C#, .NET, WinUI) that puts the team's tools and workflows one search away.",
       ],
     },
     {
@@ -130,19 +128,27 @@ export const resume = {
 
   projects: [
     {
-      title: "Greenova",
-      meta: "Enveng Group | Feb 2025 – May 2025",
+      title: "Zipr – Shared Desktop Shortcuts",
+      meta: "Personal project | 2026",
       bullets: [
-        "Developed features supporting access control, document management, and team collaboration.",
-        "Used Docker containers and CI tools to ensure reproducible, secure deployments.",
+        "Offline-first desktop client in Rust and Tauri that runs task shortcuts locally and syncs them for a team.",
+        "Go API over multi-tenant PostgreSQL with row-level security, OAuth2 sign-in and contract-tested routes.",
       ],
     },
     {
-      title: "Student Web Portal",
-      meta: "Murdoch University | 2024",
+      title: "Sheoak Tree Smart Monitor",
+      meta: "Personal project",
       bullets: [
-        "Implemented TypeScript-based static site integrated with Cloudflare D1 for secure data logging.",
-        "Enhanced IT team workflow and secure handling of customer interaction records.",
+        "Raspberry Pi sensor dashboard with live streaming updates, built with Flask and SQLAlchemy.",
+        "Privacy-first presence detection on the local network using ARP, mDNS and SNMP.",
+      ],
+    },
+    {
+      title: "Frugal – Cloudflare Workers Platform",
+      meta: "Personal project | 2026",
+      bullets: [
+        "Reusable web platform with passkey, TOTP and password sign-in, account lockout and role-based access.",
+        "Runs five live sites, including a booking system for a local business and my portfolio.",
       ],
     },
   ] satisfies ResumeEntry[],
