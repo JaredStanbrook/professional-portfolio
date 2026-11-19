@@ -510,7 +510,7 @@ describe("registration", () => {
       } as any),
     );
 
-    expect(message).toMatch(/not authorized/i);
+    expect(message).toMatch(/not authorised/i);
     const row = await db.select().from(users).where(eq(users.email, "climber@example.com")).get();
     expect(row, "a refused registration should leave no account behind").toBeUndefined();
   });

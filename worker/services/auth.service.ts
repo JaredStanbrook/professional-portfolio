@@ -631,7 +631,7 @@ export class Auth {
       const restricted = this.authConfig.roles.restricted || [];
       if (restricted.includes(data.role)) {
         console.warn(`Blocked attempt to self-register restricted role: ${data.role}`);
-        throw new Error("You are not authorized to register with this role.");
+        throw new Error("You are not authorised to register with this role.");
       }
 
       roleToAssign = data.role;
@@ -1197,7 +1197,7 @@ export class Auth {
       const restricted = this.authConfig.roles.restricted || [];
       if (restricted.includes(role)) {
         console.warn(`Blocked attempt to self-register restricted role: ${role}`);
-        throw new Error("You are not authorized to register with this role.");
+        throw new Error("You are not authorised to register with this role.");
       }
 
       roleToAssign = role;
@@ -1341,7 +1341,7 @@ export class Auth {
       .where(eq(credentials.credentialId, response.id))
       .get();
 
-    if (!pass) throw new Error("Passkey not recognized.");
+    if (!pass) throw new Error("Passkey not recognised.");
 
     let verification;
     try {

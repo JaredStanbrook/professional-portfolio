@@ -46,7 +46,7 @@ export const passkey = new Hono<AppEnv>()
           error: logAndSanitise(
             "passkey.register.options",
             e,
-            "Registration initialization failed",
+            "Registration initialisation failed",
           ),
         },
         400,
@@ -86,7 +86,7 @@ export const passkey = new Hono<AppEnv>()
       return c.json({ ...result.options, challengeId: result.challengeId });
     } catch (e: any) {
       return c.json(
-        { error: logAndSanitise("passkey.login.options", e, "Login initialization failed") },
+        { error: logAndSanitise("passkey.login.options", e, "Login initialisation failed") },
         400,
       );
     }
