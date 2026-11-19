@@ -18,7 +18,7 @@ const NotFoundPage: FC = () => (
   <div class="mx-auto max-w-xl px-4 py-32 text-center">
     <p class="text-sm font-semibold text-muted-foreground">404</p>
     <h1 class="mt-2 text-3xl font-bold tracking-tight">That page isn't here</h1>
-    <p class="mt-4 text-muted-foreground">Might be an old link, or a typo in the address.</p>
+    <p class="mt-4 text-muted-foreground">The link may be old, or the address mistyped.</p>
     <div class="mt-8 flex flex-wrap justify-center gap-3">
       <a
         href="/"

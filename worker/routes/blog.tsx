@@ -63,7 +63,7 @@ blogRoute.get("/", async (c) => {
     // "{tagline} · {name}" — the site's own entry in search results.
     title: c.var.app.tagline || undefined,
     description:
-      "Jared Stanbrook, service desk officer in Perth, Western Australia: projects in networking, security and web development, work experience, and writing.",
+      "Jared Stanbrook, IT specialist in Perth, Western Australia: selected projects in networking, security and web development, work experience, and writing.",
     type: "website",
     jsonLd: [websiteSchema(c.var.app), personSchema(c.var.app)],
   });
@@ -74,7 +74,7 @@ blogRoute.get("/blog", async (c) => {
   return c.render(<BlogIndexPage posts={posts} {...localeOf(c)} />, {
     title: "Writing",
     description:
-      "Every post by Jared Stanbrook: hands-on labs, project write-ups and notes on networking, security and the web.",
+      "Every post by Jared Stanbrook: hands-on labs, project write-ups and notes on networking, security and web development.",
   });
 });
 

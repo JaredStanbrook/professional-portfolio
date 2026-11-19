@@ -33,7 +33,7 @@ pagesRoute.get("/it-help-desk", (c) =>
   c.render(<HelpDeskPage />, {
     title: "Student IT Service Desk",
     description:
-      "A semester on Murdoch University's student IT service desk: certifications, the support log in numbers, and the app I built for the desk.",
+      "What a semester on Murdoch University's student IT service desk looked like: certifications, the support log in numbers and the help desk app.",
   }),
 );
 

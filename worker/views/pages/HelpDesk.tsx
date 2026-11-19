@@ -170,9 +170,9 @@ export const HelpDeskPage: FC = () => {
           Murdoch University, August to November 2024
         </p>
         <p class="mt-4 text-muted-foreground">
-          My workplace learning placement: shifts on the library help desk sorting out printing,
-          software, Wi-Fi and account problems for students. The desk was still logging clients on
-          paper, so I built a small app to take that over. Here's how the semester went in numbers.
+          Workplace learning at Murdoch University: shifts in the library helping students with
+          printing, software, connectivity and accounts, plus the small app I built to digitise the
+          desk's client records and feedback forms.
         </p>
       </header>
 
@@ -289,6 +289,6 @@ export const GithubStats: FC<{ weeks: Datum[] | null }> = ({ weeks }) =>
     </>
   ) : (
     <p class="py-8 text-center text-sm text-muted-foreground">
-      GitHub is still crunching the numbers. Give it a minute and refresh.
+      GitHub is still counting. Try again in a minute.
     </p>
   );

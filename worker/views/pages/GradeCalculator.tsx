@@ -179,8 +179,7 @@ export const GradeCalculatorPage: FC<{ rows: Assessment[]; expected: string }> =
     <div class="rounded-2xl bg-card p-6 text-card-foreground sm:p-10">
       <h1 class="text-4xl">Grade calculator</h1>
       <p class="mb-8 mt-2 text-sm text-muted-foreground">
-        Work out what you need on the rest of your assessments to hit your target. Nothing gets
-        saved.
+        Work out the average you need on what is left to reach your target. Nothing is saved.
       </p>
       <GradeCalculator {...props} />
     </div>

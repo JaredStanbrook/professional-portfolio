@@ -364,7 +364,7 @@ export const HomePage: FC<{ posts: BlogListItem[]; locale: string; timeZone: str
 
       <div class="space-y-32 lg:col-span-9">
         <section id="work" aria-labelledby="work-heading" class="scroll-mt-24">
-          <SectionHeading id="work">Things I've built</SectionHeading>
+          <SectionHeading id="work">Selected work</SectionHeading>
           <ul class="group/list space-y-16">
             {projects.map((p) => (
               <ProjectRow project={p} />
@@ -384,7 +384,7 @@ export const HomePage: FC<{ posts: BlogListItem[]; locale: string; timeZone: str
         <section id="writing" aria-labelledby="writing-heading" class="scroll-mt-24">
           <SectionHeading id="writing">Writing</SectionHeading>
           {posts.length === 0 ? (
-            <p class="text-muted-foreground">Nothing up yet. Soon, promise.</p>
+            <p class="text-muted-foreground">Nothing published yet.</p>
           ) : (
             <ul>
               {posts.map((post) => (
@@ -401,10 +401,9 @@ export const HomePage: FC<{ posts: BlogListItem[]; locale: string; timeZone: str
         </section>
 
         <section id="contact" aria-labelledby="contact-heading" class="scroll-mt-24">
-          <SectionHeading id="contact">Get in touch</SectionHeading>
+          <SectionHeading id="contact">Contact</SectionHeading>
           <p class="max-w-prose text-lg leading-relaxed text-muted-foreground">
-            Email's the easiest way to reach me. I'm based in {person.location}, and happy to chat
-            about roles, projects, or anything you've seen here.
+            Email is the best way to reach me. I'm in {person.location}.
           </p>
           <a
             href={`mailto:${person.email}`}

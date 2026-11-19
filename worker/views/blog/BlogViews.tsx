@@ -70,11 +70,10 @@ export const BlogIndexPage: FC<{ posts: BlogListItem[] } & Locale> = ({
       <h1 class="max-w-3xl text-[clamp(2.75rem,8vw,5.5rem)] leading-[0.95]">Writing</h1>
       <p class="mt-6 max-w-xl text-xl leading-snug text-muted-foreground">
         Labs, project write-ups and notes on what I'm learning in networking, security and the web.
-        Some polished, some less so.
       </p>
 
       {posts.length === 0 ? (
-        <p class="mt-16 text-muted-foreground">Nothing up yet. Soon, promise.</p>
+        <p class="mt-16 text-muted-foreground">Nothing published yet.</p>
       ) : (
         years.map((year) => (
           <section class="mt-16 grid gap-4 lg:grid-cols-12 lg:gap-8" aria-labelledby={`y${year}`}>
