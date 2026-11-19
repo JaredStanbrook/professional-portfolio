@@ -12,11 +12,11 @@ export const person = {
   resume: "/resume.pdf",
   /** The line under the name on the home page. */
   summary:
-    "Service desk officer in Perth. I fix people's tech problems, think hard about security, and build the tools that make the job faster.",
+    "I like building automation and AI tools that give people their time back. Day to day I'm on a service desk, helping people get unstuck.",
   about: [
-    "I work on the service desk at Bunnings, and I've just finished a Bachelor of IT at Murdoch University, majoring in Cyber Security & Forensics.",
-    "Most of what I build starts as a problem I hit at work or at home: a launcher so the team's tools are one search away, a monitor for the sharehouse's sensors, a way to get a Windows workspace back after a restart.",
-    "I like systems that are secure by default, easy to support and well documented, because I'm usually the person answering the call when they aren't.",
+    "What drives me is helping people and making things I'm proud of. Right now that's a service desk job at Bunnings, a finished Bachelor of IT at Murdoch University (Cyber Security & Forensics), and a pile of side projects about automation and AI.",
+    "Most of what I build starts with a job someone keeps doing by hand: a launcher so the team's tools are one search away, a monitor that learns the patterns in a sharehouse's sensors, shortcuts you can build yourself or ask an AI to help build, then check and run on your own machine. I like automation that keeps a person in charge.",
+    "I'm looking for a team I can believe in: a company or project with strong values, that wants to see people succeed, and where I can learn from the people around me and help the next person along too. I'm secure-by-default, well-documented and easy-to-support by habit, because on the service desk I'm the one who gets the call when they aren't.",
   ],
 };
 
@@ -57,14 +57,14 @@ export interface Project {
 export const projects: Project[] = [
   {
     title: "Zipr",
-    kind: "Desktop app and API, in private development",
-    body: "Turns repeatable tasks into shortcuts that run on your own computer, and lets a team share, version and sync them. A Rust and Tauri desktop client that works offline, and a Go API over multi-tenant PostgreSQL with row-level security, OAuth2 sign-in and a contract-tested REST interface.",
+    kind: "Automation with AI in the loop, in private development",
+    body: "Turns the things you do over and over into shortcuts that run on your own computer, and lets a team share, version and sync them. You can build one yourself or ask an AI assistant to, then check it and test it on the real machine before it runs. A Rust and Tauri desktop client that works offline, and a Go API over multi-tenant PostgreSQL with row-level security, OAuth2 sign-in and a contract-tested REST interface.",
     stack: ["Rust", "Tauri", "React", "Go", "PostgreSQL", "Redis", "OAuth2", "Docker"],
   },
   {
     title: "Service desk launcher",
-    kind: "Internal tool for my team",
-    body: "A tray app with a quick-search overlay that puts the team's approved tools, links and workflows one keystroke away. Catalogues are plain files, usage is logged locally, and privileged actions sit behind admin-only panels.",
+    kind: "Automation for my team",
+    body: "A tray app with a quick-search overlay that puts the team's approved tools, links and workflows one keystroke away, so nobody hunts through bookmarks. Catalogues are plain files, usage is logged locally, and privileged actions sit behind admin-only panels.",
     stack: ["C#", ".NET", "WinUI 3", "xUnit"],
   },
   {
@@ -77,24 +77,24 @@ export const projects: Project[] = [
   },
   {
     title: "Sheoak Tree Smart Monitor",
-    kind: "Home monitoring on a Raspberry Pi",
+    kind: "Sensors and machine learning on a Raspberry Pi",
     href: "https://github.com/JaredStanbrook/sheoak-tree",
-    body: "Live sensor and relay state for a sharehouse, streamed to a dashboard. Presence is detected on the local network over ARP, mDNS and SNMP rather than GPS, and a mock hardware mode makes it demoable anywhere.",
+    body: "Live sensor and relay state for a sharehouse, streamed to a dashboard. Presence is worked out on the local network over ARP, mDNS and SNMP rather than GPS, and a pipeline trains models on the event history to spot patterns. A mock hardware mode makes it demoable anywhere.",
     stack: ["Python", "Flask", "SQLAlchemy", "Server-sent events", "scikit-learn", "Raspberry Pi"],
     image: "https://stanbrook.me/sensor-monitor-preview.png",
   },
   {
     title: "Window Layout",
-    kind: "Windows workspace tool",
+    kind: "Automating the daily setup",
     href: "https://github.com/JaredStanbrook/win-remember-me",
     body: "Saves and restores a Windows workspace: window positions and snapped layouts, relaunching closed apps and reopening Edge tabs. Ships as an offline install bundle for machines without internet access.",
     stack: ["Python", "pywin32", "PySide6", "Windows"],
   },
   {
     title: "Frugal",
-    kind: "Cloudflare Workers starter, runs this site",
+    kind: "Starter I build with an AI assistant, runs this site",
     href: "https://github.com/JaredStanbrook/frug-template",
-    body: "The platform layer behind this site and four others: passkey, TOTP and password sign-in with lockout, roles and permissions, an audit log, and database migrations that deploy on every push.",
+    body: "The platform layer behind this site and four others, set up so an AI assistant can build on it safely: passkey, TOTP and password sign-in with lockout, roles and permissions, an audit log, and database migrations that deploy on every push.",
     stack: ["TypeScript", "Hono", "Cloudflare Workers", "D1", "HTMX", "Tailwind CSS"],
     image: "/images/projects/frugal.webp",
   },
@@ -147,7 +147,7 @@ export const experience: Role[] = [
     period: "Jan 2026–Present",
     title: "Service Desk Officer",
     org: "Bunnings",
-    body: "Full-time IT support for team members: logging, prioritising and resolving incidents and requests, and escalating with clear notes. Built an internal launcher that puts the team's tools one search away.",
+    body: "Full-time IT support for team members: logging, prioritising and resolving incidents and requests, and escalating with clear notes. Built an internal launcher that puts the team's tools one search away, because I'd rather automate a repeat job than do it twice.",
     skills: ["IT support", "Incident management", "Troubleshooting", "Active Directory"],
   },
   {

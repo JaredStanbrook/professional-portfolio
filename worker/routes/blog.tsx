@@ -63,7 +63,7 @@ blogRoute.get("/", async (c) => {
     // "{tagline} · {name}" — the site's own entry in search results.
     title: c.var.app.tagline || undefined,
     description:
-      "Jared Stanbrook, IT specialist in Perth, Western Australia: selected projects in networking, security and web development, work experience, and writing.",
+      "Jared Stanbrook, Perth, Western Australia: automation and AI projects, service desk experience, and writing. Looking for a team that wants to see people succeed.",
     type: "website",
     jsonLd: [websiteSchema(c.var.app), personSchema(c.var.app)],
   });

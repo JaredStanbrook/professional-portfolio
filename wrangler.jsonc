@@ -139,7 +139,7 @@
     // --- BRANDING ---
     // CHANGE_ME — how the site names itself in the title, nav and footer.
     "APP_NAME": "Jared Stanbrook",
-    "APP_TAGLINE": "IT specialist in Perth: blog, projects and experience",
+    "APP_TAGLINE": "Automation and AI projects, and a service desk career, from Perth",
     "APP_LOCALE": "en-AU",
     "APP_CURRENCY": "AUD",
     // IANA zone, e.g. "Australia/Perth". Decides what "today" means when a

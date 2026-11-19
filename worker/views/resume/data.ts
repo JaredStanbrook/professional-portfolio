@@ -46,7 +46,7 @@ export const resume = {
   ] satisfies ContactItem[],
 
   profile:
-    "Service desk professional and Cyber Security & Forensics graduate, currently a Service Desk Officer at Bunnings. Hands-on experience across Tier 1 support, troubleshooting and network security, and I build the tools that make support faster: desktop apps, web services and automation.",
+    "Service Desk Officer and Cyber Security & Forensics graduate focused on automation and AI. I build tools that give people their time back, from internal launchers to an offline-first desktop app where AI helps build shortcuts and the user stays in control. Looking for a values-driven team that wants to see people succeed.",
 
   skills: [
     "IT Support",
@@ -56,6 +56,7 @@ export const resume = {
     "Windows",
     "Linux",
     "Bash",
+    "Automation",
     "Docker",
     "Git",
     "Python",
@@ -70,6 +71,7 @@ export const resume = {
     "MySQL",
     "SQLite",
     "Cloudflare Workers",
+    "AI-assisted development",
   ],
 
   experience: [
