@@ -147,7 +147,7 @@ export const experience: Role[] = [
     period: "Jan 2026–Present",
     title: "Service Desk Officer",
     org: "Bunnings",
-    body: "Full-time IT support for team members: logging, prioritising and resolving incidents and requests, and escalating with clear notes. Built an internal launcher that puts the team's tools one search away, because I'd rather automate a repeat job than do it twice.",
+    body: "Full-time IT support for team members: logging, prioritising and resolving incidents and requests, and escalating with clear notes. Built an internal launcher that puts the team's tools one search away, because I'd rather automate a repeat job than do it twice. More than 20 people use it, and I estimate it saves each of them about 6 minutes a day.",
     skills: ["IT support", "Incident management", "Troubleshooting", "Active Directory"],
   },
   {
@@ -167,7 +167,7 @@ export const experience: Role[] = [
   },
   {
     period: "Aug–Nov 2024",
-    title: "IT Service Desk (internship)",
+    title: "Help Desk Technician (internship)",
     org: "Murdoch University",
     href: "/it-help-desk",
     body: "Tier 1 support on the library's help desk: printing, software installs, connectivity and account access for students.",

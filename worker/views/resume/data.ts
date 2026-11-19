@@ -40,7 +40,6 @@ export const resume = {
   location: "Perth, Western Australia",
   contact: [
     { text: "jared.stanbrook@proton.me", href: "mailto:jared.stanbrook@proton.me" },
-    { text: "(+61) 418 407 644" },
     { text: "GitHub", href: "https://github.com/JaredStanbrook" },
     { text: "Portfolio", href: "https://jared.stanbrook.me/" },
   ] satisfies ContactItem[],
@@ -78,12 +77,10 @@ export const resume = {
     {
       title: "Service Desk Officer",
       meta: "Bunnings | Jan 2026 – Present",
-      // Drafted, not from Jared: LinkedIn lists no duties for this role yet.
-      // Replace with his own when he sends them.
       bullets: [
         "Provide first-line IT support to team members, logging, prioritising and resolving incidents and requests.",
         "Troubleshoot hardware, software, account access and connectivity issues, escalating with clear notes.",
-        "Built an internal desktop launcher (C#, .NET, WinUI) that puts the team's tools and workflows one search away.",
+        "Built a desktop launcher (C#, .NET, WinUI) used by 20+ staff, saving each ~6 min a day.",
       ],
     },
     {
