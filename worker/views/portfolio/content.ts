@@ -14,9 +14,9 @@ export const person = {
   summary:
     "I like building automation and AI tools that give people their time back. Day to day I'm on a service desk, helping people get unstuck.",
   about: [
-    "What drives me is helping people and making things I'm proud of. Right now that's a service desk job at Bunnings, a finished Bachelor of IT at Murdoch University (Cyber Security & Forensics), and a pile of side projects about automation and AI.",
+    "I care most about helping people and making things I'm proud of. Right now that's a service desk job at Bunnings, a finished Bachelor of IT at Murdoch University (Cyber Security & Forensics), and a pile of side projects about automation and AI.",
     "Most of what I build starts with a job someone keeps doing by hand: a launcher so the team's tools are one search away, a monitor that learns the patterns in a sharehouse's sensors, shortcuts you can build yourself or ask an AI to help build, then check and run on your own machine. I like automation that keeps a person in charge.",
-    "I'm looking for a team I can believe in: a company or project with strong values, that wants to see people succeed, and where I can learn from the people around me and help the next person along too. I'm secure-by-default, well-documented and easy-to-support by habit, because on the service desk I'm the one who gets the call when they aren't.",
+    "I'm looking for a team I can believe in: a company or project with strong values that wants to see people succeed, where I can learn from the people around me and help the next person along too. Out of habit I build things to be secure by default, documented and easy to support, because on the service desk I'm the one who gets the call when they aren't.",
   ],
 };
 
