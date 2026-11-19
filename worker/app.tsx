@@ -10,6 +10,7 @@ import { apiAuth } from "./routes/api/auth";
 import { webAuth } from "./routes/web/auth";
 import { logsRoute } from "./routes/admin/logs";
 import { accessAdminRoute } from "./routes/admin/access.tsx";
+import { resumesAdminRoute } from "./routes/admin/resumes";
 import { accessRoute } from "./routes/access.tsx";
 import { accessGate } from "./middleware/access-gate.middleware.ts";
 import { blogRoute, editorRoute } from "./routes/blog.tsx";
@@ -28,6 +29,7 @@ const admin = new Hono<AppEnv>();
 admin.use("*", requireRole("admin"));
 admin.route("/logs", logsRoute);
 admin.route("/access", accessAdminRoute);
+admin.route("/resumes", resumesAdminRoute);
 
 // ==========================================
 // 2. MAIN APP

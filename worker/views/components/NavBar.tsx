@@ -22,6 +22,7 @@ const menuConfig: Record<string, NavItem[]> = {
   editor: [{ to: "/editor", name: "Write", icon: "notebook-pen" }],
   admin: [
     { to: "/editor", name: "Write", icon: "notebook-pen" },
+    { to: "/admin/resumes", name: "Résumés", icon: "file-text" },
     { to: "/admin/access", name: "Access links", icon: "link" },
     { to: "/admin/logs", name: "System logs", icon: "scroll-text" },
   ],

@@ -1,8 +1,11 @@
 // worker/views/resume/data.ts
 //
-// The résumé, as data. This is the file to change when the résumé changes:
-// the page at /resume renders it, and `npm run resume` prints that page to
-// public/resume.pdf, the file the site links to.
+// The public résumé, as data. The page at /resume renders it, and
+// `npm run resume` prints that page to public/resume.pdf, the file the site
+// links to. Job-specific versions build on it in ./variants.ts.
+//
+// The repository is public, so everything here is too. The phone number is
+// the RESUME_PHONE secret, added only to the admin copies.
 //
 // Keep it to one A4 page. `npm run resume` stops with an error if it runs
 // onto a second, rather than quietly shipping a two-page PDF.
@@ -35,7 +38,20 @@ export interface EducationEntry {
   dashed?: string[];
 }
 
-export const resume = {
+export interface ResumeData {
+  name: string;
+  location: string;
+  contact: ContactItem[];
+  profile: string;
+  skills: string[];
+  experience: ResumeEntry[];
+  certificates: { name: string; detail: string }[];
+  education: EducationEntry[];
+  projects: ResumeEntry[];
+  references: string;
+}
+
+export const resume: ResumeData = {
   name: "Jared Stanbrook",
   location: "Perth, Western Australia",
   contact: [
@@ -154,3 +170,7 @@ export const resume = {
 
   references: "+ Available upon request",
 };
+
+/** A copy with the phone number after the email, for copies sent directly. */
+export const withPhone = (r: ResumeData, phone?: string): ResumeData =>
+  phone ? { ...r, contact: [r.contact[0], { text: phone }, ...r.contact.slice(1)] } : r;

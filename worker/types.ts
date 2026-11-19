@@ -24,6 +24,8 @@ export type Vars = {
   JWT_SECRET: string;
   /** Optional secret. Read-only GitHub token for the repo stats on /it-help-desk; without it the unauthenticated rate limit applies. */
   GITHUB_API_TOKEN?: string;
+  /** Optional secret. The phone number on the admin résumés at /admin/resumes; never in the public one. */
+  RESUME_PHONE?: string;
   AUTH_METHODS: string;
   ROLES_AVAILABLE: string;
   ROLES_DEFAULT: string;

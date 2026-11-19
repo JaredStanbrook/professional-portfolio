@@ -148,6 +148,8 @@ describe("UI pages load", () => {
       "/editor/new",
       "/editor/first-post",
       "/admin/logs",
+      "/admin/resumes",
+      "/admin/resumes/automation",
     ]) {
       const res = await get(testApp, path);
       expect(res.status, `GET ${path}`).toBe(302);
@@ -166,10 +168,23 @@ describe("UI pages load", () => {
       "/editor/new",
       "/editor/first-post",
       "/admin/logs",
+      "/admin/resumes",
+      "/admin/resumes/automation",
     ]) {
       const res = await get(testApp, path);
       expect(res.status, `GET ${path}`).toBe(200);
     }
+  });
+
+  it("puts the phone number on admin résumés only, never the public one", async () => {
+    const admin = createTestApp(createMockData().users[0]);
+    const withPhone = { ...env, RESUME_PHONE: "(+61) 400 111 222" };
+    const fetchWith = (path: string) =>
+      admin.fetch(new Request(`http://localhost${path}`), withPhone);
+
+    expect(await (await fetchWith("/admin/resumes/automation")).text()).toContain("400 111 222");
+    expect(await (await fetchWith("/resume")).text()).not.toContain("400 111 222");
+    expect((await fetchWith("/admin/resumes/no-such-job")).status).toBe(404);
   });
 
   it("renders a post's Markdown and dates it in UTC", async () => {
@@ -261,6 +276,8 @@ describe("UI pages load", () => {
       [signedIn, "/editor/new"],
       [signedIn, "/editor/first-post"],
       [signedIn, "/admin/logs"],
+      [signedIn, "/admin/resumes"],
+      [signedIn, "/admin/resumes/automation"],
     ];
 
     for (const [testApp, path] of pages) {

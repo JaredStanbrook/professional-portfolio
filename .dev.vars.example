@@ -25,6 +25,9 @@ ACCESS_GATE_PATHS=""
 ALLOWED_EMAILS=""
 REQUIRE_EMAIL_VERIFICATION="false"
 
+# Optional. The phone number on the admin résumés at /admin/resumes.
+# RESUME_PHONE="(+61) 400 000 000"
+
 # --- Optional providers ----------------------------------------------
 # Only needed if AUTH_METHODS includes "email" or "sms".
 # SMTP_HOST="smtp.example.com"

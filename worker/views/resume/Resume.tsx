@@ -14,7 +14,12 @@
 import { raw } from "hono/html";
 import type { FC } from "hono/jsx";
 
-import { resume, type EducationEntry, type ResumeEntry } from "./data";
+import {
+  resume as publicResume,
+  type EducationEntry,
+  type ResumeData,
+  type ResumeEntry,
+} from "./data";
 
 const css = `
 @page { size: A4; margin: 0; }
@@ -62,7 +67,8 @@ li.dash::before { content: "-"; font-size: 10pt; line-height: 13.8pt; }
 .meta-italic { font-style: italic; }
 
 .actions { max-width: 595.28pt; margin: 16px auto 0; padding: 0 12px; display: flex; flex-wrap: wrap; gap: 12px; font-size: 14px; }
-.actions a {
+.actions a, .actions button {
+  border: 0; font: inherit; cursor: pointer;
   display: inline-flex; align-items: center; height: 44px; padding: 0 18px; border-radius: 999px;
   background: #1d6650; color: #fff; text-decoration: none; font-weight: 600;
 }
@@ -140,7 +146,7 @@ const fitScript = `<script>
 </script>`;
 
 /** The sheet alone. Also what the PDF script prints. */
-export const ResumeSheet: FC = () => (
+export const ResumeSheet: FC<{ resume: ResumeData }> = ({ resume }) => (
   <main class="sheet">
     <header class="top">
       <h1 class="name">{resume.name}</h1>
@@ -200,16 +206,27 @@ export const ResumeSheet: FC = () => (
   </main>
 );
 
-/** The whole document. `withActions` adds the on-screen download buttons. */
-export const ResumeDocument: FC<{ withActions?: boolean; canonical?: string }> = ({
-  withActions = true,
-  canonical,
-}) => (
+/**
+ * The whole document. `actions` picks the on-screen buttons: "public" links
+ * the committed PDF, "admin" prints this page (Save as PDF) and links back to
+ * the list, "none" is for the PDF script. The admin title becomes the saved
+ * file's name.
+ */
+export const ResumeDocument: FC<{
+  resume?: ResumeData;
+  actions?: "public" | "admin" | "none";
+  slug?: string;
+  canonical?: string;
+}> = ({ resume = publicResume, actions = "public", slug, canonical }) => (
   <html lang="en-AU">
     <head>
       <meta charset="utf-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <title>{`${resume.name} – Résumé`}</title>
+      <title>
+        {actions === "admin"
+          ? `${resume.name.replace(/ /g, "-")}-Resume${slug ? `-${slug}` : ""}`
+          : `${resume.name}: Résumé`}
+      </title>
       <meta name="description" content={resume.profile} />
       {canonical && <link rel="canonical" href={canonical} />}
       <meta name="robots" content="noindex" />
@@ -217,7 +234,17 @@ export const ResumeDocument: FC<{ withActions?: boolean; canonical?: string }> =
       <style>{raw(css)}</style>
     </head>
     <body>
-      {withActions && (
+      {actions === "admin" && (
+        <nav class="actions" aria-label="Résumé">
+          <button type="button" onclick="print()">
+            Download PDF
+          </button>
+          <a href="/admin/resumes" class="quiet">
+            All résumés
+          </a>
+        </nav>
+      )}
+      {actions === "public" && (
         <nav class="actions" aria-label="Résumé">
           <a href="/resume.pdf" download="Jared-Stanbrook-Resume.pdf">
             Download PDF
@@ -227,8 +254,8 @@ export const ResumeDocument: FC<{ withActions?: boolean; canonical?: string }> =
           </a>
         </nav>
       )}
-      <ResumeSheet />
-      {withActions && raw(fitScript)}
+      <ResumeSheet resume={resume} />
+      {actions !== "none" && raw(fitScript)}
     </body>
   </html>
 );
