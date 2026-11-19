@@ -12,11 +12,11 @@ export const person = {
   resume: "/resume.pdf",
   /** The line under the name on the home page. */
   summary:
-    "I build automation and AI tools. Day to day I'm on a service desk, helping people get unstuck.",
+    "I build automation and AI tools, and I'm looking for a junior IT automation or DevOps role. Day to day I'm on a service desk, helping people get unstuck.",
   about: [
     "I work on the service desk at Bunnings, and I've finished a Bachelor of IT at Murdoch University with a major in Cyber Security & Forensics. Outside work I build side projects in automation and AI, because I like helping people and making things I'm proud of.",
     "Most of what I build starts with a job someone keeps doing by hand, and I like automation that leaves a person in charge of it.",
-    "I want to join a team with strong values that wants its people to succeed, where I can learn from the people around me and help the next person along. Out of habit I build things to be secure by default, documented and easy to support, because on the service desk I'm the one who gets the call when they aren't.",
+    "Next I want to do that work full time, in a junior automation or DevOps role on a team where I can learn from the people around me and help the next person along. Out of habit I build things to be secure by default, documented and easy to support, because on the service desk I'm the one who gets the call when they aren't.",
   ],
 };
 
@@ -68,7 +68,15 @@ export const projects: Project[] = [
     stack: ["C#", ".NET", "WinUI 3", "xUnit"],
   },
   {
-    title: "Port Scanner Delta Reporter",
+    title: "Frugal",
+    kind: "Starter template, runs this site",
+    href: "https://github.com/JaredStanbrook/frug-template",
+    body: "The platform behind this site and four others, set up so an AI assistant can build on it safely. It has passkey, TOTP and password sign-in with lockout, roles and permissions, an audit log, and database migrations and deploys that run on every push.",
+    stack: ["TypeScript", "Hono", "Cloudflare Workers", "D1", "HTMX", "Tailwind CSS"],
+    image: "/images/projects/frugal.webp",
+  },
+  {
+    title: "Port Scan Delta Reporter",
     kind: "Network security, capstone project",
     href: "https://github.com/TeamFixIT/portscan-delta-reporter",
     body: "Scheduled port scans across many hosts that report only what changed since the last run, with CSV exports and a dashboard for tracking exposure. I coordinated the six-person team that built it for Murdoch University.",
@@ -89,14 +97,6 @@ export const projects: Project[] = [
     href: "https://github.com/JaredStanbrook/win-remember-me",
     body: "Saves and restores a Windows workspace: window positions and snapped layouts, relaunching closed apps and reopening Edge tabs. Ships as an offline install bundle for machines without internet access.",
     stack: ["Python", "pywin32", "PySide6", "Windows"],
-  },
-  {
-    title: "Frugal",
-    kind: "Starter template, runs this site",
-    href: "https://github.com/JaredStanbrook/frug-template",
-    body: "The platform behind this site and four others, set up so an AI assistant can build on it safely. It has passkey, TOTP and password sign-in with lockout, roles and permissions, an audit log, and database migrations that deploy on every push.",
-    stack: ["TypeScript", "Hono", "Cloudflare Workers", "D1", "HTMX", "Tailwind CSS"],
-    image: "/images/projects/frugal.webp",
   },
   {
     title: "Elevation Restoration",
