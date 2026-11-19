@@ -12,11 +12,11 @@ export const person = {
   resume: "/resume.pdf",
   /** The line under the name on the home page. */
   summary:
-    "I build automation and AI tools, and I'm looking for a junior IT automation or DevOps role. Day to day I'm on a service desk, helping people get unstuck.",
+    "I'm on the service desk at Bunnings, helping people get unstuck, and I build software in my own time.",
   about: [
-    "I work on the service desk at Bunnings, and I've finished a Bachelor of IT at Murdoch University with a major in Cyber Security & Forensics. Outside work I build side projects in automation and AI, because I like helping people and making things I'm proud of.",
-    "Most of what I build starts with a job someone keeps doing by hand, and I like automation that leaves a person in charge of it.",
-    "Next I want to do that work full time, in a junior automation or DevOps role on a team where I can learn from the people around me and help the next person along. Out of habit I build things to be secure by default, documented and easy to support, because on the service desk I'm the one who gets the call when they aren't.",
+    "I studied for a Bachelor of IT at Murdoch University, majoring in Cyber Security & Forensics, while doing disability support through my own small business, forklift and production-line work, and a contract on a drill rig. Those jobs were mostly about turning up, sorting problems out on the spot and looking after people, and I still work that way.",
+    "I like helping people and making things I'm proud of. On the service desk that means fixing the problem in front of me, then building something so it doesn't come back: a launcher for the team's tools is now used by more than 20 people. I also led a six-person team through our capstone project, and I run five websites on a platform I built, one of them a booking system for a local business.",
+    "I'm open to IT roles in support, systems, automation or security, on a team I can learn from and help the next person along. Out of habit I build things to be secure by default, documented and easy to support, because on the service desk I'm the one who gets the call when they aren't.",
   ],
 };
 
@@ -56,24 +56,10 @@ export interface Project {
 // internal names, nothing from their docs beyond what the product does.
 export const projects: Project[] = [
   {
-    title: "Zipr",
-    kind: "Automation with AI in the loop, in private development",
-    body: "Turns tasks you repeat into shortcuts that run on your own computer, and lets a team share, version and sync them. You write a shortcut yourself or have an AI assistant draft it, then test it on the real machine before it runs. The desktop client is Rust and Tauri and works offline. The Go API runs on multi-tenant PostgreSQL with row-level security, OAuth2 sign-in and a contract-tested REST interface.",
-    stack: ["Rust", "Tauri", "React", "Go", "PostgreSQL", "Redis", "OAuth2", "Docker"],
-  },
-  {
     title: "Service desk launcher",
     kind: "Automation for my team",
     body: "A tray app with a quick-search overlay that puts the team's approved tools, links and workflows one keystroke away. Catalogues are plain files, usage is logged locally, and privileged actions sit behind admin-only panels.",
     stack: ["C#", ".NET", "WinUI 3", "xUnit"],
-  },
-  {
-    title: "Frugal",
-    kind: "Starter template, runs this site",
-    href: "https://github.com/JaredStanbrook/frug-template",
-    body: "The platform behind this site and four others, set up so an AI assistant can build on it safely. It has passkey, TOTP and password sign-in with lockout, roles and permissions, an audit log, and database migrations and deploys that run on every push.",
-    stack: ["TypeScript", "Hono", "Cloudflare Workers", "D1", "HTMX", "Tailwind CSS"],
-    image: "/images/projects/frugal.webp",
   },
   {
     title: "Port Scan Delta Reporter",
@@ -82,6 +68,28 @@ export const projects: Project[] = [
     body: "Scheduled port scans across many hosts that report only what changed since the last run, with CSV exports and a dashboard for tracking exposure. I coordinated the six-person team that built it for Murdoch University.",
     stack: ["Python", "Flask", "SQLAlchemy", "Nmap"],
     image: "https://stanbrook.me/portscan-delta-reporter-preview.png",
+  },
+  {
+    title: "Elevation Restoration",
+    kind: "Website for a local business",
+    href: "https://elevation.stanbrook.me",
+    body: "A headlight restoration business in Perth: online booking with availability worked out from existing bookings, before-and-after galleries, reviews and an owner's admin area.",
+    stack: ["TypeScript", "Hono", "Cloudflare Workers", "D1"],
+    image: "/images/projects/elevation-restoration.webp",
+  },
+  {
+    title: "Zipr",
+    kind: "Automation with AI in the loop, in private development",
+    body: "Turns tasks you repeat into shortcuts that run on your own computer, and lets a team share, version and sync them. You write a shortcut yourself or have an AI assistant draft it, then test it on the real machine before it runs. The desktop client is Rust and Tauri and works offline. The Go API runs on multi-tenant PostgreSQL with row-level security, OAuth2 sign-in and a contract-tested REST interface.",
+    stack: ["Rust", "Tauri", "React", "Go", "PostgreSQL", "Redis", "OAuth2", "Docker"],
+  },
+  {
+    title: "Frugal",
+    kind: "Starter template, runs this site",
+    href: "https://github.com/JaredStanbrook/frug-template",
+    body: "The platform behind this site and four others, set up so an AI assistant can build on it safely. It has passkey, TOTP and password sign-in with lockout, roles and permissions, an audit log, and database migrations and deploys that run on every push.",
+    stack: ["TypeScript", "Hono", "Cloudflare Workers", "D1", "HTMX", "Tailwind CSS"],
+    image: "/images/projects/frugal.webp",
   },
   {
     title: "Sheoak Tree Smart Monitor",
@@ -97,14 +105,6 @@ export const projects: Project[] = [
     href: "https://github.com/JaredStanbrook/win-remember-me",
     body: "Saves and restores a Windows workspace: window positions and snapped layouts, relaunching closed apps and reopening Edge tabs. Ships as an offline install bundle for machines without internet access.",
     stack: ["Python", "pywin32", "PySide6", "Windows"],
-  },
-  {
-    title: "Elevation Restoration",
-    kind: "Website for a local business",
-    href: "https://elevation.stanbrook.me",
-    body: "A headlight restoration business in Perth: online booking with availability worked out from existing bookings, before-and-after galleries, reviews and an owner's admin area.",
-    stack: ["TypeScript", "Hono", "Cloudflare Workers", "D1"],
-    image: "/images/projects/elevation-restoration.webp",
   },
   {
     title: "Blender Timelapse",
