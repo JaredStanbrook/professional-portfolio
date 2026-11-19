@@ -46,7 +46,7 @@ export const resume = {
   ] satisfies ContactItem[],
 
   profile:
-    "Service Desk Officer and Cyber Security & Forensics graduate focused on automation and AI. I build tools that give people their time back, from internal launchers to an offline-first desktop app where AI helps build shortcuts and the user stays in control. Looking for a values-driven team that wants to see people succeed.",
+    "Service Desk Officer and Cyber Security & Forensics graduate who builds automation and AI tools: an internal launcher for my team, and an offline-first desktop app where AI drafts shortcuts and the user checks them before they run. Looking for a team with strong values that wants its people to succeed.",
 
   skills: [
     "IT Support",
@@ -87,7 +87,7 @@ export const resume = {
       ],
     },
     {
-      title: "Project Activity Coordinator – Port Scan Delta Reporter",
+      title: "Project Activity Coordinator, Port Scan Delta Reporter",
       meta: "Capstone Project, Murdoch University | Jul – Dec 2025",
       bullets: [
         "Led a 6-member team to deliver a staff-facing network security tool.",
@@ -108,7 +108,6 @@ export const resume = {
       meta: "Murdoch University IT Service Desk | Aug – Nov 2024",
       bullets: [
         "Tier 1 support to students across hardware/software, networking, and system access.",
-        "Developed strong customer service and communication skills.",
         "Troubleshot and resolved a range of technical problems under pressure.",
       ],
     },
@@ -125,12 +124,12 @@ export const resume = {
       labelled: [{ label: "Major", value: "Cyber Security & Forensics" }],
       dashed: ["Member: Murdoch IT Society | Programming Club"],
     },
-    { title: "Mazenod College", suffix: " – Class of 2019" },
+    { title: "Mazenod College", suffix: ", Class of 2019" },
   ] satisfies EducationEntry[],
 
   projects: [
     {
-      title: "Zipr – Shared Desktop Shortcuts",
+      title: "Zipr: Shared Desktop Shortcuts",
       meta: "Personal project | 2026",
       bullets: [
         "Offline-first desktop client in Rust and Tauri that runs task shortcuts locally and syncs them for a team.",
@@ -146,7 +145,7 @@ export const resume = {
       ],
     },
     {
-      title: "Frugal – Cloudflare Workers Platform",
+      title: "Frugal: Cloudflare Workers Platform",
       meta: "Personal project | 2026",
       bullets: [
         "Reusable web platform with passkey, TOTP and password sign-in, account lockout and role-based access.",

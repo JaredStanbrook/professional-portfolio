@@ -12,11 +12,11 @@ export const person = {
   resume: "/resume.pdf",
   /** The line under the name on the home page. */
   summary:
-    "I like building automation and AI tools that give people their time back. Day to day I'm on a service desk, helping people get unstuck.",
+    "I build automation and AI tools. Day to day I'm on a service desk, helping people get unstuck.",
   about: [
-    "I care most about helping people and making things I'm proud of. Right now that's a service desk job at Bunnings, a finished Bachelor of IT at Murdoch University (Cyber Security & Forensics), and a pile of side projects about automation and AI.",
-    "Most of what I build starts with a job someone keeps doing by hand: a launcher so the team's tools are one search away, a monitor that learns the patterns in a sharehouse's sensors, shortcuts you can build yourself or ask an AI to help build, then check and run on your own machine. I like automation that keeps a person in charge.",
-    "I'm looking for a team I can believe in: a company or project with strong values that wants to see people succeed, where I can learn from the people around me and help the next person along too. Out of habit I build things to be secure by default, documented and easy to support, because on the service desk I'm the one who gets the call when they aren't.",
+    "I work on the service desk at Bunnings, and I've finished a Bachelor of IT at Murdoch University with a major in Cyber Security & Forensics. Outside work I build side projects in automation and AI, because I like helping people and making things I'm proud of.",
+    "Most of what I build starts with a job someone keeps doing by hand, and I like automation that leaves a person in charge of it.",
+    "I want to join a team with strong values that wants its people to succeed, where I can learn from the people around me and help the next person along. Out of habit I build things to be secure by default, documented and easy to support, because on the service desk I'm the one who gets the call when they aren't.",
   ],
 };
 
@@ -58,13 +58,13 @@ export const projects: Project[] = [
   {
     title: "Zipr",
     kind: "Automation with AI in the loop, in private development",
-    body: "Turns the things you do over and over into shortcuts that run on your own computer, and lets a team share, version and sync them. You can build one yourself or ask an AI assistant to, then check it and test it on the real machine before it runs. A Rust and Tauri desktop client that works offline, and a Go API over multi-tenant PostgreSQL with row-level security, OAuth2 sign-in and a contract-tested REST interface.",
+    body: "Turns tasks you repeat into shortcuts that run on your own computer, and lets a team share, version and sync them. You write a shortcut yourself or have an AI assistant draft it, then test it on the real machine before it runs. The desktop client is Rust and Tauri and works offline. The Go API runs on multi-tenant PostgreSQL with row-level security, OAuth2 sign-in and a contract-tested REST interface.",
     stack: ["Rust", "Tauri", "React", "Go", "PostgreSQL", "Redis", "OAuth2", "Docker"],
   },
   {
     title: "Service desk launcher",
     kind: "Automation for my team",
-    body: "A tray app with a quick-search overlay that puts the team's approved tools, links and workflows one keystroke away, so nobody hunts through bookmarks. Catalogues are plain files, usage is logged locally, and privileged actions sit behind admin-only panels.",
+    body: "A tray app with a quick-search overlay that puts the team's approved tools, links and workflows one keystroke away. Catalogues are plain files, usage is logged locally, and privileged actions sit behind admin-only panels.",
     stack: ["C#", ".NET", "WinUI 3", "xUnit"],
   },
   {
@@ -79,7 +79,7 @@ export const projects: Project[] = [
     title: "Sheoak Tree Smart Monitor",
     kind: "Sensors and machine learning on a Raspberry Pi",
     href: "https://github.com/JaredStanbrook/sheoak-tree",
-    body: "Live sensor and relay state for a sharehouse, streamed to a dashboard. Presence is worked out on the local network over ARP, mDNS and SNMP rather than GPS, and a pipeline trains models on the event history to spot patterns. A mock hardware mode makes it demoable anywhere.",
+    body: "Streams a sharehouse's sensor and relay state to a live dashboard. It works out who's home from the local network over ARP, mDNS and SNMP, and trains models on the event history to spot patterns. A mock hardware mode lets you demo it with no sensors attached.",
     stack: ["Python", "Flask", "SQLAlchemy", "Server-sent events", "scikit-learn", "Raspberry Pi"],
     image: "https://stanbrook.me/sensor-monitor-preview.png",
   },
@@ -92,9 +92,9 @@ export const projects: Project[] = [
   },
   {
     title: "Frugal",
-    kind: "Starter I build with an AI assistant, runs this site",
+    kind: "Starter template, runs this site",
     href: "https://github.com/JaredStanbrook/frug-template",
-    body: "The platform layer behind this site and four others, set up so an AI assistant can build on it safely: passkey, TOTP and password sign-in with lockout, roles and permissions, an audit log, and database migrations that deploy on every push.",
+    body: "The platform behind this site and four others, set up so an AI assistant can build on it safely. It has passkey, TOTP and password sign-in with lockout, roles and permissions, an audit log, and database migrations that deploy on every push.",
     stack: ["TypeScript", "Hono", "Cloudflare Workers", "D1", "HTMX", "Tailwind CSS"],
     image: "/images/projects/frugal.webp",
   },
@@ -162,7 +162,7 @@ export const experience: Role[] = [
     period: "Feb–May 2025",
     title: "Web Developer (internship)",
     org: "Enveng Group",
-    body: "Built features for a Django compliance application: backend logic, user roles and documentation workflows, in a fast-moving team working from Docker dev containers.",
+    body: "Built features for a Django compliance application: backend logic, user roles and documentation workflows, working in Docker dev containers.",
     skills: ["Django", "Docker", "Backend development", "Teamwork"],
   },
   {
@@ -170,13 +170,13 @@ export const experience: Role[] = [
     title: "IT Service Desk (internship)",
     org: "Murdoch University",
     href: "/it-help-desk",
-    body: "Tier 1 support on the library's help desk: printing, software installs, connectivity across every kind of device, and account access for students.",
+    body: "Tier 1 support on the library's help desk: printing, software installs, connectivity and account access for students.",
     skills: ["Customer service", "Communication", "Troubleshooting"],
   },
   {
     period: "2021–2025",
     title: "Disability support, warehousing and drilling",
-    body: "Disability support worker running my own small business, forklift and production-line work at Jasol, and a contract on a drill rig at Sahara. Years of turning up, solving problems on the spot and looking after people.",
+    body: "Disability support worker running my own small business, forklift and production-line work at Jasol, and a contract on a drill rig at Sahara.",
     skills: ["Reliability", "Communication", "Problem-solving"],
   },
 ];
