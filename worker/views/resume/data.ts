@@ -25,7 +25,7 @@ export interface EducationEntry {
   title: string;
   /** Italic, after the title, e.g. "(Ongoing)". */
   note?: string;
-  /** Plain, after the title, e.g. " – Class of 2019". */
+  /** Plain, after the title, e.g. ", Class of 2019". */
   suffix?: string;
   /** Plain lines under the title. */
   lines?: string[];
